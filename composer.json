@@ -1,0 +1,25 @@
+{
+  "name": "churchplugins/cp-locations",
+  "type": "wordpress-plugin",
+  "description": "Church locations plugin for multi campus.",
+  "keywords": [],
+  "homepage": "https://churchplugins.com",
+  "authors": [
+    {
+      "name": "Tanner Moushey",
+      "email": "tanner@churchplugins.com",
+      "homepage": "https://churchplugins.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.0",
+    "composer/installers": "*",
+    "wpackio/enqueue": "^3.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "CP_Locations\\": "includes/",
+      "ChurchPlugins\\": "includes/ChurchPlugins/"
+    }
+  }
+}

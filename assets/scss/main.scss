@@ -1,0 +1,76 @@
+
+@import "leaflet/dist/leaflet.css";
+
+#map, #cploc_root {
+	height: 360px;
+}
+
+#cploc_root {
+	.leaflet-container {
+		//height: 500px;
+		padding-bottom: 56.25%;
+	}
+}
+
+.cploc-map {
+	display: flex;
+	flex-flow: row;
+	
+	&--tabs {
+		width: 15em;
+		margin-right: 1rem;
+	}
+	
+	&--map {
+		width: 100%;
+	}
+}
+
+body .cploc-map-tab {
+	display: flex;
+	flex-flow: row;
+	align-items: center;
+	cursor: pointer;
+	
+	&:not(:last-child) {
+		border-bottom: 1px solid;
+		margin-bottom: 1rem;
+		padding-bottom: 1rem;
+	}
+	
+	&--thumb {
+		width: 20rem;
+		max-width: 20%;
+		margin-right: 1rem;
+		
+		div {
+			padding-bottom: 100%;
+			background-size: cover;
+		}
+	}
+
+	&--content {
+		font-size: .875rem;
+		line-height: 1.25;
+	}
+	
+	&--title {
+		font-size: 1.25em;
+		margin: 0;
+	}
+}
+
+body .cploc-map-popup {
+	&--title {
+		font-size: 1.25rem;
+		margin-bottom: .25rem;
+	}
+	
+	&--thumb {
+		margin-bottom: .25rem;
+		
+		img {
+			display: block;
+		}
+	}
+}
