@@ -1,13 +1,10 @@
 
 @import "leaflet/dist/leaflet.css";
 
-#map, #cploc_root {
-	height: 360px;
-}
-
 #cploc_root {
+	min-height: 300px;
+	
 	.leaflet-container {
-		//height: 500px;
 		padding-bottom: 56.25%;
 	}
 }
@@ -15,33 +12,86 @@
 .cploc-map {
 	display: flex;
 	flex-flow: row;
+	position: relative;
+	
+	&--loading {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		text-align: center;
+		padding: 200px;
+		z-index: 77777;
+		background: rgba(255,255,255, .25);
+	}
 	
 	&--tabs {
-		width: 15em;
-		margin-right: 1rem;
+		width: min(20em, 40%);
+		
+		&--search {
+			padding: 1rem;
+			font-size: .85rem;
+		}
+		
+		&--tab {
+			padding: 1rem;
+		}
 	}
 	
 	&--map {
+		position: relative;
 		width: 100%;
+	}
+	
+	.searchInput__root {
+		z-index: 5555;
+		position: absolute;
+		left: 40px;
+		top: 40px;
+		box-shadow: 0 0 8px rgba(0,0,0,.25);
+		background: white;
+		padding: 1em;
+		
+		input {
+			border: none;
+			outline: none;
+			box-shadow: none;
+			background: transparent;
+			padding: 0;
+			margin-left: .5em;
+		}
+	}
+	
+	.leaflet-control-zoom {
+		border: none;
+		display: flex;
+		margin-left: 40px;
+		margin-bottom: 40px;
+		
+		a {
+			text-decoration: none;
+			border: none;
+			border-radius: 100% !important;
+			margin-right: 10px;
+			box-shadow: 0 0 8px rgba(0,0,0,.25);
+		}
 	}
 }
 
 body .cploc-map-tab {
 	display: flex;
 	flex-flow: row;
-	align-items: center;
 	cursor: pointer;
 	
 	&:not(:last-child) {
-		border-bottom: 1px solid;
-		margin-bottom: 1rem;
-		padding-bottom: 1rem;
+		border-bottom: 1px solid rgba(0, 0, 0, .1);
 	}
 	
 	&--thumb {
 		width: 20rem;
-		max-width: 20%;
+		max-width: 30%;
 		margin-right: 1rem;
+		border-radius: 3px;
+		overflow: hidden;
 		
 		div {
 			padding-bottom: 100%;
@@ -50,6 +100,7 @@ body .cploc-map-tab {
 	}
 
 	&--content {
+		padding-top: 1em;
 		font-size: .875rem;
 		line-height: 1.25;
 	}

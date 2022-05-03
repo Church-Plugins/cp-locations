@@ -11,7 +11,7 @@ export default function SearchInput({
   return (
     <InputBase
       className="searchInput__root"
-      placeholder="Zip Code"
+      placeholder="Enter your zip code"
       defaultValue={urlParams.get('s')}
       startAdornment={<Search />}
       inputProps={{pattern: '[0-9]{5}', maxLength: '5'}}

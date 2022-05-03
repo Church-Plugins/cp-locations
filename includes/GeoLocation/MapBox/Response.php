@@ -45,6 +45,11 @@ class Response extends ResponseJSON {
 			}
 		}
 		
+		// if searching for a postcode, the code is not returned in the context
+		if ( false !== strpos( $feature->id, 'postcode' ) ) {
+			$data['attr']['postcode'] = $feature->text;
+		}
+		
 		return $data;
 	}
 }
