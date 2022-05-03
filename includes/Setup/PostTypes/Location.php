@@ -72,6 +72,7 @@ class Location extends PostType {
 	public function get_args() {
 		$args               = parent::get_args();
 		$args['menu_icon']  = apply_filters( "{$this->post_type}_icon", 'dashicons-location' );
+		$args['has_archive'] = false;
 		$args['supports'][] = 'page-attributes';
 		
 		return $args;

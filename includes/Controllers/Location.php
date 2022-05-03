@@ -66,7 +66,7 @@ class Location {
 			$request_url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' . urlencode( $this->address ) . '.json';
 			$request_url = add_query_arg( [
 				'types'        => 'address',
-				'access_token' => 'pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaTkwdWcwcm9yM2NueGRhdmR3M3Y1In0.Su6h_mXCh6WfLO4aJ5uMFg',
+				'access_token' => cp_locations()->get_api_key(),
 				'limit'        => 1,
 			], $request_url );
 			$response    = wp_remote_get( $request_url );

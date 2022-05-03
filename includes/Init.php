@@ -25,6 +25,11 @@ class Init {
 	 */
 	public $api;
 
+	/**
+	 * @var 
+	 */
+	public $geoAPI;
+	
 	public $enqueue;
 
 	/**
@@ -176,6 +181,7 @@ class Init {
 		require_once( 'Templates.php' );
 		Admin\Init::get_instance();
 		$this->setup = Setup\Init::get_instance();
+		$this->geoAPI = new GeoLocation\MapBox\MapBox();
 		API\Init::get_instance();
 	}
 
@@ -294,6 +300,18 @@ class Init {
 	 */
 	public function get_api_namespace() {
 		return $this->get_id() . '/v1';
+	}
+
+	/**
+	 * Get the key for the geo api
+	 * 
+	 * @return string
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function get_api_key() {
+		return 'pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaTkwdWcwcm9yM2NueGRhdmR3M3Y1In0.Su6h_mXCh6WfLO4aJ5uMFg';
 	}
 
 }
