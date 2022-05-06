@@ -124,12 +124,27 @@ body .cploc-map-tab {
 }
 
 .cploc-list {
+	
+	&--meta {
+		padding: 1rem 0;
+		font-size: .85rem;
+		
+		> * {
+			margin-right: 1rem;
+		}
+	}
+	
 	&--items {
 		display: grid;
 		grid-template-columns: repeat( auto-fit, minmax(220px, max-content) );
 		margin: auto;
 		justify-content: center;
 		gap: 2rem;
+	}
+	
+	&--item {
+		padding: 2rem;
+		background: #eee;
 	}
 }
 body .cploc-map-popup {

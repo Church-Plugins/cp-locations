@@ -63,6 +63,10 @@ const App = () => {
 		markerRef.current[index].openPopup();
 	}
 	
+	const closePopups = () => {
+		locations.map((location, index) => ( markerRef.current[index].closePopup() ));
+	}
+	
 	const handleSearchInputChange = debounce((value) => {
 		
 		if ( 5 !== value.length ) {
@@ -160,7 +164,7 @@ const App = () => {
 					<div className="cploc-map--tabs">
 						
 						<div className="cploc-map--tabs--mode">
-							<span className="cploc--mode-switch" onClick={() => setMode('list')}>Hide map</span>
+							<span className="cploc--mode-switch" onClick={() => { closePopups(); setMode('list') }}>Hide map</span>
 						</div>
 						
 						{userGeo && (
@@ -213,13 +217,16 @@ const App = () => {
 		        <SearchInput onValueChange={handleSearchInputChange} className="cploc-map--search" />
 	        </div>
 
-					<span className="cploc--mode-switch" onClick={() => setMode('map')}>Show map</span>
-
+					<div className="cploc-list--meta">
 						{userGeo && (
-							<div className="cploc-list--search">
+							<span className="cploc-list--search">
 								{locations.length ? (<span>Showing results for</span>) : (<span>No results found for</span>)} '{userGeo.attr.postcode}'
-							</div>
+							</span>
 						)}
+
+						<span className="cploc--mode-switch" onClick={() => setMode('map')}>View on Map</span>
+					</div>
+
 					
 					<div className="cploc-list--items" >
 						{locations.map((location, index) => (
