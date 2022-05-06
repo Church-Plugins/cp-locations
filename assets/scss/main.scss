@@ -9,9 +9,11 @@
 	}
 }
 
-.cploc-map {
-	display: flex;
-	flex-flow: row;
+.cploc--mode-switch {
+	cursor: pointer;
+}
+
+.cploc-container {
 	position: relative;
 	
 	&--loading {
@@ -22,12 +24,34 @@
 		padding: 200px;
 		z-index: 77777;
 		background: rgba(255,255,255, .25);
+	}	
+	
+	.searchInput__root {
+		box-shadow: 0 0 8px rgba(0,0,0,.25);
+		background: white;
+		padding: 1em;
+		
+		input {
+			border: none;
+			outline: none;
+			box-shadow: none;
+			background: transparent;
+			padding: 0;
+			margin-left: .5em;
+		}
 	}
+		
+}
+
+.cploc-map {
+	display: flex;
+	flex-flow: row;
+	position: relative;
 	
 	&--tabs {
 		width: min(20em, 40%);
 		
-		&--search {
+		&--search, .cploc--mode-switch {
 			padding: 1rem;
 			font-size: .85rem;
 		}
@@ -47,18 +71,6 @@
 		position: absolute;
 		left: 40px;
 		top: 40px;
-		box-shadow: 0 0 8px rgba(0,0,0,.25);
-		background: white;
-		padding: 1em;
-		
-		input {
-			border: none;
-			outline: none;
-			box-shadow: none;
-			background: transparent;
-			padding: 0;
-			margin-left: .5em;
-		}
 	}
 	
 	.leaflet-control-zoom {
@@ -111,6 +123,15 @@ body .cploc-map-tab {
 	}
 }
 
+.cploc-list {
+	&--items {
+		display: grid;
+		grid-template-columns: repeat( auto-fit, minmax(220px, max-content) );
+		margin: auto;
+		justify-content: center;
+		gap: 2rem;
+	}
+}
 body .cploc-map-popup {
 	&--title {
 		font-size: 1.25rem;
