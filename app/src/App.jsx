@@ -1,9 +1,12 @@
 import { useRef, createRef, useEffect, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, useMap, latLngBounds, ZoomControl } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer, Tooltip,useMap, latLngBounds, ZoomControl } from 'react-leaflet';
 import Controllers_WP_REST_Request from './Controllers/WP_REST_Request';
 import debounce from '@mui/utils/debounce';
 import SearchInput from './Elements/SearchInput';
 import CircularProgress from '@mui/material/CircularProgress';
+import { CupertinoPane } from 'cupertino-pane';
+import { MyLocation, LocationSearching, LocationDisabled } from '@mui/icons-material';
+import Toast from '../../includes/ChurchPlugins/assets/js/toast';
 
 import { distance, point } from "turf";
 import L from "leaflet";
@@ -67,6 +70,19 @@ const App = () => {
 		locations.map((location, index) => ( markerRef.current[index].closePopup() ));
 	}
 	
+	const getMyLocation = () => {
+		navigator.geolocation.getCurrentPosition((position) => {
+			setUserGeo( {
+				attr : { postcode : 'current location' },
+				center : [ position.coords.latitude, position.coords.longitude ],
+			} );
+			console.log('Latitude is :', position.coords.latitude);
+			console.log('Longitude is :', position.coords.longitude);
+		}, () => {
+			Toast.error( 'Location sharing is disabled in your browser.' );
+		} );
+	}
+	
 	const handleSearchInputChange = debounce((value) => {
 		
 		if ( 5 !== value.length ) {
@@ -107,6 +123,19 @@ const App = () => {
 				}
 			}
 		)();
+	}, [] );
+	
+	useEffect( () => {
+		return;
+		const locationPane = new CupertinoPane( '.cploc-map--tabs', {
+			parentElement: '.cploc-map--map',
+			breaks: {
+				middle : { enabled: true, height: 300, bounce: true },
+				bottom: { enabled: true, height: 80 }
+			}
+		} );
+		
+		locationPane.present({animate: true}).then();
 	}, [] );
 	
 	useEffect( () => {
@@ -186,7 +215,10 @@ const App = () => {
 						))}
 					</div>
 					<div className="cploc-map--map">
-		        <SearchInput onValueChange={handleSearchInputChange} className="cploc-map--search" />
+						<div className="cploc-map--controls">
+							<SearchInput onValueChange={handleSearchInputChange} className="cploc-map--search" />
+							<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation /></button>
+						</div>
 	
 						<MapContainer scrollWheelZoom={false} zoomControl={false}>
 							<TileLayer
@@ -202,6 +234,7 @@ const App = () => {
 							
 							{locations.map((location, index) => (
 								<Marker ref={(el) => (markerRef.current[index] = el)} key={index} position={location.geodata.center}>
+									<Tooltip direction="center" permanent={true}>{location.title}</Tooltip>
 									<Popup><div dangerouslySetInnerHTML={{__html: location.templates.popup }} /></Popup>
 								</Marker>	
 							))}

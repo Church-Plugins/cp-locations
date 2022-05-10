@@ -21,6 +21,7 @@
     "@mui/styles": "^5.0.1",
     "@wpackio/entrypoint": "^6.4.0",
     "axios": "^0.21.4",
+    "cupertino-pane": "^1.2.82",
     "leaflet": "^1.7.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
