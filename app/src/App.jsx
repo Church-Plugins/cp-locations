@@ -126,8 +126,8 @@ const App = () => {
 	}, [] );
 	
 	useEffect( () => {
-		return;
-		const locationPane = new CupertinoPane( '.cploc-map--tabs', {
+//		return;
+		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: '.cploc-map--map',
 			breaks: {
 				middle : { enabled: true, height: 300, bounce: true },
@@ -190,26 +190,26 @@ const App = () => {
 			
 				<div className="cploc-map" style={mode === 'map' ? {} : { display: 'none' }}>
 					
-					<div className="cploc-map--tabs">
+					<div className="cploc-map--locations">
 						
-						<div className="cploc-map--tabs--mode">
+						<div className="cploc-map--locations--mode">
 							<span className="cploc--mode-switch" onClick={() => { closePopups(); setMode('list') }}>Hide map</span>
 						</div>
 						
 						{userGeo && (
-							<div className="cploc-map--tabs--search">
+							<div className="cploc-map--locations--search">
 								{locations.length ? (<span>Showing results for</span>) : (<span>No results found for</span>)} '{userGeo.attr.postcode}'
 							</div>
 						)}
 	
 						{locations.map((location, index) => (
-							<div className="cploc-map--tabs--tab cploc-map-tab" key={index} onClick={() => onClick(index)}>
-								<div className="cploc-map-tab--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
-								<div className="cploc-map-tab--content">
-									<h3 className="cploc-map-tab--title">{location.title}</h3>
-									<div className="cploc-map-tab--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc + 'mi') && (<span className="cploc-map-tab--distance">({location.distanceDesc})</span>)}</div>
+							<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
+								<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
+								<div className="cploc-map-location--content">
+									<h3 className="cploc-map-location--title">{location.title}</h3>
+									<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc + 'mi') && (<span className="cploc-map-location--distance">({location.distanceDesc})</span>)}</div>
 	
-									<div className="cploc-map-tab--times"></div>
+									<div className="cploc-map-location--times"></div>
 								</div>
 							</div>
 						))}
@@ -234,7 +234,7 @@ const App = () => {
 							
 							{locations.map((location, index) => (
 								<Marker ref={(el) => (markerRef.current[index] = el)} key={index} position={location.geodata.center}>
-									<Tooltip direction="center" permanent={true}>{location.title}</Tooltip>
+									{0 && (<Tooltip direction="center" permanent={true}>{location.title}</Tooltip>)}
 									<Popup><div dangerouslySetInnerHTML={{__html: location.templates.popup }} /></Popup>
 								</Marker>	
 							))}
@@ -242,6 +242,20 @@ const App = () => {
 							<ZoomControl position="bottomleft"  />
 						</MapContainer>
 	
+						<div className="cploc-map--locations-mobile">
+							{locations.map((location, index) => (
+								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
+									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
+									<div className="cploc-map-location--content">
+										<h3 className="cploc-map-location--title">{location.title}</h3>
+										<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc + 'mi') && (<span className="cploc-map-location--distance">({location.distanceDesc})</span>)}</div>
+		
+										<div className="cploc-map-location--times"></div>
+									</div>
+								</div>
+							))}
+						</div>
+						
 					</div>
 				</div>
 		

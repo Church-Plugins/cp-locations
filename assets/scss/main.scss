@@ -1,13 +1,34 @@
 @import "leaflet/dist/leaflet.css";
+@import "../../includes/ChurchPlugins/assets/scss/mixins/breakpoints";
 @import "../../includes/ChurchPlugins/assets/scss/vars";
 @import "../../includes/ChurchPlugins/assets/scss/toast";
 
+
 #cploc_root {
+	--cpl-map-control-gap: min(2vw, 40px);
 	min-height: 300px;
-	
+
 	.leaflet-container {
-		padding-bottom: 56.25%;
+		padding-bottom: 100vh;
+		
+		@include media-breakpoint-up(lg) {
+			padding-bottom: 56.25%;
+		}
 	}
+
+	.cupertino-pane-wrapper {
+		z-index: 5655;
+		width: 100%;
+		.pane {
+			position: absolute;
+			z-index: 5655;
+		}
+
+		@include media-breakpoint-up(lg) {
+			display: none !important;
+		}		
+	}
+	
 }
 
 .cploc--mode-switch {
@@ -16,7 +37,7 @@
 
 .cploc-container {
 	position: relative;
-	
+
 	&--loading {
 		width: 100%;
 		height: 100%;
@@ -24,14 +45,14 @@
 		text-align: center;
 		padding: 200px;
 		z-index: 77777;
-		background: rgba(255,255,255, .25);
-	}	
-	
+		background: rgba(255, 255, 255, .25);
+	}
+
 	.searchInput__root {
-		box-shadow: 0 0 8px rgba(0,0,0,.25);
+		box-shadow: var(--cp-box-shadow);
 		background: white;
-		padding: 1em;
-		
+		padding: var(--cp-ui--gap-y);
+
 		input {
 			border: none;
 			outline: none;
@@ -41,82 +62,88 @@
 			margin-left: .5em;
 		}
 	}
-		
+
 }
 
 .cploc-map {
 	display: flex;
 	flex-flow: row;
 	position: relative;
-	
-	&--tabs {
+
+	&--locations {
 		width: min(20em, 40%);
+		display: none;
 		
 		&--search, .cploc--mode-switch {
-			padding: 1rem;
-			font-size: .85rem;
+			padding: var(--cp-ui--gap-y);
+			font-size: var(--cp-font-size--sm);
+		}
+
+		&--location {
+			padding: var(--cp-ui--gap-y);
 		}
 		
-		&--tab {
-			padding: 1rem;
-		}
+		@include media-breakpoint-up(lg) {
+			display: block;
+		}				
 	}
-	
+
 	&--map {
 		position: relative;
 		width: 100%;
+		overflow: hidden;
 	}
-	
+
 	&--controls {
 		z-index: 5555;
 		position: absolute;
-		left: 40px;
-		top: 40px;
+		left: var(--cpl-map-control-gap);
+		top: var(--cpl-map-control-gap);
 	}
-	
+
 	.leaflet-control-zoom {
 		border: none;
 		display: flex;
-		margin-left: 40px;
-		margin-bottom: 40px;
-		
+		margin-left: var(--cpl-map-control-gap);
+		margin-bottom: var(--cpl-map-control-gap);
+
 		a {
 			text-decoration: none;
 			border: none;
 			border-radius: 100% !important;
-			margin-right: 10px;
-			box-shadow: 0 0 8px rgba(0,0,0,.25);
+			margin-right: var(--cp-grid--gap);
+			box-shadow: var(--cp-box-shadow);
 		}
 	}
-	
+
 	&--my-location {
-		box-shadow: 0 0 8px rgba(0,0,0,.25);
-		padding: 1em;
+		box-shadow: var(--cp-box-shadow);
+		padding: var(--cp-ui--gap-y);
 		border-radius: 100%;
-		margin-left: 1rem;
-		
+		margin-left: var(--cpl-map-control-gap);
+
 		svg {
 			display: block;
 		}
 	}
 }
 
-body .cploc-map-tab {
+body .cploc-map-location {
 	display: flex;
 	flex-flow: row;
 	cursor: pointer;
-	
+
 	&:not(:last-child) {
 		border-bottom: 1px solid rgba(0, 0, 0, .1);
 	}
-	
+
 	&--thumb {
 		width: 20rem;
 		max-width: 30%;
 		margin-right: 1rem;
 		border-radius: 3px;
 		overflow: hidden;
-		
+
 		div {
 			padding-bottom: 100%;
 			background-size: cover;
@@ -128,7 +155,7 @@ body .cploc-map-tab {
 		font-size: .875rem;
 		line-height: 1.25;
 	}
-	
+
 	&--title {
 		font-size: 1.25em;
 		margin: 0;
@@ -136,16 +163,16 @@ body .cploc-map-tab {
 }
 
 .cploc-list {
-	
+
 	&--meta {
 		padding: 1rem 0;
 		font-size: .85rem;
-		
+
 		> * {
 			margin-right: 1rem;
 		}
 	}
-	
+
 	&--items {
 		display: grid;
 		grid-template-columns: repeat( auto-fit, minmax(220px, max-content) );
@@ -153,21 +180,22 @@ body .cploc-map-tab {
 		justify-content: center;
 		gap: 2rem;
 	}
-	
+
 	&--item {
 		padding: 2rem;
 		background: #eee;
 	}
 }
+
 body .cploc-map-popup {
 	&--title {
 		font-size: 1.25rem;
 		margin-bottom: .25rem;
 	}
-	
+
 	&--thumb {
 		margin-bottom: .25rem;
-		
+
 		img {
 			display: block;
 		}
