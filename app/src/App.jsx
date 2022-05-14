@@ -142,18 +142,23 @@ const App = () => {
 	
 	useEffect( () => {
 //		return;
-		document.body.style.overflow = 'hidden';
-		document.addEventListener('touchstart', (e, x) => {
-			debugger;
+		var blockScroll = false;
+		
+		document.addEventListener('touchstart', (e) => {
 			if ( document.getElementById('cploc-map-pane').contains(e.target) ) {
-				return;
+				blockScroll = true;
 			}
-			
-			document.body.style['touch-action'] = 'auto';
 		} );
 
+		document.addEventListener('touchmove', (e) => {
+			if ( blockScroll ) {
+				e.preventDefault();
+				return false;
+			}	
+		} );
+		
 		document.addEventListener('touchend', (e, x) => {
-			document.body.style['touch-action'] = 'none';
+			blockScroll = false;
 		} );
 
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
