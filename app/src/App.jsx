@@ -149,11 +149,11 @@ const App = () => {
 				return;
 			}
 			
-			document.body.style.overflow = 'scroll';
+			document.body.style['touch-action'] = 'auto';
 		} );
 
 		document.addEventListener('touchend', (e, x) => {
-			setTimeout( () => document.body.style.overflow = 'hidden', 1000 );
+			document.body.style['touch-action'] = 'none';
 		} );
 
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
