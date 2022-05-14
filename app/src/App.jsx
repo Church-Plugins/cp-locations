@@ -59,6 +59,7 @@ const App = () => {
 	const [initLocations, setInitLocations] = useState([]);
 	const [userGeo, setUserGeo] = useState( false );
 	const [mode, setMode] = useState( 'map' );
+	const [mobileMode, setMobileMode] = useState( 'map' );
 	const mapRef = useRef();
 	const searchCenter = [51.505, -0.09];
 	
@@ -140,9 +141,10 @@ const App = () => {
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: '.cploc-map',
 			breaks: {
-				middle : { enabled: true, height: 300, bounce: true },
 				bottom: { enabled: true, height: 80 }
-			}
+			},
+			initialBreak: 'bottom',
+			touchMoveStopPropagation: true
 		} );
 		
 		locationPane.present({animate: true}).then();
@@ -264,6 +266,8 @@ const App = () => {
 									</div>
 								</div>
 							))}
+							
+							<div className="cploc-map--locations--mode"></div>
 						</div>
 						
 					</div>
