@@ -153,7 +153,7 @@ const App = () => {
 		} );
 
 		document.addEventListener('touchend', (e, x) => {
-			document.body.style.overflow = 'hidden';
+			setTimeout( () => document.body.style.overflow = 'hidden', 1000 );
 		} );
 
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
