@@ -143,7 +143,7 @@ const App = () => {
 	useEffect( () => {
 //		return;
 		var blockScroll = false;
-		
+		debugger;
 		document.addEventListener('touchstart', (e) => {
 			if ( document.getElementById('cploc-map-pane').contains(e.target) ) {
 				blockScroll = true;
