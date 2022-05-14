@@ -59,7 +59,7 @@ const App = () => {
 	const [initLocations, setInitLocations] = useState([]);
 	const [userGeo, setUserGeo] = useState( false );
 	const [mode, setMode] = useState( 'map' );
-	const [mobileMode, setMobileMode] = useState( 'map' );
+	const [listPane, setListPane] = useState({} );
 	const mapRef = useRef();
 	const searchCenter = [51.505, -0.09];
 	
@@ -144,10 +144,12 @@ const App = () => {
 				bottom: { enabled: true, height: 80 }
 			},
 			initialBreak: 'bottom',
-			touchMoveStopPropagation: true
+			touchMoveStopPropagation: true,
+			buttonDestroy: false
 		} );
 		
 		locationPane.present({animate: true}).then();
+		setListPane( locationPane );
 	}, [] );
 	
 	useEffect( () => {
@@ -254,7 +256,7 @@ const App = () => {
 							<ZoomControl position="bottomleft"  />
 						</MapContainer>
 	
-						<div className="cploc-map--locations-mobile" onTouchStart={disableScroll} onTouchEnd={enableScroll}>
+						<div className="cploc-map--locations-mobile" onTouchMove={disableScroll} onTouchStart={disableScroll} onTouchEnd={enableScroll}>
 							{locations.map((location, index) => (
 								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
@@ -267,7 +269,7 @@ const App = () => {
 								</div>
 							))}
 							
-							<div className="cploc-map--locations--mode"></div>
+							<div className="cploc-map--locations--mode">Switch Mode</div>
 						</div>
 						
 					</div>
