@@ -143,7 +143,7 @@ const App = () => {
 	useEffect( () => {
 //		return;
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
-			parentElement: '.cploc-map',
+			parentElement: 'body',
 			breaks: {
 				bottom: { enabled: true, height: 80 }
 			},
