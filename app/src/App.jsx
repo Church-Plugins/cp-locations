@@ -137,7 +137,6 @@ const App = () => {
 	useEffect( () => {
 //		return;
 		var blockScroll = false;
-
 		document.addEventListener('touchmove', (e) => {
 			if ( blockScroll ) {
 				e.preventDefault();
@@ -150,9 +149,12 @@ const App = () => {
 		}, { passive: false } );
 
 		document.addEventListener('touchstart', (e) => {
-			if ( document.getElementById('cploc-map-pane').contains(e.target) ) {
-				blockScroll = true;
-//				e.preventDefault();
+			let draggable = document.querySelectorAll('.pane .draggable');
+			for ( let i = 0, len = draggable.length; i < len; i ++ ) {
+				if ( draggable[i] === e.target || draggable[i].contains(e.target) ) {
+					blockScroll = true;
+					e.preventDefault();
+				}
 			}
 		}, { passive: false } );
 		
@@ -165,12 +167,14 @@ const App = () => {
 			touchMoveStopPropagation: true,
 			buttonDestroy: false,
 			fitScreenHeight: false,
+			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ]
 //			onDragStart: () => document.body.style.overflow = 'hidden',
 //			onDragEnd: () => document.body.style.overflow = 'scroll',
 		} );
 		
 		locationPane.present({animate: true}).then();
 		setListPane( locationPane );
+		
 	}, [] );
 	
 	useEffect( () => {
@@ -278,6 +282,9 @@ const App = () => {
 						</MapContainer>
 	
 						<div id="cploc-map-pane" className="cploc-map--locations-mobile" >
+							<div className="cploc-map--locations--header">
+								<h3>6 Locations</h3>
+							</div>
 							{locations.map((location, index) => (
 								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>

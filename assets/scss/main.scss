@@ -38,6 +38,11 @@ body .cupertino-pane-wrapper {
 		position: absolute;
 		z-index: 777777;
 	}
+	
+	.draggable {
+		z-index: 1;
+		height: 60px;
+	}
 
 	@include media-breakpoint-up(lg) {
 		display: none !important;
