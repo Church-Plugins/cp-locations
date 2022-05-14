@@ -143,7 +143,6 @@ const App = () => {
 	useEffect( () => {
 //		return;
 		var blockScroll = false;
-		debugger;
 
 		document.addEventListener('touchmove', (e) => {
 			if ( blockScroll ) {
@@ -164,7 +163,7 @@ const App = () => {
 		}, { passive: false } );
 		
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
-			parentElement: 'body',
+			parentElement: '.cploc-map',
 			breaks: {
 				bottom: { enabled: true, height: 80 }
 			},
