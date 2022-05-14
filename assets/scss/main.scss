@@ -3,6 +3,12 @@
 @import "../../includes/ChurchPlugins/assets/scss/vars";
 @import "../../includes/ChurchPlugins/assets/scss/toast";
 
+.lock-screen {
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+    position: fixed;
+}
 
 #cploc_root {
 	--cpl-map-control-gap: min(2vw, 40px);

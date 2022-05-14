@@ -69,12 +69,12 @@ const App = () => {
 	
 	const disableScroll = () => {
 		console.log('disable scroll');
-		document.body.style.overflowY = "hidden";
+		document.body.classList.add('lock-screen')
 	}
 	
 	const enableScroll = () => {
 		console.log('enable scroll');
-		document.body.style.overflowY = "scroll";
+		document.body.classList.remove('lock-screen')
 	}
 	
 	const closePopups = () => {
