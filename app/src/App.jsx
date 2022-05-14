@@ -144,6 +144,7 @@ const App = () => {
 //		return;
 		document.body.style.overflow = 'hidden';
 		document.addEventListener('touchstart', (e, x) => {
+			debugger;
 			if ( document.getElementById('cploc-map-pane').contains(e.target) ) {
 				return;
 			}
