@@ -67,16 +67,6 @@ const App = () => {
 		markerRef.current[index].openPopup();
 	}
 	
-	const disableScroll = () => {
-		console.log('disable scroll');
-		document.body.style.overflow = 'hidden';
-	}
-	
-	const enableScroll = () => {
-		console.log('enable scroll');
-		document.body.style.overflow = 'scroll';
-	}
-	
 	const closePopups = () => {
 		locations.map((location, index) => ( markerRef.current[index].closePopup() ));
 	}
@@ -137,7 +127,11 @@ const App = () => {
 	}, [] );
 	
 	const switchPaneMode = () => {
-		
+		if (listPane.currentBreak() === 'top') {
+      listPane.moveToBreak('bottom');
+		} else {
+			listPane.moveToBreak('top');
+		}
 	}
 	
 	useEffect( () => {
@@ -158,7 +152,7 @@ const App = () => {
 		document.addEventListener('touchstart', (e) => {
 			if ( document.getElementById('cploc-map-pane').contains(e.target) ) {
 				blockScroll = true;
-				e.preventDefault();
+//				e.preventDefault();
 			}
 		}, { passive: false } );
 		
@@ -283,7 +277,7 @@ const App = () => {
 							<ZoomControl position="bottomleft"  />
 						</MapContainer>
 	
-						<div id="cploc-map-pane" className="cploc-map--locations-mobile" onTouchMove={disableScroll} onTouchStart={disableScroll} onTouchEnd={enableScroll}>
+						<div id="cploc-map-pane" className="cploc-map--locations-mobile" >
 							{locations.map((location, index) => (
 								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
@@ -296,10 +290,12 @@ const App = () => {
 								</div>
 							))}
 							
-							<div className="cploc-map--locations--mode" onClick={switchPaneMode}>Switch Mode</div>
 						</div>
 						
 					</div>
+					
+					<div className="cploc-map--locations--mode" onClick={switchPaneMode}>Switch Mode</div>
+
 				</div>
 			
 				<div className="cploc-list" style={mode === 'list' ? {} : { display: 'none' }}>
