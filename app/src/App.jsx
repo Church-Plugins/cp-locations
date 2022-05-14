@@ -148,11 +148,11 @@ const App = () => {
 				bottom: { enabled: true, height: 80 }
 			},
 			initialBreak: 'bottom',
-			touchMoveStopPropagation: true,
-			buttonDestroy: false,
-			fitScreenHeight: false,
-			onDragStart: () => document.body.style.overflow = 'hidden',
-			onDragEnd: () => document.body.style.overflow = 'scroll',
+//			touchMoveStopPropagation: true,
+//			buttonDestroy: false,
+//			fitScreenHeight: false,
+//			onDragStart: () => document.body.style.overflow = 'hidden',
+//			onDragEnd: () => document.body.style.overflow = 'scroll',
 		} );
 		
 		locationPane.present({animate: true}).then();
