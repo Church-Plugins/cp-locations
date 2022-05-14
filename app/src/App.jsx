@@ -66,6 +66,16 @@ const App = () => {
 		markerRef.current[index].openPopup();
 	}
 	
+	const disableScroll = () => {
+		console.log('disable scroll');
+		document.body.style.overflowY = "hidden";
+	}
+	
+	const enableScroll = () => {
+		console.log('enable scroll');
+		document.body.style.overflowY = "scroll";
+	}
+	
 	const closePopups = () => {
 		locations.map((location, index) => ( markerRef.current[index].closePopup() ));
 	}
@@ -128,7 +138,7 @@ const App = () => {
 	useEffect( () => {
 //		return;
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
-			parentElement: '.cploc-map--map',
+			parentElement: '.cploc-map',
 			breaks: {
 				middle : { enabled: true, height: 300, bounce: true },
 				bottom: { enabled: true, height: 80 }
@@ -220,7 +230,7 @@ const App = () => {
 							<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation /></button>
 						</div>
 	
-						<MapContainer scrollWheelZoom={false} zoomControl={false}>
+						<MapContainer scrollWheelZoom={false} zoomControl={false} dragging={!L.Browser.mobile}>
 							<TileLayer
 								attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 								url="https://api.mapbox.com/styles/v1/mapbox-map-design/ckshxkppe0gge18nz20i0nrwq/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaWEwZ2IwaHpjM2NsZjh4Z2s3MHk2In0.QGwQkxVGACSg4yQnFhmjuw"
@@ -242,7 +252,7 @@ const App = () => {
 							<ZoomControl position="bottomleft"  />
 						</MapContainer>
 	
-						<div className="cploc-map--locations-mobile">
+						<div className="cploc-map--locations-mobile" onTouchStart={disableScroll} onTouchEnd={enableScroll}>
 							{locations.map((location, index) => (
 								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>

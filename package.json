@@ -29,6 +29,7 @@
     "react-leaflet": "^3.2.5",
     "sass": "^1.42.1",
     "turf": "^3.0.14",
-    "url-loader": "^4.1.1"
+    "url-loader": "^4.1.1",
+    "velocity": "^0.7.3"
   }
 }

@@ -17,11 +17,13 @@
 	}
 
 	.cupertino-pane-wrapper {
-		z-index: 5655;
+		z-index: 999999999;
+		margin: auto;
 		width: 100%;
 		.pane {
+			width: min( 500px, 95% );
 			position: absolute;
-			z-index: 5655;
+			z-index: 999999999;
 		}
 
 		@include media-breakpoint-up(lg) {
@@ -69,7 +71,7 @@
 	display: flex;
 	flex-flow: row;
 	position: relative;
-
+	overflow: hidden;
 	&--locations {
 		width: min(20em, 40%);
 		display: none;
