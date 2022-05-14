@@ -117,6 +117,10 @@ const App = () => {
 					const data = await restRequest.get({endpoint: 'locations'});
 					setLocations(JSON.parse(JSON.stringify(data.locations)));
 					setInitLocations( JSON.parse(JSON.stringify(data.locations)) );
+					
+					if ( undefined !== listPane.calcFitHeight ) {
+						listPane.calcFitHeight();
+					}
 				} catch (error) {
 					setError(error);
 				} finally {
@@ -161,7 +165,7 @@ const App = () => {
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: '.cploc-map',
 			breaks: {
-				bottom: { enabled: true, height: 80 },
+				bottom: { enabled: true, height: document.querySelector('.cploc-map--locations--header').offsetHeight + 15 },
 				middle: { enabled: false }
 			},
 			initialBreak: 'bottom',
