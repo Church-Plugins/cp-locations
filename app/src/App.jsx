@@ -69,12 +69,12 @@ const App = () => {
 	
 	const disableScroll = () => {
 		console.log('disable scroll');
-		document.body.classList.add('lock-screen')
+		document.body.style.overflow = 'hidden';
 	}
 	
 	const enableScroll = () => {
 		console.log('enable scroll');
-		document.body.classList.remove('lock-screen')
+		document.body.style.overflow = 'scroll';
 	}
 	
 	const closePopups = () => {
@@ -135,6 +135,10 @@ const App = () => {
 			}
 		)();
 	}, [] );
+	
+	const switchPaneMode = () => {
+		
+	}
 	
 	useEffect( () => {
 //		return;
@@ -269,12 +273,12 @@ const App = () => {
 								</div>
 							))}
 							
-							<div className="cploc-map--locations--mode">Switch Mode</div>
+							<div className="cploc-map--locations--mode" onClick={switchPaneMode}>Switch Mode</div>
 						</div>
 						
 					</div>
 				</div>
-		
+			
 				<div className="cploc-list" style={mode === 'list' ? {} : { display: 'none' }}>
 	        <div>
 		        <SearchInput onValueChange={handleSearchInputChange} className="cploc-map--search" />
