@@ -69,12 +69,12 @@ const App = () => {
 	
 	const disableScroll = () => {
 		console.log('disable scroll');
-		document.body.style.overflow = 'hidden';
+//		document.body.style.overflow = 'hidden';
 	}
 	
 	const enableScroll = () => {
 		console.log('enable scroll');
-		document.body.style.overflow = 'scroll';
+//		document.body.style.overflow = 'scroll';
 	}
 	
 	const closePopups = () => {
@@ -149,7 +149,9 @@ const App = () => {
 			},
 			initialBreak: 'bottom',
 			touchMoveStopPropagation: true,
-			buttonDestroy: false
+			buttonDestroy: false,
+			onDrag: () => document.body.style.overflow = 'hidden',
+			onDragEnd: () => document.body.style.overflow = 'scroll',
 		} );
 		
 		locationPane.present({animate: true}).then();
