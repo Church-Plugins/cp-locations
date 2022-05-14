@@ -155,7 +155,7 @@ const App = () => {
 				e.preventDefault();
 				return false;
 			}	
-		} );
+		}, { passive: false } );
 		
 		document.addEventListener('touchend', (e, x) => {
 			blockScroll = false;
