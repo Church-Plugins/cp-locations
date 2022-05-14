@@ -24,25 +24,25 @@
 	
 }
 
-//body .cupertino-pane-wrapper {
-//	z-index: 999999999;
+body .cupertino-pane-wrapper {
+	z-index: 999999999;
 //	width: 100%;
 //	height: 100%;
 //
-//	.pane {
+	.pane {
 //		border-top-right-radius: var(--cp-border-radius);
 //		border-top-left-radius: var(--cp-border-radius);
 //		box-shadow: var(--cp-box-shadow);
 //		height: 100%;
 //		width: min(500px, 100%);
 //		//position: absolute;
-//		z-index: 999999999;
-//	}
+		z-index: 999999999;
+	}
 //
-//	@include media-breakpoint-up(lg) {
-//		display: none !important;
-//	}
-//}
+	@include media-breakpoint-up(lg) {
+		display: none !important;
+	}
+}
 	
 
 .cploc--mode-switch {
