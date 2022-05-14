@@ -144,11 +144,6 @@ const App = () => {
 //		return;
 		var blockScroll = false;
 		debugger;
-		document.addEventListener('touchstart', (e) => {
-			if ( document.getElementById('cploc-map-pane').contains(e.target) ) {
-				blockScroll = true;
-			}
-		} );
 
 		document.addEventListener('touchmove', (e) => {
 			if ( blockScroll ) {
@@ -159,8 +154,15 @@ const App = () => {
 		
 		document.addEventListener('touchend', (e, x) => {
 			blockScroll = false;
-		} );
+		}, { passive: false } );
 
+		document.addEventListener('touchstart', (e) => {
+			if ( document.getElementById('cploc-map-pane').contains(e.target) ) {
+				blockScroll = true;
+				e.preventDefault();
+			}
+		}, { passive: false } );
+		
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: 'body',
 			breaks: {
