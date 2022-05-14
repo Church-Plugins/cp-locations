@@ -161,15 +161,14 @@ const App = () => {
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: '.cploc-map',
 			breaks: {
-				bottom: { enabled: true, height: 80 }
+				bottom: { enabled: true, height: 80 },
+				middle: { enabled: false }
 			},
 			initialBreak: 'bottom',
 			touchMoveStopPropagation: true,
 			buttonDestroy: false,
 			fitScreenHeight: false,
 			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ]
-//			onDragStart: () => document.body.style.overflow = 'hidden',
-//			onDragEnd: () => document.body.style.overflow = 'scroll',
 		} );
 		
 		locationPane.present({animate: true}).then();
