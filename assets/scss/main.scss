@@ -116,6 +116,9 @@ body .cupertino-pane-wrapper {
 		bottom: 20px;
 		right: 20px;
 		background: black;
+		color: white;
+		padding: .25em .5em;
+		border-radius: var(--cp-border-radius-lg);
 	}
 
 	&--map {
