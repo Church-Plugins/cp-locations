@@ -142,6 +142,19 @@ const App = () => {
 	
 	useEffect( () => {
 //		return;
+		document.body.style.overflow = 'hidden';
+		document.addEventListener('touchstart', (e, x) => {
+			if ( document.getElementById('cploc-map-pane').contains(e.target) ) {
+				return;
+			}
+			
+			document.body.style.overflow = 'scroll';
+		} );
+
+		document.addEventListener('touchend', (e, x) => {
+			document.body.style.overflow = 'hidden';
+		} );
+
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: 'body',
 			breaks: {
@@ -263,7 +276,7 @@ const App = () => {
 							<ZoomControl position="bottomleft"  />
 						</MapContainer>
 	
-						<div className="cploc-map--locations-mobile" onTouchMove={disableScroll} onTouchStart={disableScroll} onTouchEnd={enableScroll}>
+						<div id="cploc-map-pane" className="cploc-map--locations-mobile" onTouchMove={disableScroll} onTouchStart={disableScroll} onTouchEnd={enableScroll}>
 							{locations.map((location, index) => (
 								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
