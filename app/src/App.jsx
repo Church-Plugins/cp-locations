@@ -150,7 +150,8 @@ const App = () => {
 			initialBreak: 'bottom',
 			touchMoveStopPropagation: true,
 			buttonDestroy: false,
-			onDrag: () => document.body.style.overflow = 'hidden',
+			fitScreenHeight: false,
+			onDragStart: () => document.body.style.overflow = 'hidden',
 			onDragEnd: () => document.body.style.overflow = 'scroll',
 		} );
 		
