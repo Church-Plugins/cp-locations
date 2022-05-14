@@ -165,8 +165,8 @@ const App = () => {
 			touchMoveStopPropagation: true,
 			buttonDestroy: false,
 			fitScreenHeight: false,
-			onDragStart: () => document.body.style.overflow = 'hidden',
-			onDragEnd: () => document.body.style.overflow = 'scroll',
+//			onDragStart: () => document.body.style.overflow = 'hidden',
+//			onDragEnd: () => document.body.style.overflow = 'scroll',
 		} );
 		
 		locationPane.present({animate: true}).then();
