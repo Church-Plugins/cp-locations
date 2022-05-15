@@ -94,6 +94,14 @@ body .cupertino-pane-wrapper {
 		width: min(20em, 40%);
 		display: none;
 		
+		&--header {
+			padding: var(--cp-ui--gap-y);
+			
+			> * {
+				margin: 0 !important;
+			}
+		}
+		
 		&--search, .cploc--mode-switch {
 			padding: var(--cp-ui--gap-y);
 			font-size: var(--cp-font-size--sm);

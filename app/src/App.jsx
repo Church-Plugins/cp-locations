@@ -168,7 +168,7 @@ const App = () => {
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: '.cploc-map',
 			breaks: {
-				bottom: { enabled: true, height: document.querySelector('.cploc-map--locations--header').offsetHeight + 15 },
+				bottom: { enabled: true, height: document.querySelector('.cploc-map--locations--header').offsetHeight + 45 },
 				middle: { enabled: false }
 			},
 			initialBreak: 'bottom',
@@ -290,7 +290,7 @@ const App = () => {
 	
 						<div id="cploc-map-pane" className="cploc-map--locations-mobile" >
 							<div className="cploc-map--locations--header">
-								<h3>6 Locations</h3>
+								<h3>{locations.length} {1 < locations.length ? (<span>Locations</span>) : (<span>Location</span>)}</h3>
 							</div>
 							{locations.map((location, index) => (
 								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
