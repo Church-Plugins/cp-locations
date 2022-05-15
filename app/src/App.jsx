@@ -60,6 +60,7 @@ const App = () => {
 	const [userGeo, setUserGeo] = useState( false );
 	const [mode, setMode] = useState( 'map' );
 	const [listPane, setListPane] = useState({} );
+	const [listPaneMode, setListPaneMode] = useState('map' );
 	const mapRef = useRef();
 	const searchCenter = [51.505, -0.09];
 	
@@ -133,8 +134,10 @@ const App = () => {
 	const switchPaneMode = () => {
 		if (listPane.currentBreak() === 'top') {
       listPane.moveToBreak('bottom');
+			setListPaneMode('map');
 		} else {
 			listPane.moveToBreak('top');
+			setListPaneMode('list');
 		}
 	}
 	
@@ -172,7 +175,8 @@ const App = () => {
 			touchMoveStopPropagation: true,
 			buttonDestroy: false,
 			fitScreenHeight: false,
-			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ]
+			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ],
+			onDragEnd : () => setListPaneMode( locationPane.currentBreak() === 'bottom' ? 'map' : 'list' ),
 		} );
 		
 		locationPane.present({animate: true}).then();
@@ -293,7 +297,7 @@ const App = () => {
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 									<div className="cploc-map-location--content">
 										<h3 className="cploc-map-location--title">{location.title}</h3>
-										<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc + 'mi') && (<span className="cploc-map-location--distance">({location.distanceDesc})</span>)}</div>
+										<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc) && (<span className="cploc-map-location--distance">({location.distanceDesc}mi)</span>)}</div>
 		
 										<div className="cploc-map-location--times"></div>
 									</div>
@@ -304,7 +308,7 @@ const App = () => {
 						
 					</div>
 					
-					<div className="cploc-map--locations--mode" onClick={switchPaneMode}>Switch Mode</div>
+					<div className="cploc-map--locations--mode" onClick={switchPaneMode}>{'list' === listPaneMode ? (<span>Map View</span>) : (<span>List View</span>) }</div>
 
 				</div>
 			
