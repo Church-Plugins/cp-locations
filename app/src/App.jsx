@@ -45,7 +45,7 @@ function ChangeView ({locations, userGeo}) {
 		features.push( { geodata : { center: userGeo.center } } );
 	}
 	
-	fitBoundsTimeout = setTimeout( () => map.fitBounds(features.map((feature) => feature.geodata.center), {padding: [100, 100]} ), 100 );
+	fitBoundsTimeout = setTimeout( () => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft: [50, 100], paddingBottomRight: [50, 150]} ), 100 );
 	return null;
 }
 
