@@ -1,19 +1,17 @@
-import { useRef, createRef, useEffect, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, Tooltip,useMap, latLngBounds, ZoomControl } from 'react-leaflet';
+import { useEffect, useState } from 'react';
+import { useMap } from 'react-leaflet';
 import Controllers_WP_REST_Request from './Controllers/WP_REST_Request';
 import debounce from '@mui/utils/debounce';
-import SearchInput from './Elements/SearchInput';
 import CircularProgress from '@mui/material/CircularProgress';
-import { CupertinoPane } from 'cupertino-pane';
-import { MyLocation, LocationSearching, LocationDisabled } from '@mui/icons-material';
 import Toast from '../../includes/ChurchPlugins/assets/js/toast';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import DesktopFinder from './Components/DesktopFinder';
+import MobileFinder from './Components/MobileFinder';
 
 import { distance, point } from "turf";
 import L from "leaflet";
 import markerIcon from '../../assets/images/marker-icon.png'; // "leaflet/dist/images/marker-icon.png";
 import markerIconAlt from '../../assets/images/marker-icon-alt.png'; // "leaflet/dist/images/marker-icon.png";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -52,26 +50,13 @@ function ChangeView ({locations, userGeo}) {
 }
 
 const App = () => {
-	let markerRef = useRef([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
 	const [locations, setLocations] = useState([]);
 	const [initLocations, setInitLocations] = useState([]);
 	const [userGeo, setUserGeo] = useState( false );
-	const [mode, setMode] = useState( 'map' );
-	const [listPane, setListPane] = useState({} );
-	const [listPaneMode, setListPaneMode] = useState('map' );
-	const mapRef = useRef();
-	const searchCenter = [51.505, -0.09];
-	
-	const onClick = ( index ) => {
-		markerRef.current[index].openPopup();
-	}
-	
-	const closePopups = () => {
-		locations.map((location, index) => ( markerRef.current[index].closePopup() ));
-	}
-	
+	const isDesktop = useMediaQuery('(min-width:1025px)');
+
 	const getMyLocation = () => {
 		navigator.geolocation.getCurrentPosition((position) => {
 			setUserGeo( {
@@ -118,10 +103,6 @@ const App = () => {
 					const data = await restRequest.get({endpoint: 'locations'});
 					setLocations(JSON.parse(JSON.stringify(data.locations)));
 					setInitLocations( JSON.parse(JSON.stringify(data.locations)) );
-					
-					if ( undefined !== listPane.calcFitHeight ) {
-						listPane.calcFitHeight();
-					}
 				} catch (error) {
 					setError(error);
 				} finally {
@@ -129,59 +110,6 @@ const App = () => {
 				}
 			}
 		)();
-	}, [] );
-	
-	const switchPaneMode = () => {
-		if (listPane.currentBreak() === 'top') {
-      listPane.moveToBreak('bottom');
-			setListPaneMode('map');
-		} else {
-			listPane.moveToBreak('top');
-			setListPaneMode('list');
-		}
-	}
-	
-	useEffect( () => {
-//		return;
-		var blockScroll = false;
-		document.addEventListener('touchmove', (e) => {
-			if ( blockScroll ) {
-				e.preventDefault();
-				return false;
-			}	
-		}, { passive: false } );
-		
-		document.addEventListener('touchend', (e, x) => {
-			blockScroll = false;
-		}, { passive: false } );
-
-		document.addEventListener('touchstart', (e) => {
-			let draggable = document.querySelectorAll('.pane .draggable');
-			for ( let i = 0, len = draggable.length; i < len; i ++ ) {
-				if ( draggable[i] === e.target || draggable[i].contains(e.target) ) {
-					blockScroll = true;
-					e.preventDefault();
-				}
-			}
-		}, { passive: false } );
-		
-		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
-			parentElement: '.cploc-map',
-			breaks: {
-				bottom: { enabled: true, height: document.querySelector('.cploc-map--locations--header').offsetHeight + 45 },
-				middle: { enabled: false }
-			},
-			initialBreak: 'bottom',
-			touchMoveStopPropagation: true,
-			buttonDestroy: false,
-			fitScreenHeight: false,
-			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ],
-			onDragEnd : () => setListPaneMode( locationPane.currentBreak() === 'bottom' ? 'map' : 'list' ),
-		} );
-		
-		locationPane.present({animate: true}).then();
-		setListPane( locationPane );
-		
 	}, [] );
 	
 	useEffect( () => {
@@ -223,122 +151,24 @@ const App = () => {
 		setLocations(data);
 	}, [userGeo])
 	
+	
+
 	return error ? (
 			<pre>{JSON.stringify(error, null, 2)}</pre>
 	) : ( 
-		<div className="cploc-container cploc">
+		<div className="cploc">
 			
 			{loading && (
 				<div className="cploc-container--loading">
 					<CircularProgress/>
 				</div>
 			)}
-			
-				<div className="cploc-map" style={mode === 'map' ? {} : { display: 'none' }}>
-					
-					<div className="cploc-map--locations">
-						
-						<div className="cploc-map--locations--mode">
-							<span className="cploc--mode-switch" onClick={() => { closePopups(); setMode('list') }}>Hide map</span>
-						</div>
-						
-						{userGeo && (
-							<div className="cploc-map--locations--search">
-								{locations.length ? (<span>Showing results for</span>) : (<span>No results found for</span>)} '{userGeo.attr.postcode}'
-							</div>
-						)}
-	
-						{locations.map((location, index) => (
-							<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
-								<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
-								<div className="cploc-map-location--content">
-									<h3 className="cploc-map-location--title">{location.title}</h3>
-									<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc + 'mi') && (<span className="cploc-map-location--distance">({location.distanceDesc})</span>)}</div>
-	
-									<div className="cploc-map-location--times"></div>
-								</div>
-							</div>
-						))}
-					</div>
-					<div className="cploc-map--map">
-						<div className="cploc-map--controls">
-							<SearchInput onValueChange={handleSearchInputChange} className="cploc-map--search" />
-							<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation /></button>
-						</div>
-	
-						<MapContainer scrollWheelZoom={false} zoomControl={false} dragging={!L.Browser.mobile}>
-							<TileLayer
-								attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-								url="https://api.mapbox.com/styles/v1/mapbox-map-design/ckshxkppe0gge18nz20i0nrwq/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaWEwZ2IwaHpjM2NsZjh4Z2s3MHk2In0.QGwQkxVGACSg4yQnFhmjuw"
-							/>
-							
-							<ChangeView locations={locations} userGeo={userGeo} />
-	
-							{userGeo && (
-								<Marker icon={pcIcon} position={userGeo.center} />
-							)}
-							
-							{locations.map((location, index) => (
-								<Marker ref={(el) => (markerRef.current[index] = el)} key={index} position={location.geodata.center}>
-									{0 && (<Tooltip direction="center" permanent={true}>{location.title}</Tooltip>)}
-									<Popup><div dangerouslySetInnerHTML={{__html: location.templates.popup }} /></Popup>
-								</Marker>	
-							))}
-							
-							<ZoomControl position="bottomleft"  />
-						</MapContainer>
-	
-						<div id="cploc-map-pane" className="cploc-map--locations-mobile" >
-							<div className="cploc-map--locations--header">
-								<h3>{locations.length} {1 < locations.length ? (<span>Locations</span>) : (<span>Location</span>)}</h3>
-							</div>
-							{locations.map((location, index) => (
-								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
-									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
-									<div className="cploc-map-location--content">
-										<h3 className="cploc-map-location--title">{location.title}</h3>
-										<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc) && (<span className="cploc-map-location--distance">({location.distanceDesc}mi)</span>)}</div>
-		
-										<div className="cploc-map-location--times"></div>
-									</div>
-								</div>
-							))}
-							
-						</div>
-						
-					</div>
-					
-					<div className="cploc-map--locations--mode" onClick={switchPaneMode}>{'list' === listPaneMode ? (<span>Map View</span>) : (<span>List View</span>) }</div>
 
-				</div>
-			
-				<div className="cploc-list" style={mode === 'list' ? {} : { display: 'none' }}>
-	        <div>
-		        <SearchInput onValueChange={handleSearchInputChange} className="cploc-map--search" />
-	        </div>
-
-					<div className="cploc-list--meta">
-						{userGeo && (
-							<span className="cploc-list--search">
-								{locations.length ? (<span>Showing results for</span>) : (<span>No results found for</span>)} '{userGeo.attr.postcode}'
-							</span>
-						)}
-
-						<span className="cploc--mode-switch" onClick={() => setMode('map')}>View on Map</span>
-					</div>
-
-					
-					<div className="cploc-list--items" >
-						{locations.map((location, index) => (
-							<div className="cploc-list--item" key={index}>
-								<div dangerouslySetInnerHTML={{__html: location.templates.popup }} />
-								{(userGeo && location.distanceDesc + 'mi') && (<div className="cploc-list-item--distance">{location.distanceDesc} miles away</div>)}
-								<div className="cp-button" onClick={() => { setMode('map'); setTimeout(() => onClick(index), 250); }}>View on Map ></div>
-							</div>
-						))}
-					</div>
-					
-				</div>
+			{isDesktop ? (
+				<DesktopFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconUser={pcIcon}/>
+			) : (
+				<MobileFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconUser={pcIcon}/>
+			)}
 			
 		</div>
 	);
