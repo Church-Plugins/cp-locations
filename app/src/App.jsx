@@ -7,6 +7,7 @@ import Toast from '../../includes/ChurchPlugins/assets/js/toast';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import DesktopFinder from './Components/DesktopFinder';
 import MobileFinder from './Components/MobileFinder';
+import { GestureHandling } from 'leaflet-gesture-handling';
 
 import { distance, point } from "turf";
 import L from "leaflet";
@@ -20,6 +21,8 @@ L.Icon.Default.mergeOptions({
 	iconRetinaUrl: undefined,
 	shadowUrl: undefined,
 });
+
+L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
 
 const pcIcon = L.icon({
 	iconUrl: markerIconAlt,

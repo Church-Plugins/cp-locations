@@ -2,6 +2,7 @@
 @import "../../includes/ChurchPlugins/assets/scss/mixins/breakpoints";
 @import "../../includes/ChurchPlugins/assets/scss/vars";
 @import "../../includes/ChurchPlugins/assets/scss/toast";
+@import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
 
 #cploc_root {
 	--cpl-map-control-gap: min(2vw, 40px);
