@@ -29,7 +29,8 @@ const pcIcon = L.icon({
 let fitBoundsTimeout;
 
 function ChangeView ({locations, userGeo}) {
-	
+	const isDesktop = useMediaQuery('(min-width:1025px)');
+
 	if (typeof fitBoundsTimeout === 'number') {
 		clearTimeout(fitBoundsTimeout);
 	}
@@ -45,7 +46,10 @@ function ChangeView ({locations, userGeo}) {
 		features.push( { geodata : { center: userGeo.center } } );
 	}
 	
-	fitBoundsTimeout = setTimeout( () => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft: [50, 100], paddingBottomRight: [50, 150]} ), 100 );
+	const paddingTopLeft = [50,100];
+	const paddingBottomRight = isDesktop ? [50,100] : [50, 150];
+	
+	fitBoundsTimeout = setTimeout( () => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight} ), 100 );
 	return null;
 }
 
