@@ -34,6 +34,11 @@
 		
 	}
 	
+	// disable leaflet gesture 
+	.leaflet-gesture-handling-touch-warning:after {
+		content: none;
+	}
+	
 }
 
 body .cupertino-pane-wrapper {
@@ -128,7 +133,7 @@ body .cupertino-pane-wrapper {
 	
 	&--locations--mode {
 		position: absolute;
-		z-index: 777888;
+		z-index: 777999;
 		bottom: var(--cp-gap--large);
 		right: var(--cp-gap--large);
 		background: black;
@@ -195,7 +200,7 @@ body .cupertino-pane-wrapper {
 		left: 0;
 		bottom: 0;
 		width: 100%;
-		z-index: 5555;
+		z-index: 777888;
 		
 		&--footer {
 			margin: var(--cp-gap--large);

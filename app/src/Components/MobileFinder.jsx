@@ -40,10 +40,8 @@ const MobileFinder = ({
 				listPane.moveToBreak('top');
 				break;
 			case 'map' :
-				listPane.moveToBreak('bottom');
-				break;
 			case 'location' :
-				listPane.hide();
+				listPane.moveToBreak('bottom');
 				break;
 		}
 	}, [mode] );
