@@ -39,6 +39,20 @@
 		content: none;
 	}
 	
+	.leaflet-control-zoom {
+		border: none;
+		display: flex;
+		margin-left: var(--cpl-map-control-gap);
+		margin-bottom: var(--cpl-map-control-gap);
+
+		a {
+			text-decoration: none;
+			border: none;
+			border-radius: 100% !important;
+			margin-right: var(--cp-grid--gap);
+			box-shadow: var(--cp-box-shadow);
+		}
+	}
 }
 
 body .cupertino-pane-wrapper {
@@ -177,21 +191,6 @@ body .cupertino-pane-wrapper {
 		position: absolute;
 		left: var(--cpl-map-control-gap);
 		top: var(--cpl-map-control-gap);
-	}
-
-	.leaflet-control-zoom {
-		border: none;
-		display: flex;
-		margin-left: var(--cpl-map-control-gap);
-		margin-bottom: var(--cpl-map-control-gap);
-
-		a {
-			text-decoration: none;
-			border: none;
-			border-radius: 100% !important;
-			margin-right: var(--cp-grid--gap);
-			box-shadow: var(--cp-box-shadow);
-		}
 	}
 
 	&--my-location {
