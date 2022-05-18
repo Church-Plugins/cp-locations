@@ -97,8 +97,37 @@ body .cupertino-pane-wrapper {
 	}
 	
 	&--mobile {
-		.cploc-map-location--thumb {
-			width: 6rem;
+		
+		.cploc-map {
+			&--locations--mode {
+				position: absolute;
+				z-index: 777999;
+				bottom: var(--cp-gap--large);
+				right: var(--cp-gap--large);
+				background: black;
+				color: white;
+				padding: var(--cp-ui--gap-y);
+				border-radius: var(--cp-border-radius-round);
+				box-shadow: var(--cp-box-shadow);
+				line-height: 1;
+				
+				.material-icons {
+					line-height: .75;
+					margin-right: .5rem;
+				}
+				
+				> span {
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+				}
+			}			
+		}
+
+		.cploc-map-location {
+			&--thumb {
+				width: 6rem;
+			}
 		}
 	}
 
@@ -135,30 +164,6 @@ body .cupertino-pane-wrapper {
 			display: block;
 		}			
 		
-	}
-	
-	&--locations--mode {
-		position: absolute;
-		z-index: 777999;
-		bottom: var(--cp-gap--large);
-		right: var(--cp-gap--large);
-		background: black;
-		color: white;
-		padding: var(--cp-ui--gap-y);
-		border-radius: var(--cp-border-radius-round);
-		box-shadow: var(--cp-box-shadow);
-		line-height: 1;
-		
-		.material-icons {
-			line-height: .75;
-			margin-right: .5rem;
-		}
-		
-		> span {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-		}
 	}
 
 	&--map {
