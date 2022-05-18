@@ -49,9 +49,9 @@ const iconLocationCurrent = L.divIcon({
 
 let fitBoundsTimeout;
 
-function ChangeView ({locations, userGeo}) {
+function ChangeView (locations, userGeo) {
 	const isDesktop = useMediaQuery('(min-width:1025px)');
-
+	console.log( 'change view' );
 	if (typeof fitBoundsTimeout === 'number') {
 		clearTimeout(fitBoundsTimeout);
 	}
@@ -190,7 +190,7 @@ const App = () => {
 			)}
 
 			{isDesktop ? (
-				<DesktopFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconUser={pcIcon}/>
+				<DesktopFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon} initLocations={initLocations}/>
 			) : (
 				<MobileFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon}/>
 			)}

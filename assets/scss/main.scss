@@ -18,7 +18,6 @@
 	}
 	
 	.marker-pin {
-		//background: #f00;
 		
 		.material-icons {
 			font-size: 24px;
@@ -159,6 +158,7 @@ body .cupertino-pane-wrapper {
 		
 		&--header {
 			padding: var(--cp-ui--gap-y);
+			border-bottom: 1px solid rgba(0, 0, 0, .1);
 			
 			> * {
 				margin: 0 !important;
@@ -170,10 +170,6 @@ body .cupertino-pane-wrapper {
 			font-size: var(--cp-font-size--sm);
 		}
 
-		&--location {
-			padding: var(--cp-ui--gap-y);
-		}
-		
 		@include media-breakpoint-up(lg) {
 			display: block;
 		}			
@@ -224,9 +220,16 @@ body .cploc-map-location {
 	display: flex;
 	flex-flow: row;
 	cursor: pointer;
+	border-left: 4px solid transparent;
+	padding: var(--cp-ui--gap-y);
+	margin-top: var(--cp-ui--gap-y);
 
 	&:not(:last-child) {
 		border-bottom: 1px solid rgba(0, 0, 0, .1);
+	}
+	
+	&--active {
+		border-color: var(--cp-color-ui-primary);
 	}
 
 	&--thumb {

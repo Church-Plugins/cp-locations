@@ -1,27 +1,65 @@
-import { useRef, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl } from 'react-leaflet';
+import { useRef, useState, useEffect } from 'react';
+import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl, useMap } from 'react-leaflet';
 import SearchInput from '../Elements/SearchInput';
 import { MyLocation } from '@mui/icons-material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const DesktopFinder = ({
 	userGeo,
 	onSearch,
 	getMyLocation,
 	locations,
-	ChangeView,
+	initLocations,
 	iconLocation,
-	iconUser
+	iconUser,
+	iconLocationCurrent
 }) => {
 	let markerRef = useRef([]);
+	let fitBoundsTimeout;
 	const [mode, setMode] = useState( 'map' );
+	const [currentLocation, setCurrentLocation] = useState( {} );
+	const [activeLocation, setActiveLocation] = useState(-1);
+	const [test, setTest] = useState( 'test' );
+	const [map, setMap] = useState(null);
+	
+	const updateActiveLocation = (location) => {
+		setActiveLocation(location);
+		console.log('test');
+		return null;
+	}
 	
 	const onClick = ( index ) => {
-		markerRef.current[index].openPopup();
+		setTimeout(() => markerRef.current[index].openPopup(), 50);
+		setActiveLocation(index);
 	}
 	
 	const closePopups = () => {
 		locations.map((location, index) => ( markerRef.current[index].closePopup() ));
 	}
+	
+	useEffect( () => {
+		console.log('change view');
+		if (typeof fitBoundsTimeout === 'number') {
+			clearTimeout(fitBoundsTimeout);
+		}
+
+		if (!locations.length) {
+			return null;
+		}
+
+		const features = [...locations];
+
+		if (userGeo) {
+			features.push({geodata: {center: userGeo.center}});
+		}
+
+		const paddingTopLeft = [50, 100];
+		const paddingBottomRight = [50, 100];
+		fitBoundsTimeout = setTimeout(
+			() => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight}),
+			100);
+
+	}, [locations, userGeo])
 	
 	return (
 		<div className="cploc-container cploc-container--desktop">
@@ -29,19 +67,25 @@ const DesktopFinder = ({
 				<div className="cploc-map" style={mode === 'map' ? {} : { display: 'none' }}>
 				
 					<div className="cploc-map--locations">
+
+						{initLocations.length > 0 && (
+							<div className="cploc-map--locations--header">
+								<h2>{initLocations.length} Locations</h2>
+							</div>
+						)}
 						
 						<div className="cploc-map--locations--mode">
 							<span className="cploc--mode-switch" onClick={() => { closePopups(); setMode('list') }}>Hide map</span>
 						</div>
 						
-						{userGeo && (
+						{userGeo !== false && (
 							<div className="cploc-map--locations--search">
 								{locations.length ? (<span>Showing results for</span>) : (<span>No results found for</span>)} '{userGeo.attr.postcode}'
 							</div>
 						)}
 	
 						{locations.map((location, index) => (
-							<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(index)}>
+							<div className={"cploc-map--locations--location cploc-map-location" + ( activeLocation === index ? ' cploc-map-location--active' : '')} key={index} onClick={() => onClick(index)} onMouseOver={() => setActiveLocation(index)}>
 								<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 								<div className="cploc-map-location--content">
 									<h3 className="cploc-map-location--title">{location.title}</h3>
@@ -53,31 +97,48 @@ const DesktopFinder = ({
 						))}
 					</div>
 					<div className="cploc-map--map">
-						<div className="cploc-map--controls">
-							<SearchInput onValueChange={onSearch} className="cploc-map--search" />
-							<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation /></button>
-						</div>
 	
-						<MapContainer scrollWheelZoom={false} zoomControl={false}>
+						<MapContainer whenCreated={setMap} scrollWheelZoom={false} zoomControl={false}>
+							
 							<TileLayer
 								attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 								url="https://api.mapbox.com/styles/v1/mapbox-map-design/ckshxkppe0gge18nz20i0nrwq/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaWEwZ2IwaHpjM2NsZjh4Z2s3MHk2In0.QGwQkxVGACSg4yQnFhmjuw"
 							/>
+
+							<div className="cploc-map--controls">
+								<SearchInput onValueChange={onSearch} className="cploc-map--search"/>
+								<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation/></button>
+							</div>
 							
-							<ChangeView locations={locations} userGeo={userGeo} />
-	
-							{userGeo && (
+							{userGeo !== false && (
 								<Marker icon={iconUser} position={userGeo.center} />
 							)}
 							
 							{locations.map((location, index) => (
-								<Marker ref={(el) => (markerRef.current[index] = el)} key={index} position={location.geodata.center}>
-									{0 && (<Tooltip direction="center" permanent={true}>{location.title}</Tooltip>)}
-									<Popup><div dangerouslySetInnerHTML={{__html: location.templates.popup }} /></Popup>
+								<Marker 
+									ref={(el) => (markerRef.current[index] = el)} 
+									key={index} 
+									position={location.geodata.center}
+									icon={(activeLocation == index) ? iconLocationCurrent : iconLocation }
+									eventHandlers={{
+										click: (e) => {
+											setActiveLocation(index);
+											onClick(index);
+										},
+									}}
+								>
+									<Popup 
+										offset={[0, -15]} autoPanPadding={[50, 100]} 
+//										beforeOpen={() => {debugger;setActiveLocation(location)}} 
+										onClose={() => setActiveLocation(-1)}
+									>
+										<div dangerouslySetInnerHTML={{__html: location.templates.popup }} />
+									</Popup>
 								</Marker>	
 							))}
 							
 							<ZoomControl position="bottomleft"  />
+
 						</MapContainer>
 	
 					</div>
@@ -90,7 +151,7 @@ const DesktopFinder = ({
 	        </div>
 
 					<div className="cploc-list--meta">
-						{userGeo && (
+						{userGeo !== false && (
 							<span className="cploc-list--search">
 								{locations.length ? (<span>Showing results for</span>) : (<span>No results found for</span>)} '{userGeo.attr.postcode}'
 							</span>
@@ -104,7 +165,7 @@ const DesktopFinder = ({
 						{locations.map((location, index) => (
 							<div className="cploc-list--item" key={index}>
 								<div dangerouslySetInnerHTML={{__html: location.templates.popup }} />
-								{(userGeo && location.distanceDesc + 'mi') && (<div className="cploc-list-item--distance">{location.distanceDesc} miles away</div>)}
+								{(userGeo !== false && location.distanceDesc) && (<div className="cploc-list-item--distance">{location.distanceDesc} miles away</div>)}
 								<div className="cp-button" onClick={() => { setMode('map'); setTimeout(() => onClick(index), 250); }}>View on Map ></div>
 							</div>
 						))}
