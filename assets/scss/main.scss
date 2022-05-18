@@ -137,6 +137,17 @@ body .cupertino-pane-wrapper {
 		border-radius: var(--cp-border-radius-round);
 		box-shadow: var(--cp-box-shadow);
 		line-height: 1;
+		
+		.material-icons {
+			line-height: .75;
+			margin-right: .5rem;
+		}
+		
+		> span {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
 	}
 
 	&--map {
