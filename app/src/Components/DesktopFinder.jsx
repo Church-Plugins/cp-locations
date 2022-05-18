@@ -71,7 +71,7 @@ const DesktopFinder = ({
 							)}
 							
 							{locations.map((location, index) => (
-								<Marker ref={(el) => (markerRef.current[index] = el)} key={index} position={location.geodata.center} onClick={(e) => e.preventDefault()}>
+								<Marker ref={(el) => (markerRef.current[index] = el)} key={index} position={location.geodata.center}>
 									{0 && (<Tooltip direction="center" permanent={true}>{location.title}</Tooltip>)}
 									<Popup><div dangerouslySetInnerHTML={{__html: location.templates.popup }} /></Popup>
 								</Marker>	

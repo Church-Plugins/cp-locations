@@ -4,6 +4,7 @@ import SearchInput from '../Elements/SearchInput';
 import { CupertinoPane } from 'cupertino-pane';
 import { MyLocation } from '@mui/icons-material';
 import { GestureHandling } from 'leaflet-gesture-handling';
+import {IconDefault} from 'leaflet/src/layer/marker/Icon.Default';
 
 const MobileFinder = ({
 	userGeo,
@@ -12,21 +13,40 @@ const MobileFinder = ({
 	locations,
 	ChangeView,
 	iconLocation,
-	iconUser
+	iconUser,
+	iconLocationCurrent
 }) => {
-	let markerRef = useRef([]);
 	const [mode, setMode] = useState( 'map' );
 	const [listPane, setListPane] = useState({} );
+	const [currentLocation, setCurrentLocation] = useState( {} );
+	
+	
+	const selectLocation = ( index ) => {
+		setCurrentLocation( locations[ index ] );
+		setMode( 'location' );
+	};
 	
 	const switchPaneMode = () => {
-		if (listPane.currentBreak() === 'top') {
-      listPane.moveToBreak('bottom');
-			setMode('map');
-		} else {
-			listPane.moveToBreak('top');
-			setMode('list');
+		setMode(listPane.currentBreak() === 'top' ? 'map' : 'list' );
+	};
+	
+	useEffect( () => {
+		if ( undefined === listPane.moveToBreak ) {
+			return;
 		}
-	}
+		
+		switch ( mode ) {
+			case 'list' :
+				listPane.moveToBreak('top');
+				break;
+			case 'map' :
+				listPane.moveToBreak('bottom');
+				break;
+			case 'location' :
+				listPane.hide();
+				break;
+		}
+	}, [mode] );
 	
 	useEffect( () => {
 		var blockScroll = false;
@@ -94,9 +114,14 @@ const MobileFinder = ({
 							)}
 							
 							{locations.map((location, index) => (
-								<Marker ref={(el) => (markerRef.current[index] = el)} key={index} position={location.geodata.center}>
-									{0 && (<Tooltip direction="center" permanent={true}>{location.title}</Tooltip>)}
-								</Marker>	
+								<Marker key={index} 
+								        position={location.geodata.center}
+								        icon={('location' === mode && currentLocation == location) ? iconLocationCurrent : iconLocation }
+								        eventHandlers={{
+									        click: (e) => {
+										        selectLocation( index );
+									        },
+								        }}/>
 							))}
 						</MapContainer>
 	
@@ -119,6 +144,29 @@ const MobileFinder = ({
 						</div>
 						
 					</div>
+
+					{'location' === mode && (
+						<div className="cploc-map--locations-current">
+							<div className="cploc-map--locations--location cploc-map-location">
+								<div className="cploc-map-location--thumb">
+									<div style={{backgroundImage: 'url(' + currentLocation.thumb.thumb + ')'}}/>
+								</div>
+								<div className="cploc-map-location--content">
+									<h3 className="cploc-map-location--title">{currentLocation.title}</h3>
+									<div className="cploc-map-location--address">
+										{currentLocation.geodata.attr.place}, {currentLocation.geodata.attr.region} 
+										{(userGeo && currentLocation.distanceDesc) && (
+											<span className="cploc-map-location--distance">({currentLocation.distanceDesc}mi)</span>
+										)}
+									</div>
+								</div>
+							</div>
+							
+							<div className="cploc-map--locations-current--footer">
+								{locations.length} additional {1 < locations.length ? (<span>locations</span>) : (<span>location</span>)} nearby
+							</div>
+						</div>
+					)}
 					
 					<div className="cploc-map--locations--mode" onClick={switchPaneMode}>{'list' === mode ? (<span>Map View</span>) : (<span>List View</span>) }</div>
 

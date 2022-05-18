@@ -8,7 +8,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import DesktopFinder from './Components/DesktopFinder';
 import MobileFinder from './Components/MobileFinder';
 import { GestureHandling } from 'leaflet-gesture-handling';
-
+import {LocationOn, MyLocation} from '@mui/icons-material';
 import { distance, point } from "turf";
 import L from "leaflet";
 import markerIcon from '../../assets/images/marker-icon.png'; // "leaflet/dist/images/marker-icon.png";
@@ -24,10 +24,28 @@ L.Icon.Default.mergeOptions({
 
 L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
 
-const pcIcon = L.icon({
-	iconUrl: markerIconAlt,
-	iconSize: [35, 35],
+const pcIcon = L.divIcon({
+	className : 'custom-div-icon',
+	html      : "<div class='marker-pin marker-pin--person'><i class='material-icons'>person_pin_circle</i></div>",
+	iconSize  : [24, 24],
+	iconAnchor: [12, 24]
 });
+
+const iconLocation = L.divIcon({
+	className : 'custom-div-icon',
+	html      : "<div class='marker-pin  marker-pin--location'><i class='material-icons'>location_on</i></div>",
+	iconSize  : [24, 24],
+	iconAnchor: [12, 24]
+});
+
+const iconLocationCurrent = L.divIcon({
+	className : 'custom-div-icon',
+	html      : "<div class='marker-pin marker-pin--current'><i class='material-icons'>location_on</i></div>",
+	iconSize  : [30, 30],
+	iconAnchor: [15, 30]
+});
+
+
 
 let fitBoundsTimeout;
 
@@ -172,9 +190,9 @@ const App = () => {
 			)}
 
 			{isDesktop ? (
-				<DesktopFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconUser={pcIcon}/>
+				<DesktopFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconUser={pcIcon}/>
 			) : (
-				<MobileFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconUser={pcIcon}/>
+				<MobileFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon}/>
 			)}
 			
 		</div>
