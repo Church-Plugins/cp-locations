@@ -52,6 +52,27 @@
 			box-shadow: var(--cp-box-shadow);
 		}
 	}
+	
+	.leaflet-popup-content-wrapper {
+		padding: 0;
+		border-radius: var(--cp-border-radius-sm);
+		overflow: hidden;
+	}
+	
+	.leaflet-popup-content {
+		margin: 0;
+		padding: var(--cp-ui--gap-x);
+	}
+	
+	.leaflet-popup-close-button {
+		background: black;
+    overflow: hidden;
+    width: auto;
+    height: auto;
+    color: white;
+    padding: calc(var(--cp-ui--gap-y)/2);
+		border-top-right-radius: var(--cp-border-radius-sm);
+	}
 }
 
 body .cupertino-pane-wrapper {
@@ -289,7 +310,7 @@ body .cploc-map-popup {
 	}
 
 	&--thumb {
-		margin-bottom: .25rem;
+		margin: calc(var(--cp-ui--gap-x) * -1) calc(var(--cp-ui--gap-x) * -1) var(--cp-ui--gap-y);
 
 		img {
 			display: block;
