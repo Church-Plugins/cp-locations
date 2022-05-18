@@ -95,6 +95,12 @@ body .cupertino-pane-wrapper {
 			margin-left: .5em;
 		}
 	}
+	
+	&--mobile {
+		.cploc-map-location--thumb {
+			width: 6rem;
+		}
+	}
 
 }
 
