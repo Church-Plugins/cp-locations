@@ -59,7 +59,7 @@ ORDER BY %2$s.order ASC';
 			$speakers = [];
 		}
 
-		return apply_filters( 'cpl_get_all_speakers', $speakers );
+		return apply_filters( 'cpl_get_all_locations', $speakers );
 	}
 
 	public static function get_type_id() {

@@ -1,10 +1,8 @@
-import { useRef, useEffect, useState } from 'react';
-import { MapContainer, Marker, TileLayer, Tooltip,useMap, ZoomControl } from 'react-leaflet';
+import { useEffect, useState } from 'react';
+import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import SearchInput from '../Elements/SearchInput';
 import { CupertinoPane } from 'cupertino-pane';
 import { MyLocation } from '@mui/icons-material';
-import { GestureHandling } from 'leaflet-gesture-handling';
-import {IconDefault} from 'leaflet/src/layer/marker/Icon.Default';
 
 const MobileFinder = ({
 	userGeo,
@@ -165,11 +163,11 @@ const MobileFinder = ({
 							</div>
 						</div>
 					)}
-					
+
 					<div className="cploc-map--locations--mode" onClick={switchPaneMode}>{'list' === mode ? (<span><span className="material-icons">map</span> Map View</span>) : (<span><span className="material-icons">list</span> List View</span>) }</div>
 
 				</div>
-			
+
 		</div>
 	);
 };

@@ -2,7 +2,6 @@ import { useRef, useState, useEffect } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl, useMap } from 'react-leaflet';
 import SearchInput from '../Elements/SearchInput';
 import { MyLocation } from '@mui/icons-material';
-import useMediaQuery from '@mui/material/useMediaQuery';
 
 const DesktopFinder = ({
 	userGeo,
@@ -17,16 +16,8 @@ const DesktopFinder = ({
 	let markerRef = useRef([]);
 	let fitBoundsTimeout;
 	const [mode, setMode] = useState( 'map' );
-	const [currentLocation, setCurrentLocation] = useState( {} );
 	const [activeLocation, setActiveLocation] = useState(-1);
-	const [test, setTest] = useState( 'test' );
 	const [map, setMap] = useState(null);
-	
-	const updateActiveLocation = (location) => {
-		setActiveLocation(location);
-		console.log('test');
-		return null;
-	}
 	
 	const onClick = ( index ) => {
 		setTimeout(() => markerRef.current[index].openPopup(), 50);
@@ -38,7 +29,6 @@ const DesktopFinder = ({
 	}
 	
 	useEffect( () => {
-		console.log('change view');
 		if (typeof fitBoundsTimeout === 'number') {
 			clearTimeout(fitBoundsTimeout);
 		}
@@ -85,7 +75,12 @@ const DesktopFinder = ({
 						)}
 	
 						{locations.map((location, index) => (
-							<div className={"cploc-map--locations--location cploc-map-location" + ( activeLocation === index ? ' cploc-map-location--active' : '')} key={index} onClick={() => onClick(index)} onMouseOver={() => setActiveLocation(index)}>
+							<div className={"cploc-map--locations--location cploc-map-location" + ( activeLocation === index ? ' cploc-map-location--active' : '')} 
+							     key={index} 
+							     onClick={() => onClick(index)} 
+							     onMouseOver={() => setActiveLocation(index)}
+							     onMouseLeave={() => setActiveLocation(-1)}
+							>
 								<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 								<div className="cploc-map-location--content">
 									<h3 className="cploc-map-location--title">{location.title}</h3>
@@ -129,7 +124,6 @@ const DesktopFinder = ({
 								>
 									<Popup 
 										offset={[0, -15]} autoPanPadding={[50, 100]} 
-//										beforeOpen={() => {debugger;setActiveLocation(location)}} 
 										onClose={() => setActiveLocation(-1)}
 									>
 										<div dangerouslySetInnerHTML={{__html: location.templates.popup }} />
