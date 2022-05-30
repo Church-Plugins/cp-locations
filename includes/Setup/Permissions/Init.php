@@ -54,7 +54,12 @@ class Init {
 
 	/** Actions ***************************************************/
 	
-	public static function get_user_locations( $user_id, $with_prefix = false ) {
+	public static function get_user_locations( $user_id = false, $with_prefix = false ) {
+
+		if ( empty( $user_id ) ) {
+			$user_id = get_current_user_id();
+		}
+
 		if ( ! $locations = get_user_meta( $user_id, 'cp_location_permissions', true ) ) {
 			$locations = [];
 		}
