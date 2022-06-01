@@ -53,13 +53,13 @@ ON %1$s.id = %2$s.source_id
 WHERE %2$s.key = "source_type" AND %2$s.source_type_id = %3$d
 ORDER BY %2$s.order ASC';
 
-		$speakers = $wpdb->get_results( $wpdb->prepare( $sql, $instance->table_name, $meta->table_name, $type_id ) );
+		$locations = $wpdb->get_results( $wpdb->prepare( $sql, $instance->table_name, $meta->table_name, $type_id ) );
 
-		if ( ! $speakers ) {
-			$speakers = [];
+		if ( ! $locations ) {
+			$locations = [];
 		}
 
-		return apply_filters( 'cpl_get_all_locations', $speakers );
+		return apply_filters( 'cpl_get_all_locations', $locations );
 	}
 
 	public static function get_type_id() {
