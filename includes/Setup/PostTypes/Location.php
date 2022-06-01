@@ -159,5 +159,17 @@ class Location extends PostType {
 		] );
 
 	}
+	
+	public function save_post( $post_id ) {
+		$post = get_post();
+		$tax = cp_locations()->setup->taxonomies->location->taxonomy;
+		if ( ! $term = get_term_by( 'slug', 'location_' . $post_id, $tax ) ) {
+			wp_insert_term( $post->post_title, $tax, [ 'slug' => 'location_' . $post_id ] );
+		} else {
+			wp_update_term( $term->term_id, $tax, [ 'name' => $post->post_title, 'slug' => 'location_' . $post_id ] );
+		}
+		
+		return parent::save_post( $post_id );
+	}
 
 }
