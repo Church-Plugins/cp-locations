@@ -77,4 +77,40 @@ class Location extends Taxonomy  {
 		return apply_filters( "{$this->taxonomy}_get_term_data", $locations );
 	}
 
+	/**
+	 * return terms for metabox. Overwriting so we can get slugs instead of Names.
+	 *
+	 * @param $data
+	 * @param $object_id
+	 * @param $data_args
+	 * @param $field
+	 *
+	 * @return array
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function meta_get_override( $data, $object_id, $data_args, $field ) {
+
+		$type = get_post_type( $object_id );
+
+		// break early if this is not our post type
+		if ( ! in_array( $type, $this->get_object_types() ) ) {
+			return $data;
+		}
+
+		if ( $data_args['field_id'] != $this->taxonomy ) {
+			return $data;
+		}
+
+		$terms = wp_get_post_terms( $object_id, $this->taxonomy, [ 'fields' => 'slugs' ] );
+
+		// @todo handle this error better
+		if ( is_wp_error( $terms ) ) {
+			return $data;
+		}
+
+		return $terms;
+	}
+	
 }
