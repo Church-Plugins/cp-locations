@@ -25,6 +25,8 @@ class Location extends Taxonomy  {
 
 		$this->single_label = apply_filters( "{$this->taxonomy}_single_label", 'Location' );
 		$this->plural_label = apply_filters( "{$this->taxonomy}_plural_label", 'Locations' );
+		
+		$this->field_type = 'multicheck';
 
 		parent::__construct();
 	}
