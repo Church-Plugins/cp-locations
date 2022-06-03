@@ -10,9 +10,13 @@
  * Domain Path: languages
  */
 
+if ( ! class_exists( 'ChurchPlugins' ) ) {
+	require_once( CP_LOCATIONS_PLUGIN_DIR . "/includes/ChurchPlugins/init.php" );
+}
+
 require_once( dirname( __FILE__ ) . "/includes/Constants.php" );
-require_once( CP_LOCATIONS_PLUGIN_DIR . "/includes/ChurchPlugins/init.php" );
 require_once( CP_LOCATIONS_PLUGIN_DIR . 'vendor/autoload.php' );
+
 
 use CP_Locations\Init as Init;
 
