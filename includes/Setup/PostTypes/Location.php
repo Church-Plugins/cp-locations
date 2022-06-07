@@ -47,7 +47,7 @@ class Location extends PostType {
 	 * @author Tanner Moushey
 	 */
 	public function location_meta_keys( $keys ) {
-		$keys[] = 'address';
+//		$keys[] = 'address';
 		return $keys;
 	}
 
