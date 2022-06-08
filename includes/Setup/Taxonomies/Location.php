@@ -1,7 +1,6 @@
 <?php
 namespace CP_Locations\Setup\Taxonomies;
 
-use CP_Library\Templates;
 use ChurchPlugins\Setup\Taxonomies\Taxonomy;
 
 // Exit if accessed directly
@@ -27,7 +26,12 @@ class Location extends Taxonomy  {
 	 * 
 	 * @var bool 
 	 */
-	protected static $_request_uri = false;	
+	protected static $_request_uri = false;
+
+	/**
+	 * @var array 
+	 */
+	protected static $_locations_regex = false;
 
 	/**
 	 * Child class constructor. Punts to the parent.
@@ -171,18 +175,40 @@ class Location extends Taxonomy  {
 		parent::add_actions();
 	}
 
+	public function locations_regex() {
+		if ( false === self::$_locations_regex ) {
+			$locations = \CP_Locations\Models\Location::get_all_locations( true );
+			self::$_locations_regex = implode( '|', wp_list_pluck( $locations, 'post_name' ) ); 
+		}
+		
+		return self::$_locations_regex;
+	}
+	
 	public function parse_location_request() {
+		
+		$locations_regex = $this->locations_regex();
+		
+		if ( empty( $locations_regex ) ) {
+			return true;
+		}
+		
 		self::$_request_uri = $_SERVER['REQUEST_URI'];
 		
-		list( $req_uri ) = explode( '?', $_SERVER['REQUEST_URI'] );
+		list( $req_uri, $query_params ) = explode( '?', $_SERVER['REQUEST_URI'] );
 		
 		$pathinfo         = isset( $_SERVER['PATH_INFO'] ) ? $_SERVER['PATH_INFO'] : '';
 		list( $pathinfo ) = explode( '?', $pathinfo );
 		$pathinfo         = str_replace( '%', '%25', $pathinfo );
 		
 		$req_uri = str_replace( $pathinfo, '', $req_uri );
-		$req_uri = trim( $req_uri, '/' );
-		$match = $this->get_slug() . "/([^/]+)(.*)$";
+		$req_uri = trailingslashit( trim( $req_uri, '/' ) );
+		$slug    = trim( cp_locations()->setup->post_types->locations->get_slug(), '/' );
+		
+		if ( $slug ) {
+			$slug = trailingslashit( $slug );
+		}
+		
+		$match = $slug . "($locations_regex)\/(.*)$";
 		
 		if ( preg_match( "#^$match#", $req_uri, $matches ) ||
 		     preg_match( "#^$match#", urldecode( $req_uri ), $matches ) ) {
@@ -192,21 +218,36 @@ class Location extends Taxonomy  {
 				self::$_rewrite_location = [
 					'ID' => $location->ID,
 					'term' => 'location_' . $location->ID,
-					'path' => '/' . $this->get_slug() . '/' . $matches[1],
+					'path' => '/' . $slug . $matches[1],
 				];
 				
-				if ( ! empty( $matches[2] ) ) {
+				// BB passes a page_id and expects the match to be empty
+				if ( ! empty( $matches[2] ) || isset( $_GET['fl_builder']) ) {
 					$_SERVER['REQUEST_URI'] = $matches[2];
+					
+					if ( $query_params ) {
+						$_SERVER['REQUEST_URI'] .= '?' . $query_params;
+					}
 				}
 			}
 			
 			// add filters to customize for this location
 			add_action( 'parse_request', [ $this, 'add_location_to_main_query' ] );
 			add_action( 'pre_get_posts', [ $this, 'maybe_add_location_to_query' ] );
-			add_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );			
+			add_filter( 'body_class', [ $this, 'start_home_url' ] );
+			add_filter( 'wp_footer', [ $this, 'stop_home_url' ] );
 		}
 		
 		return true;
+	}
+	
+	public function start_home_url( $classes ) {
+		add_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );
+		return $classes;
+	}
+	
+	public function stop_home_url() {
+		remove_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );			
 	}
 
 	/**
@@ -227,7 +268,9 @@ class Location extends Taxonomy  {
 		}
 		
 		// reset REQUEST_URI
-		$_SERVER['REQUEST_URI'] = self::$_request_uri;
+		if ( empty( $_GET['fl_builder'] ) ) {
+			$_SERVER['REQUEST_URI'] = self::$_request_uri;
+		}
 
 		$query->query_vars[ $this->taxonomy . '_id' ] = self::$_rewrite_location['ID'];
 		if ( ! isset( $query->query_vars[ 'post_type' ] ) || in_array( $query->query_vars[ 'post_type' ], $this->get_object_types() ) ) {
@@ -263,10 +306,14 @@ class Location extends Taxonomy  {
 			return $url;
 		}
 		
+		$locations_regex = $this->locations_regex();
+
+		$slug    = trim( cp_locations()->setup->post_types->locations->get_slug(), '/' );
+		
 		// don't rewrite for urls with location already set
-		if ( strpos( $url, $this->get_slug() ) ) {
+		if ( preg_match( "/$slug\/($locations_regex)/", $url ) ) {
 			return $url;
-		}
+		} 
 		
 		$url = str_replace( $path, self::$_rewrite_location['path'] . '/' . $path, $url );
 		$url = str_replace( '//', '/', $url );

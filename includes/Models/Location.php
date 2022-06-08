@@ -39,7 +39,7 @@ class Location extends Source {
 	 *
 	 * @author Tanner Moushey
 	 */
-	public static function get_all_locations() {
+	public static function get_all_locations( $origin = false ) {
 		global $wpdb;
 
 
@@ -58,8 +58,13 @@ ORDER BY %2$s.order ASC';
 		if ( ! $locations ) {
 			$locations = [];
 		}
+		
+		if ( $origin ) {
+			$ids = wp_list_pluck( $locations, 'origin_id' );
+			$locations = get_posts( [ 'post_type' => $instance->post_type, 'post__in' => $ids, 'posts_per_page' => 999 ] );
+		}
 
-		return apply_filters( 'cpl_get_all_locations', $locations );
+		return apply_filters( 'cpl_get_all_locations', $locations, $origin );
 	}
 
 	public static function get_type_id() {
