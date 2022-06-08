@@ -16,7 +16,7 @@ use ChurchPlugins\Setup\PostTypes\PostType;
  * @since 1.0
  */
 class Location extends PostType {
-
+		
 	/**
 	 * Child class constructor. Punts to the parent.
 	 *
@@ -33,6 +33,7 @@ class Location extends PostType {
 
 	public function add_actions() {
 		add_filter( 'cp_source_meta_keys_enum', [ $this, 'location_meta_keys' ] );
+
 		parent::add_actions();
 	}
 
@@ -171,5 +172,5 @@ class Location extends PostType {
 		
 		return parent::save_post( $post_id );
 	}
-
+	
 }
