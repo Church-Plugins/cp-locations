@@ -46,6 +46,22 @@ class Location extends Taxonomy  {
 	}
 
 	/**
+	 * Get the slug for this taxonomy
+	 * 
+	 * @return false|mixed
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function get_slug() {
+		if ( ! $tax = get_taxonomy( $this->taxonomy ) ) {
+			return false;
+		}
+		
+		return $tax->rewrite['slug'];
+	}
+	
+	/**
 	 * Return the object types for this taxonomy
 	 *
 	 * @return array
@@ -150,6 +166,7 @@ class Location extends Taxonomy  {
 		add_filter( 'page_link', [ $this, 'location_permalink' ], 10, 2 );
 		add_filter( 'post_link', [ $this, 'location_permalink' ], 10, 2 );
 		add_filter( 'post_type_link', [ $this, 'location_permalink' ], 10, 2 );
+		add_filter( 'body_class', [ $this, 'body_class' ] );
 		
 		parent::add_actions();
 	}
@@ -165,7 +182,7 @@ class Location extends Taxonomy  {
 		
 		$req_uri = str_replace( $pathinfo, '', $req_uri );
 		$req_uri = trim( $req_uri, '/' );
-		$match = "locations/([^/]+)(.*)$";
+		$match = $this->get_slug() . "/([^/]+)(.*)$";
 		
 		if ( preg_match( "#^$match#", $req_uri, $matches ) ||
 		     preg_match( "#^$match#", urldecode( $req_uri ), $matches ) ) {
@@ -175,7 +192,7 @@ class Location extends Taxonomy  {
 				self::$_rewrite_location = [
 					'ID' => $location->ID,
 					'term' => 'location_' . $location->ID,
-					'path' => '/locations/' . $matches[1],
+					'path' => '/' . $this->get_slug() . '/' . $matches[1],
 				];
 				
 				if ( ! empty( $matches[2] ) ) {
@@ -243,6 +260,11 @@ class Location extends Taxonomy  {
 		
 		// location has already been added to this url
 		if ( strpos( $url, self::$_rewrite_location['path'] ) ) {
+			return $url;
+		}
+		
+		// don't rewrite for urls with location already set
+		if ( strpos( $url, $this->get_slug() ) ) {
 			return $url;
 		}
 		
@@ -388,5 +410,24 @@ class Location extends Taxonomy  {
 		
 		return $where;
 	}
-	
+
+	/**
+	 * Add the location parameter to the body class if it exists
+	 * 
+	 * @param $classes
+	 *
+	 * @return mixed
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function body_class( $classes ) {
+		if ( ! $location_id = get_query_var( 'cp_location_id' ) ) {
+			$classes[] = $this->taxonomy . '-none';
+		} else {
+			$classes[] = $this->taxonomy . '-' . $location_id;
+		}
+		
+		return $classes;
+	}
 }
