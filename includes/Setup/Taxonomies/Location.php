@@ -424,6 +424,7 @@ class Location extends Taxonomy  {
 			}
 		}
 		
+		//@todo need to mimick get_page_by_path
 		$query_vars = $query->query;
 		unset( $query_vars['pagename'] );
 		
@@ -453,7 +454,6 @@ class Location extends Taxonomy  {
 			$query->queried_object_id = $id;
 			$query->queried_object = $posts[0];
 		}
-		
 		
 		return $where;
 	}
