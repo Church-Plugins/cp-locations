@@ -346,7 +346,12 @@ class Location extends Taxonomy  {
 			return $where;
 		}
 		
-		$has_tax = isset( $query->query[ $this->taxonomy ] );
+		// if the queried post has the correct taxonomy, return early
+		if ( $has_tax = isset( $query->query[ $this->taxonomy ] ) ) {
+			if ( has_term( $query->query[ $this->taxonomy ], $this->taxonomy, $query->queried_object_id ) ) {
+				return $where;
+			}
+		}
 		
 		$query_vars = $query->query;
 		unset( $query_vars['pagename'] );
@@ -365,6 +370,11 @@ class Location extends Taxonomy  {
 					break;
 				}
 			}
+		}
+		
+		// don't allow location pages to be accessed without the location permalink
+		if ( ! $has_tax && ! $id ) {
+			$id = -1;
 		}
 		
 		if ( $id ) {
