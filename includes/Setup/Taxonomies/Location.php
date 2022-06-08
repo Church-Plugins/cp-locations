@@ -165,13 +165,12 @@ class Location extends Taxonomy  {
 		
 		$req_uri = str_replace( $pathinfo, '', $req_uri );
 		$req_uri = trim( $req_uri, '/' );
-		$match = "locations/([^/]+)/(.*)$";
+		$match = "locations/([^/]+)(.*)$";
 		
 		if ( preg_match( "#^$match#", $req_uri, $matches ) ||
 		     preg_match( "#^$match#", urldecode( $req_uri ), $matches ) ) {
 			
 			if ( $location = get_page_by_path( $matches[1], OBJECT, cp_locations()->setup->post_types->locations->post_type ) ) {
-				self::$_request_uri = $_SERVER['REQUEST_URI'];
 				
 				self::$_rewrite_location = [
 					'ID' => $location->ID,
@@ -179,14 +178,17 @@ class Location extends Taxonomy  {
 					'path' => '/locations/' . $matches[1],
 				];
 				
-				$_SERVER['REQUEST_URI'] = $matches[2];
+				if ( ! empty( $matches[2] ) ) {
+					$_SERVER['REQUEST_URI'] = $matches[2];
+				}
 			}
 			
+			// add filters to customize for this location
+			add_action( 'parse_request', [ $this, 'add_location_to_main_query' ] );
+			add_action( 'pre_get_posts', [ $this, 'maybe_add_location_to_query' ] );
+			add_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );			
 		}
-
-		add_action( 'parse_request', [ $this, 'add_location_to_main_query' ] );
-		add_action( 'pre_get_posts', [ $this, 'maybe_add_location_to_query' ] );
-		add_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );
+		
 		return true;
 	}
 
