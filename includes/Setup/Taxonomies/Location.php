@@ -413,24 +413,35 @@ class Location extends Taxonomy  {
 	 * @author Tanner Moushey
 	 */
 	public function single_page_with_location( $where, $query ) {
-		if ( empty( $query->query['pagename'] ) || empty( $query->queried_object_id ) ) {
+
+		$query_vars = $query->query;
+		
+		
+		//@todo need to mimick get_page_by_path
+		if ( isset( $query->query['pagename'] ) ) {
+			$query_vars['post_name__in'] = [ $query->query['pagename'] ];
+			unset( $query_vars['pagename'] );
+		} elseif ( isset( $query->query['name'] ) ) {
+			$query_vars['post_name__in'] = [ $query->query['name'] ];
+			unset( $query_vars['name'] );
+		} else {
 			return $where;
 		}
 		
+		$has_tax = isset( $query->query[ $this->taxonomy ] );
+		
+		// if we have the object_id, get the post_type from that
+		if ( ! empty( $query->queried_object_id ) ) {
+			$query_vars['post_type'] = get_post_type( $query->queried_object_id );
+		}
+		
 		// if the queried post has the correct taxonomy, return early
-		if ( $has_tax = isset( $query->query[ $this->taxonomy ] ) ) {
+		if ( ! empty( $query->queried_object_id ) && $has_tax ) {
 			if ( has_term( $query->query[ $this->taxonomy ], $this->taxonomy, $query->queried_object_id ) ) {
 				return $where;
 			}
 		}
 		
-		//@todo need to mimick get_page_by_path
-		$query_vars = $query->query;
-		unset( $query_vars['pagename'] );
-		
-		$query_vars['post_name__in'] = [ $query->query['pagename'] ];
-		$query_vars['post_type'] = get_post_type( $query->queried_object_id );
-
 		$posts = get_posts( $query_vars );
 		$id    = false;
 		if ( $has_tax && ! empty( $posts ) ) {
@@ -449,10 +460,14 @@ class Location extends Taxonomy  {
 			$id = -1;
 		}
 		
-		if ( $id ) {
+		global $wpdb;
+		
+		if ( ! empty( $query->queried_object_id ) ) {
 			$where = str_replace( $query->queried_object_id, $id, $where );
 			$query->queried_object_id = $id;
 			$query->queried_object = $posts[0];
+		} else {
+			$where .= " AND $wpdb->posts.ID = '$id'";
 		}
 		
 		return $where;
