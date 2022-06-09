@@ -6,11 +6,11 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 #cploc_root {
-	--cpl-map-control-gap: min(2vw, 40px);
+	--cpl-map-control-gap: min(2vw, var(--cp-gap--lg));
 	min-height: 300px;
 
 	.leaflet-container {
-		padding-bottom: 56.25%;
+		padding-bottom: max( 80%, 90vh );
 	}
 	
 	.cploc-container--mobile .leaflet-container {
@@ -178,16 +178,17 @@ body .cupertino-pane-wrapper {
 		display: none;
 		
 		&--header {
-			padding: var(--cp-ui--gap-y);
+			padding: var(--cp-gap--sm) var(--cp-gap--md);
 			border-bottom: 1px solid rgba(0, 0, 0, .1);
 			
 			> * {
 				margin: 0 !important;
 			}
 		}
-		
+
 		&--search, .cploc--mode-switch {
-			padding: var(--cp-ui--gap-y);
+			padding: 0 var(--cp-gap--md);
+			margin-bottom: var(--cp-gap--sm);
 			font-size: var(--cp-font-size--sm);
 		}
 
@@ -242,7 +243,7 @@ body .cploc-map-location {
 	flex-flow: row;
 	cursor: pointer;
 	border-left: 4px solid transparent;
-	padding: var(--cp-ui--gap-y);
+	padding: var(--cp-gap--sm) var(--cp-gap--md);
 	margin-top: var(--cp-ui--gap-y);
 
 	&:not(:last-child) {

@@ -20,8 +20,9 @@ const DesktopFinder = ({
 	const [map, setMap] = useState(null);
 	
 	const onClick = ( index ) => {
-		setTimeout(() => markerRef.current[index].openPopup(), 50);
+//		setTimeout(() => markerRef.current[index].openPopup(), 50);
 		setActiveLocation(index);
+		window.location = locations[index].permalink;
 	}
 	
 	const closePopups = () => {
@@ -79,7 +80,6 @@ const DesktopFinder = ({
 							     key={index} 
 							     onClick={() => onClick(index)} 
 							     onMouseOver={() => setActiveLocation(index)}
-							     onMouseLeave={() => setActiveLocation(-1)}
 							>
 								<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 								<div className="cploc-map-location--content">
@@ -116,18 +116,27 @@ const DesktopFinder = ({
 									position={location.geodata.center}
 									icon={(activeLocation == index) ? iconLocationCurrent : iconLocation }
 									eventHandlers={{
-										click: (e) => {
+										mouseover: (e) => {
 											setActiveLocation(index);
-											onClick(index);
 										},
+										click: (e) => {
+											e.preventDefault();
+											onClick(index);
+										}
 									}}
 								>
-									<Popup 
-										offset={[0, -15]} autoPanPadding={[50, 100]} 
-										onClose={() => setActiveLocation(-1)}
-									>
-										<div dangerouslySetInnerHTML={{__html: location.templates.popup }} />
-									</Popup>
+									{activeLocation == index && (
+										<Tooltip direction="bottom" permanent>{location.title}</Tooltip>		
+									) }
+
+									{false && (
+										<Popup 
+											offset={[0, -15]} autoPanPadding={[50, 100]} 
+											onClose={() => setActiveLocation(-1)}
+										>
+											<div dangerouslySetInnerHTML={{__html: location.templates.popup }} />
+										</Popup>
+									)}
 								</Marker>	
 							))}
 							
