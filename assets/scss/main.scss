@@ -10,11 +10,11 @@
 	min-height: 300px;
 
 	.leaflet-container {
-		padding-bottom: max( 80%, 90vh );
+		padding-bottom: min( 80%, calc(100vh - var(--cp-header-height) ) );
 	}
 	
 	.cploc-container--mobile .leaflet-container {
-		padding-bottom: calc(100vh - 70px); // bottom padding minus (80px) header height (70px)
+		padding-bottom: calc(100vh - var(--cp-header-height)); // bottom padding minus (80px) header height (70px)
 	}
 	
 	.marker-pin {
@@ -174,7 +174,7 @@ body .cupertino-pane-wrapper {
 	overflow: hidden;
 	
 	&--locations {
-		width: min(20em, 40%);
+		width: min(25em, 40%);
 		display: none;
 		
 		&--header {
@@ -186,6 +186,17 @@ body .cupertino-pane-wrapper {
 			}
 		}
 
+		&--list {
+			position: absolute;
+			width: 100%;
+			
+			&--cont {
+				height: 100%;
+				position: relative;
+				overflow: scroll;
+			}
+		}
+		
 		&--search, .cploc--mode-switch {
 			padding: 0 var(--cp-gap--md);
 			margin-bottom: var(--cp-gap--sm);
@@ -193,7 +204,8 @@ body .cupertino-pane-wrapper {
 		}
 
 		@include media-breakpoint-up(lg) {
-			display: block;
+			display: flex;
+			flex-flow: column;
 		}			
 		
 	}

@@ -64,32 +64,42 @@ const DesktopFinder = ({
 								<h2>{initLocations.length} Locations</h2>
 							</div>
 						)}
-						
-						<div className="cploc-map--locations--mode">
-							<span className="cploc--mode-switch" onClick={() => { closePopups(); setMode('list') }}>Hide map</span>
-						</div>
-						
-						{userGeo !== false && (
-							<div className="cploc-map--locations--search">
-								{locations.length ? (<span>Showing results for</span>) : (<span>No results found for</span>)} '{userGeo.attr.postcode}'
-							</div>
-						)}
 	
-						{locations.map((location, index) => (
-							<div className={"cploc-map--locations--location cploc-map-location" + ( activeLocation === index ? ' cploc-map-location--active' : '')} 
-							     key={index} 
-							     onClick={() => onClick(index)} 
-							     onMouseOver={() => setActiveLocation(index)}
-							>
-								<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
-								<div className="cploc-map-location--content">
-									<h3 className="cploc-map-location--title">{location.title}</h3>
-									<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc + 'mi') && (<span className="cploc-map-location--distance">({location.distanceDesc})</span>)}</div>
-	
-									<div className="cploc-map-location--times"></div>
+						<div className="cploc-map--locations--list--cont">
+							<div className="cploc-map--locations--list">
+								<div className="cploc-map--locations--mode">
+									<span className="cploc--mode-switch" onClick={() => {
+										closePopups();
+										setMode('list');
+									}}>Hide map</span>
 								</div>
+
+								{userGeo !== false && (
+									<div className="cploc-map--locations--search">
+										{locations.length ? (
+											<span>Showing results for</span>
+										) : (
+											<span>No results found for</span>
+										)} '{userGeo.attr.postcode}'
+									</div>
+								)}
+								{locations.map((location, index) => (
+									<div className={"cploc-map--locations--location cploc-map-location" + ( activeLocation === index ? ' cploc-map-location--active' : '')} 
+									     key={index} 
+									     onClick={() => onClick(index)} 
+									     onMouseOver={() => setActiveLocation(index)}
+									>
+										<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
+										<div className="cploc-map-location--content">
+											<h3 className="cploc-map-location--title">{location.title}</h3>
+											<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc + 'mi') && (<span className="cploc-map-location--distance">({location.distanceDesc})</span>)}</div>
+			
+											<div className="cploc-map-location--times"></div>
+										</div>
+									</div>
+								))}
 							</div>
-						))}
+						</div>
 					</div>
 					<div className="cploc-map--map">
 	
