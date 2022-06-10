@@ -130,7 +130,6 @@ const DesktopFinder = ({
 											setActiveLocation(index);
 										},
 										click: (e) => {
-											e.preventDefault();
 											onClick(index);
 										}
 									}}
