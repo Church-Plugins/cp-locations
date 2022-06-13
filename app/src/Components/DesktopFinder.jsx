@@ -92,7 +92,7 @@ const DesktopFinder = ({
 										<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 										<div className="cploc-map-location--content">
 											<h3 className="cploc-map-location--title">{location.title}</h3>
-											<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc + 'mi') && (<span className="cploc-map-location--distance">({location.distanceDesc})</span>)}</div>
+											<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc) && (<span className="cploc-map-location--distance">({location.distanceDesc} + 'mi')</span>)}</div>
 			
 											<div className="cploc-map-location--times"></div>
 										</div>

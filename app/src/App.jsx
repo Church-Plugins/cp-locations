@@ -192,7 +192,7 @@ const App = () => {
 			{isDesktop ? (
 				<DesktopFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon} initLocations={initLocations}/>
 			) : (
-				<MobileFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon}/>
+				<MobileFinder  userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon} initLocations={initLocations}/>
 			)}
 			
 		</div>

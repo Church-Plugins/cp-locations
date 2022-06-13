@@ -17,7 +17,12 @@ const MobileFinder = ({
 	const [mode, setMode] = useState( 'map' );
 	const [listPane, setListPane] = useState({} );
 	const [currentLocation, setCurrentLocation] = useState( {} );
+	let fitBoundsTimeout;
+	const [map, setMap] = useState(null);
 	
+	const onClick = ( url ) => {
+		window.location = url;
+	}
 	
 	const selectLocation = ( index ) => {
 		setCurrentLocation( locations[ index ] );
@@ -93,6 +98,29 @@ const MobileFinder = ({
 		
 	}, [] );
 	
+	useEffect( () => {
+		if (typeof fitBoundsTimeout === 'number') {
+			clearTimeout(fitBoundsTimeout);
+		}
+
+		if (!locations.length) {
+			return null;
+		}
+
+		const features = [...locations];
+
+		if (userGeo) {
+			features.push({geodata: {center: userGeo.center}});
+		}
+
+		const paddingTopLeft = [50, 100];
+		const paddingBottomRight = [50, 100];
+		fitBoundsTimeout = setTimeout(
+			() => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight}),
+			100);
+
+	}, [locations, userGeo])
+	
 	return ( 
 		<div className="cploc-container cploc-container--mobile">
 			
@@ -104,7 +132,7 @@ const MobileFinder = ({
 							<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation /></button>
 						</div>
 	
-						<MapContainer scrollWheelZoom={false} zoomControl={false} gestureHandling={true}>
+						<MapContainer whenCreated={setMap} scrollWheelZoom={false} zoomControl={false} gestureHandling={true}>
 							<TileLayer
 								attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 								url="https://api.mapbox.com/styles/v1/mapbox-map-design/ckshxkppe0gge18nz20i0nrwq/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaWEwZ2IwaHpjM2NsZjh4Z2s3MHk2In0.QGwQkxVGACSg4yQnFhmjuw"
@@ -133,7 +161,7 @@ const MobileFinder = ({
 								<h2>{locations.length} {1 < locations.length ? (<span>Locations</span>) : (<span>Location</span>)}</h2>
 							</div>
 							{locations.map((location, index) => (
-								<div className="cploc-map--locations--location cploc-map-location" key={index}>
+								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(location.permalink)}>
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 									<div className="cploc-map-location--content">
 										<h3 className="cploc-map-location--title">{location.title}</h3>
@@ -150,27 +178,26 @@ const MobileFinder = ({
 
 					{'location' === mode && (
 						<div className="cploc-map--locations-current">
-							<div className="cploc-map--locations--location cploc-map-location">
+							<div className="cploc-map--locations--location cploc-map-location" onClick={() => onClick(currentLocation.permalink)}>
 								<div className="cploc-map-location--thumb">
 									<div style={{backgroundImage: 'url(' + currentLocation.thumb.thumb + ')'}}/>
 								</div>
 								<div className="cploc-map-location--content">
 									<h3 className="cploc-map-location--title">{currentLocation.title}</h3>
 									<div className="cploc-map-location--address">
-										{currentLocation.geodata.attr.place}, {currentLocation.geodata.attr.region} 
-										{(userGeo && currentLocation.distanceDesc) && (
-											<span className="cploc-map-location--distance">({currentLocation.distanceDesc}mi)</span>
-										)}
+										{currentLocation.geodata.attr.place}, {currentLocation.geodata.attr.region}
+										{(
+										 userGeo && currentLocation.distanceDesc
+										 ) && (
+											 <span className="cploc-map-location--distance">({currentLocation.distanceDesc}mi)</span>
+										 )}
 									</div>
 								</div>
 							</div>
-							
-							<div className="cploc-map--locations-current--footer">
-								{locations.length} additional {1 < locations.length ? (<span>locations</span>) : (<span>location</span>)} nearby
-							</div>
+
 						</div>
 					)}
-
+					
 					<div className="cploc-map--locations--mode" onClick={switchPaneMode}>{'list' === mode ? (<span><span className="material-icons">map</span> Map View</span>) : (<span><span className="material-icons">list</span> List View</span>) }</div>
 
 				</div>
