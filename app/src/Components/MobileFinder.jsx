@@ -67,16 +67,23 @@ const MobileFinder = ({
 			}
 		}, { passive: false } );
 		
+		const bottomOffset = window.innerHeight - document.querySelector('.cploc-map .leaflet-container').offsetHeight;
+		const headerHeight = document.querySelector('.cploc-map--locations--header').offsetHeight + 15;
+		
+//		debugger;
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: '.cploc-map',
 			breaks: {
-				bottom: { enabled: true, height: document.querySelector('.cploc-map--locations--header').offsetHeight + 100 },
+				bottom: { enabled: true, height: headerHeight + bottomOffset },
 				middle: { enabled: false }
 			},
 			initialBreak: 'bottom',
 			touchMoveStopPropagation: true,
 			buttonDestroy: false,
 			fitScreenHeight: false,
+			maxFitHeight: document.querySelector('.cploc-map .leaflet-container').offsetHeight,
+			bottomOffset: 15,
+			topperOverflowOffset: bottomOffset,
 			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ],
 			onDragEnd : () => setMode( locationPane.currentBreak() === 'bottom' ? 'map' : 'list' ),
 		} );
@@ -123,7 +130,7 @@ const MobileFinder = ({
 	
 						<div id="cploc-map-pane" className="cploc-map--locations-mobile" >
 							<div className="cploc-map--locations--header">
-								<h3>{locations.length} {1 < locations.length ? (<span>Locations</span>) : (<span>Location</span>)}</h3>
+								<h2>{locations.length} {1 < locations.length ? (<span>Locations</span>) : (<span>Location</span>)}</h2>
 							</div>
 							{locations.map((location, index) => (
 								<div className="cploc-map--locations--location cploc-map-location" key={index}>
