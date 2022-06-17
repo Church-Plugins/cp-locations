@@ -73,6 +73,16 @@
     padding: calc(var(--cp-ui--gap-y)/2);
 		border-top-right-radius: var(--cp-border-radius-sm);
 	}
+	
+	.leaflet-tooltip {
+		box-shadow: var(--cp-box-shadow);
+		border-radius: var(--cp-border-radius-round);
+		margin-top: 0;
+		
+		&:before {
+			content: none;
+		}
+	}
 }
 
 body .cupertino-pane-wrapper {

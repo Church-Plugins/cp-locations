@@ -15,14 +15,28 @@ const DesktopFinder = ({
 }) => {
 	let markerRef = useRef([]);
 	let fitBoundsTimeout;
+	let activeLocationTimeout;
 	const [mode, setMode] = useState( 'map' );
 	const [activeLocation, setActiveLocation] = useState(-1);
 	const [map, setMap] = useState(null);
 	
 	const onClick = ( index ) => {
-//		setTimeout(() => markerRef.current[index].openPopup(), 50);
+		clearTimeout( activeLocationTimeout );
 		setActiveLocation(index);
 		window.location = locations[index].permalink;
+	}
+	
+	const focusLocation = ( index ) => {
+		if ( activeLocation !== index ) {
+			clearTimeout( activeLocationTimeout );
+			setActiveLocation(index);
+		}
+	}
+	
+	const unsetActiveLocation = () => {
+		if (  undefined === activeLocationTimeout ) {
+			activeLocationTimeout = setTimeout(() => setActiveLocation( -1 ), 2000 );
+		}
 	}
 	
 	const closePopups = () => {
@@ -87,7 +101,8 @@ const DesktopFinder = ({
 									<div className={"cploc-map--locations--location cploc-map-location" + ( activeLocation === index ? ' cploc-map-location--active' : '')} 
 									     key={index} 
 									     onClick={() => onClick(index)} 
-									     onMouseOver={() => setActiveLocation(index)}
+									     onMouseOver={() => focusLocation(index)}
+									     onMouseOut={() => unsetActiveLocation() }
 									>
 										<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 										<div className="cploc-map-location--content">
@@ -127,7 +142,10 @@ const DesktopFinder = ({
 									icon={(activeLocation == index) ? iconLocationCurrent : iconLocation }
 									eventHandlers={{
 										mouseover: (e) => {
-											setActiveLocation(index);
+											focusLocation(index);
+										},
+										mouseout: (e) => {
+											unsetActiveLocation();
 										},
 										click: (e) => {
 											onClick(index);
@@ -135,17 +153,14 @@ const DesktopFinder = ({
 									}}
 								>
 									{activeLocation == index && (
-										<Tooltip direction="bottom" permanent>{location.title}</Tooltip>		
+										<Tooltip 
+											direction="bottom"
+											interactive={true} 
+											onClick={() => onClick(index)}
+											onMouseOut={() => unsetActiveLocation()}
+											permanent>{location.title}</Tooltip>		
 									) }
-
-									{false && (
-										<Popup 
-											offset={[0, -15]} autoPanPadding={[50, 100]} 
-											onClose={() => setActiveLocation(-1)}
-										>
-											<div dangerouslySetInnerHTML={{__html: location.templates.popup }} />
-										</Popup>
-									)}
+									
 								</Marker>	
 							))}
 							
