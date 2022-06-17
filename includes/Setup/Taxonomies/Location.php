@@ -175,6 +175,14 @@ class Location extends Taxonomy  {
 		parent::add_actions();
 	}
 
+	/**
+	 * Build the location regex string
+	 * 
+	 * @return array|bool|string
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
 	public function locations_regex() {
 		if ( false === self::$_locations_regex ) {
 			$locations = \CP_Locations\Models\Location::get_all_locations( true );
@@ -183,7 +191,15 @@ class Location extends Taxonomy  {
 		
 		return self::$_locations_regex;
 	}
-	
+
+	/**
+	 * Parse the request before WordPress to see if this is a location page
+	 * 
+	 * @return bool
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
 	public function parse_location_request() {
 		
 		$locations_regex = $this->locations_regex();
@@ -240,12 +256,29 @@ class Location extends Taxonomy  {
 		
 		return true;
 	}
-	
+
+	/**
+	 * start home url filter
+	 * 
+	 * @param $classes
+	 *
+	 * @return mixed
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
 	public function start_home_url( $classes ) {
 		add_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );
 		return $classes;
 	}
-	
+
+	/**
+	 * remove home url filter
+	 * 
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
 	public function stop_home_url() {
 		remove_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );			
 	}
@@ -261,7 +294,16 @@ class Location extends Taxonomy  {
 	public static function get_rewrite_location() {
 		return self::$_rewrite_location;
 	}
-	
+
+	/**
+	 * Add query params for locations 
+	 * 
+	 * @param $query
+	 *
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
 	public function add_location_to_main_query( $query ) {
 		if ( ! self::$_rewrite_location ) {
 			return;
@@ -295,7 +337,18 @@ class Location extends Taxonomy  {
 			$query->set( $this->taxonomy, self::$_rewrite_location['term'] );
 		}
 	}
-	
+
+	/**
+	 * Overwrite the home link to include the location url
+	 * 
+	 * @param $url
+	 * @param $path
+	 *
+	 * @return array|string|string[]
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
 	public function location_home( $url, $path ) {
 		if ( empty( $path ) || '/' === $path ) {
 			return $url;
@@ -321,7 +374,18 @@ class Location extends Taxonomy  {
 		
 		return $url;
 	}
-	
+
+	/**
+	 * Customize location permalink to include location at the base
+	 * 
+	 * @param $link
+	 * @param $post
+	 *
+	 * @return array|mixed|string|string[]
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
 	public function location_permalink( $link, $post ) {
 		$post = get_post( $post );
 		
@@ -414,26 +478,7 @@ class Location extends Taxonomy  {
 	 */
 	public function single_page_with_location( $where, $query ) {
 
-		$query_vars = $query->query;
-		
-		
-		//@todo need to mimick get_page_by_path
-		if ( isset( $query->query['pagename'] ) ) {
-			$query_vars['post_name__in'] = [ $query->query['pagename'] ];
-			unset( $query_vars['pagename'] );
-		} elseif ( isset( $query->query['name'] ) ) {
-			$query_vars['post_name__in'] = [ $query->query['name'] ];
-			unset( $query_vars['name'] );
-		} else {
-			return $where;
-		}
-		
 		$has_tax = isset( $query->query[ $this->taxonomy ] );
-		
-		// if we have the object_id, get the post_type from that
-		if ( ! empty( $query->queried_object_id ) ) {
-			$query_vars['post_type'] = get_post_type( $query->queried_object_id );
-		}
 		
 		// if the queried post has the correct taxonomy, return early
 		if ( ! empty( $query->queried_object_id ) && $has_tax ) {
@@ -442,22 +487,48 @@ class Location extends Taxonomy  {
 			}
 		}
 		
-		$posts = get_posts( $query_vars );
-		$id    = false;
-		if ( $has_tax && ! empty( $posts ) ) {
-			$id = $posts[0]->ID;
-		} else if ( ! empty( $posts ) ) {
-			foreach( $posts as $post ) {
-				if ( ! has_term( '', $this->taxonomy, $post ) ) {
-					$id = $post->ID;
-					break;
+		$query_vars = $query->query;
+		$post_type  = empty( $query->queried_object_id ) ? false : get_post_type( $query->queried_object_id );
+		$id         = false;
+
+		//@todo need to mimick get_page_by_path
+		if ( isset( $query->query['pagename'] ) ) {
+			$id = $this->get_page_id_by_path( $query->query['pagename'], $post_type );
+		} elseif ( isset( $query->query['name'] ) ) {
+			
+			if ( $post_type ) {
+				$query_vars['post_type'] = $post_type;
+			}
+			
+			$query_vars['post_name__in'] = [ $query->query['name'] ];
+			unset( $query_vars['name'] );
+
+			$posts = get_posts( $query_vars );
+
+			// if the taxonomy is set for this query, return the first found post
+			// if the taxonomy is not set, return the first post without a taxonomy term
+			if ( $has_tax && ! empty( $posts ) ) {
+				$id = $posts[0]->ID;
+			} else if ( ! empty( $posts ) ) {
+				foreach ( $posts as $post ) {
+					if ( ! has_term( '', $this->taxonomy, $post ) ) {
+						$id = $post->ID;
+						break;
+					}
 				}
 			}
+			
+		} else {
+			return $where;
 		}
 		
 		// don't allow location pages to be accessed without the location permalink
 		if ( ! $has_tax && ! $id ) {
 			$id = -1;
+		}
+		
+		if ( false === $id ) {
+			return $where;
 		}
 		
 		global $wpdb;
@@ -491,5 +562,142 @@ class Location extends Taxonomy  {
 		}
 		
 		return $classes;
+	}
+	
+	protected function get_page_by_name( $name, $post_type = false ) {
+		
+	} 
+
+	/**
+	 * Custom get_page_by_path to allow for location
+	 * 
+	 * @param $page_path
+	 * @param $post_type
+	 *
+	 * @return array|void|\WP_Post|null
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	protected function get_page_id_by_path( $page_path, $post_type = 'page' ) {
+		global $wpdb;
+		
+		if ( ! $post_type ) {
+			$post_type = 'page';
+		}
+
+		$last_changed = wp_cache_get_last_changed( 'posts' );
+
+		// add location_id to the cache_key
+		$location_id = get_query_var( 'cp_location_id' );
+		$hash        = md5( $page_path . serialize( $post_type ) . $location_id );
+		$cache_key   = "get_page_by_path:$hash:$last_changed";
+		$cached      = wp_cache_get( $cache_key, 'posts' );
+		
+		if ( false !== $cached ) {
+			// Special case: '0' is a bad `$page_path`.
+			if ( '0' === $cached || 0 === $cached ) {
+				return false;
+			} else {
+				return $cached;
+			}
+		}
+
+		$page_path     = rawurlencode( urldecode( $page_path ) );
+		$page_path     = str_replace( '%2F', '/', $page_path );
+		$page_path     = str_replace( '%20', ' ', $page_path );
+		$parts         = explode( '/', trim( $page_path, '/' ) );
+		$parts         = array_map( 'sanitize_title_for_query', $parts );
+		$escaped_parts = esc_sql( $parts );
+
+		$in_string = "'" . implode( "','", $escaped_parts ) . "'";
+
+		if ( is_array( $post_type ) ) {
+			$post_types = $post_type;
+		} else {
+			$post_types = array( $post_type, 'attachment' );
+		}
+
+		$post_types          = esc_sql( $post_types );
+		$post_type_in_string = "'" . implode( "','", $post_types ) . "'";
+		$sql                 = "
+		SELECT ID, post_name, post_parent, post_type
+		FROM $wpdb->posts
+		WHERE post_name IN ($in_string)
+		AND post_type IN ($post_type_in_string)
+	";
+
+		$pages = $wpdb->get_results( $sql, OBJECT_K );
+
+		$revparts = array_reverse( $parts );
+
+		$foundid        = 0;
+		$valid_pages    = [];
+		$fallback_pages = [];
+		
+		// build an array of primary and fallback pages
+		foreach( (array) $pages as $id => $page ) {
+			if ( $page->post_name != $revparts[0] ) {
+				continue;
+			}
+			
+			// if the location_id is not set but this page has a term, continue
+			// we don't allow location pages to be accessed outside of the location context
+			if ( ! $location_id && has_term( '', $this->taxonomy, $page ) ) {
+				continue;
+			}			
+			
+			if ( $location_id && has_term( "location_$location_id", $this->taxonomy, $page ) ) {
+				$valid_pages[ $id ] = $page;
+			}
+			
+			// use top level pages as a fallback
+			if ( ! has_term( '', $this->taxonomy, $page ) ) {
+				$fallback_pages[ $id ] = $page;
+			}
+		}
+		
+		$page_sets = [ $valid_pages, $fallback_pages ];
+		
+		foreach( $page_sets as $page_set ) {
+			
+			foreach ( $page_set as $page ) {
+				$count = 0;
+				$p     = $page;
+
+				/*
+				 * Loop through the given path parts from right to left,
+				 * ensuring each matches the post ancestry.
+				 */
+				while ( 0 != $p->post_parent && isset( $pages[ $p->post_parent ] ) ) {
+					$count ++;
+					$parent = $pages[ $p->post_parent ];
+					if ( ! isset( $revparts[ $count ] ) || $parent->post_name != $revparts[ $count ] ) {
+						break;
+					}
+					$p = $parent;
+				}
+
+				if ( 0 == $p->post_parent && count( $revparts ) == $count + 1 && $p->post_name == $revparts[ $count ] ) {
+					$foundid = $page->ID;
+					if ( $page->post_type == $post_type ) {
+						break;
+					}
+				}
+			}
+			
+			if ( $foundid ) {
+				break;
+			}			
+		}
+
+		// We cache misses as well as hits.
+		wp_cache_set( $cache_key, $foundid, 'posts' );
+
+		if ( $foundid ) {
+			return $foundid;
+		}
+
+		return false;		
 	}
 }
