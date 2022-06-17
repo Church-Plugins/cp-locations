@@ -112,6 +112,7 @@ class Location {
 	public function get_thumbnail() {
 		return  [
 			'thumb' => get_the_post_thumbnail_url( $this->post->ID ),
+			'thumbnail' => get_the_post_thumbnail_url( $this->post->ID, 'thumbnail' ),
 			'medium' => get_the_post_thumbnail_url( $this->post->ID, 'medium' ),
 			'large' => get_the_post_thumbnail_url( $this->post->ID, 'large' ),
 			'full' => get_the_post_thumbnail_url( $this->post->ID, 'full' ),

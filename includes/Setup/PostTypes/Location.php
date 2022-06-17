@@ -167,6 +167,13 @@ class Location extends PostType {
 		] );
 
 		$cmb->add_field( [
+			'name' => __( 'Pastor', 'cp-locations' ),
+			'desc' => __( 'The name of the lead pastor at this location.', 'cp-locations' ),
+			'id'   => 'pastor',
+			'type' => 'text',
+		] );
+
+		$cmb->add_field( [
 			'name' => __( 'Address', 'cp-locations' ),
 			'desc' => __( 'The address of this location.', 'cp-locations' ),
 			'id'   => 'address',
