@@ -298,8 +298,12 @@ body .cploc-map-location {
 	}
 
 	&--title {
-		font-size: 1.25em;
+		font-size: var(--cp-font-size--lg);
 		margin: 0;
+	}
+	
+	&--desc {
+		font-size: var(--cp-font-size--xs);
 	}
 }
 
