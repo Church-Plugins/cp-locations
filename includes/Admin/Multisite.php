@@ -261,6 +261,7 @@ class Multisite {
 			delete_post_meta( $synced_post_id, $key );
 			
 			foreach( $values as $value ) {
+				$value = maybe_unserialize( $value );
 				add_post_meta( $synced_post_id, $key, $value );
 			}
 		}
