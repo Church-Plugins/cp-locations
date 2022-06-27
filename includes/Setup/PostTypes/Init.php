@@ -72,9 +72,11 @@ class Init {
 	public function register_post_types() {
 
 		$this->locations = Location::get_instance();
-		$this->locations->add_actions();
-
-		do_action( 'cp_register_post_types' );
+		
+		if ( cp_locations()->enabled() ) {
+			$this->locations->add_actions();
+			do_action( 'cp_register_post_types' );
+		}
 	}
 
 	public function disable_gutenberg( $status, $post_type ) {

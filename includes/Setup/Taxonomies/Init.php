@@ -94,9 +94,17 @@ class Init {
 
 		$this->location = Location::get_instance();
 
-		$this->location->add_actions();
-
-		do_action( 'cp_register_taxonomies' );
+		if ( cp_locations()->enabled() ) {
+			$this->location->add_actions();
+			do_action( 'cp_register_taxonomies' );
+		} else {
+			// still register the taxonomy, but do so in the background
+			add_filter( $this->location->taxonomy . '_args', function( $args ){
+				$args['show_admin_column'] = false;
+				return $args;
+			} );
+			$this->location->register_taxonomy();
+		}
 
 	}
 

@@ -33,7 +33,11 @@ class Init {
 	 */
 	protected function __construct() {
 		$this->includes();
-		$this->actions();
+		
+		if ( cp_locations()->enabled() ) {
+			$this->actions();
+		}
+
 	}
 
 	/**

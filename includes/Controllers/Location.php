@@ -2,38 +2,12 @@
 
 namespace CP_Locations\Controllers;
 
+use ChurchPlugins\Controllers\Controller;
 use CP_Locations\Models\Location as LocationModel;
 use CP_Locations\Exception;
 use function CP_Locations\get_template_part;
 
-class Location {
-
-	/**
-	 * @var bool|LocationModel
-	 */
-	public $model;
-
-	/**
-	 * @var array|\WP_Post|null
-	 */
-	public $post;
-
-	/**
-	 * Location constructor.
-	 *
-	 * @param $id
-	 * @param bool $use_origin whether or not to use the origin / post id
-	 *
-	 * @throws Exception
-	 */
-	public function __construct( $id, $use_origin = true ) {
-		$this->model = $use_origin ? LocationModel::get_instance_from_origin( $id ) : LocationModel::get_instance( $id );
-		$this->post  = get_post( $this->model->origin_id );
-	}
-
-	protected function filter( $value, $function ) {
-		return apply_filters( 'cploc_location_' . $function, $value, $this );
-	}
+class Location extends Controller {
 
 	public function get_content( $raw = false ) {
 		$content = get_the_content( null, false, $this->post );

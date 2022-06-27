@@ -292,7 +292,7 @@ class Location extends Taxonomy  {
 	 * @author Tanner Moushey
 	 */
 	public static function get_rewrite_location() {
-		return self::$_rewrite_location;
+		return apply_filters( 'cploc_get_rewrite_location', self::$_rewrite_location );
 	}
 
 	/**
