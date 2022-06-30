@@ -238,7 +238,7 @@ class Location extends Taxonomy  {
 				];
 				
 				// BB passes a page_id and expects the match to be empty
-				if ( ! empty( $matches[2] ) || isset( $_GET['fl_builder'], $_GET['page_id']) ) {
+				if ( ! empty( $matches[2] ) || isset( $_GET['fl_builder'], $_GET['page_id'] ) ) { // || isset( $_GET['fl_builder'], $_GET['fl_builder_load_settings_config'] ) ) {
 					$_SERVER['REQUEST_URI'] = $matches[2];
 					
 					if ( $query_params ) {
@@ -523,7 +523,7 @@ class Location extends Taxonomy  {
 		}
 		
 		// don't allow location pages to be accessed without the location permalink
-		if ( ! $has_tax && ! $id ) {
+		if ( ( ! $has_tax && ! $id ) || ( $has_tax && empty( $posts ) ) ) {
 			$id = -1;
 		}
 		
