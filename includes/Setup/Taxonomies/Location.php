@@ -523,7 +523,7 @@ class Location extends Taxonomy  {
 		}
 		
 		// don't allow location pages to be accessed without the location permalink
-		if ( ( ! $has_tax && ! $id ) || ( $has_tax && empty( $posts ) ) ) {
+		if ( empty( $id ) && ( ! $has_tax || ( $has_tax && empty( $posts ) ) ) ) {
 			$id = -1;
 		}
 		
