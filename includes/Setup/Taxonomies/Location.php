@@ -250,8 +250,9 @@ class Location extends Taxonomy  {
 			// add filters to customize for this location
 			add_action( 'parse_request', [ $this, 'add_location_to_main_query' ] );
 			add_action( 'pre_get_posts', [ $this, 'maybe_add_location_to_query' ] );
-			add_filter( 'body_class', [ $this, 'start_home_url' ] );
-			add_filter( 'wp_footer', [ $this, 'stop_home_url' ] );
+//			add_filter( 'body_class', [ $this, 'start_home_url' ] );
+//			add_filter( 'wp_footer', [ $this, 'stop_home_url' ] );
+			add_filter( 'wp_footer', [ $this, 'update_relative_urls' ] );
 		}
 		
 		return true;
@@ -281,6 +282,27 @@ class Location extends Taxonomy  {
 	 */
 	public function stop_home_url() {
 		remove_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );			
+	}
+	
+	public function update_relative_urls() {
+		if ( ! self::$_rewrite_location ) {
+			return;
+		}
+		?>
+		<script>
+			var cplocAnchors = document.getElementsByTagName('a');
+			var cplocAnchorPath = "<?php echo self::$_rewrite_location['path']; ?>";
+			
+			for (var i = 0; i < cplocAnchors.length; i++) {
+				if (cplocAnchors[i].getAttribute('href').startsWith('/') 
+					&& !cplocAnchors[i].getAttribute('href').startsWith('//')
+					&& !cplocAnchors[i].getAttribute('href').startsWith(cplocAnchorPath)
+				) {
+					cplocAnchors[i].setAttribute( 'href', cplocAnchorPath + cplocAnchors[i].getAttribute('href') );
+				}
+			}
+		</script>
+		<?php
 	}
 
 	/**
@@ -559,6 +581,7 @@ class Location extends Taxonomy  {
 			$classes[] = $this->taxonomy . '-none';
 		} else {
 			$classes[] = $this->taxonomy . '-' . $location_id;
+			$classes[] = $this->taxonomy . '-found';
 		}
 		
 		return $classes;

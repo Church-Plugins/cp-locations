@@ -171,7 +171,7 @@ class Location extends PostType {
 			'desc' => __( 'The name of the lead pastor at this location.', 'cp-locations' ),
 			'id'   => 'pastor',
 			'type' => 'text',
-		] );
+		], 5 );
 
 		$cmb->add_field( [
 			'name' => __( 'Address', 'cp-locations' ),
@@ -181,21 +181,21 @@ class Location extends PostType {
 			'attributes' => [
 				'rows' => 2,
 			],
-		] );
+		], 10 );
 
 		$cmb->add_field( [
 			'name' => __( 'Phone Number', 'cp-locations' ),
 			'desc' => __( 'The phone number for this location.', 'cp-locations' ),
 			'id'   => 'phone',
 			'type' => 'text_medium',
-		] );
+		], 15 );
 
 		$cmb->add_field( [
 			'name' => __( 'Email', 'cp-locations' ),
 			'desc' => __( 'The email for this location.', 'cp-locations' ),
 			'id'   => 'email',
 			'type' => 'text_email',
-		] );
+		], 20 );
 
 		$group_field_id = $cmb->add_field( [
 			'name' => __( 'Service Times', 'cp-locations' ),
@@ -207,7 +207,7 @@ class Location extends PostType {
 				'remove_button' => __( 'Remove Time', 'cp-locations' ),
 				'sortable'      => true,
 			),
-		] );
+		], 25 );
 	
 		$cmb->add_group_field( $group_field_id, [
 			'name' => __( 'Day of Week', 'cp-locations' ),
@@ -223,7 +223,7 @@ class Location extends PostType {
 				'friday'    => __( 'Friday', 'cp-locations' ),
 				'saturday'  => __( 'Saturday', 'cp-locations' ),
 			],
-		] );
+		], 30 );
 		
 		$cmb->add_group_field( $group_field_id, [
 			'name'    => __( 'Time', 'cp-locations' ),
@@ -238,6 +238,8 @@ class Location extends PostType {
 			'type'        => 'text',
 			'description' => __( 'Description of the time. When this is not blank it will be used instead of Time.', 'cp-locations' ),
 		] );
+		
+		do_action( 'cploc_location_meta_details', $cmb, $this );
 
 	}
 
