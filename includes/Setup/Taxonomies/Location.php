@@ -283,7 +283,13 @@ class Location extends Taxonomy  {
 	public function stop_home_url() {
 		remove_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );			
 	}
-	
+
+	/**
+	 * Make relative URLs relative to the location
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
 	public function update_relative_urls() {
 		if ( ! self::$_rewrite_location ) {
 			return;

@@ -53,6 +53,8 @@ class ShortCodes {
 			return;
 		}
 		
+		switch_to_blog( get_main_site_id() );
+		
 		switch ( $atts['field'] ) {
 			case 'title':
 				$data = get_the_title( $location_id );
@@ -64,6 +66,8 @@ class ShortCodes {
 				$data = get_post_meta( $location_id, $atts['field'], true );
 				break;
 		}
+		
+		restore_current_blog();
 		
 		if ( ! $data = apply_filters( 'cp-location-data', $data, $location_id ) ) {
 			return;
