@@ -637,7 +637,7 @@ class Location extends Taxonomy  {
 		$last_changed = wp_cache_get_last_changed( 'posts' );
 
 		// add location_id to the cache_key
-		$location_id = get_query_var( 'cp_location_id' );
+		$location_id = self::get_rewrite_location()['ID'];
 		$hash        = md5( $page_path . serialize( $post_type ) . $location_id );
 		$cache_key   = "get_page_by_path:$hash:$last_changed";
 		$cached      = wp_cache_get( $cache_key, 'posts' );
