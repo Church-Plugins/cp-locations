@@ -47,6 +47,10 @@ class Location extends Taxonomy  {
 		$this->field_type = 'multicheck';
 
 		parent::__construct();
+		
+		// run these actions every time, even if we aren't fully enabled
+		add_filter( 'body_class', [ $this, 'body_class' ] );
+		add_action( 'template_redirect', [ $this, 'add_location_query_var' ] );
 	}
 
 	/**
@@ -170,7 +174,6 @@ class Location extends Taxonomy  {
 		add_filter( 'page_link', [ $this, 'location_permalink' ], 10, 2 );
 		add_filter( 'post_link', [ $this, 'location_permalink' ], 10, 2 );
 		add_filter( 'post_type_link', [ $this, 'location_permalink' ], 10, 2 );
-		add_filter( 'body_class', [ $this, 'body_class' ] );
 		
 		parent::add_actions();
 	}
@@ -342,11 +345,27 @@ class Location extends Taxonomy  {
 			$_SERVER['REQUEST_URI'] = self::$_request_uri;
 		}
 
-		$query->query_vars[ $this->taxonomy . '_id' ] = self::$_rewrite_location['ID'];
 		if ( ! isset( $query->query_vars[ 'post_type' ] ) || in_array( $query->query_vars[ 'post_type' ], $this->get_object_types() ) ) {
 			$query->query_vars[ $this->taxonomy ] = self::$_rewrite_location['term'];
 		}
 		
+	}
+
+	/**
+	 * Add query param for locations 
+	 * 
+	 * @param $query
+	 *
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function add_location_query_var() {
+		if ( ! $location = self::get_rewrite_location() ) {
+			return;
+		}
+		
+		set_query_var( 'cp_location_id', $location['ID'] );
 	}
 
 	/**
