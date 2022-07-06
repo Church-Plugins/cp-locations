@@ -291,7 +291,7 @@ class Location extends Taxonomy  {
 	 * @author Tanner Moushey
 	 */
 	public function update_relative_urls() {
-		if ( ! self::$_rewrite_location ) {
+		if ( ! self::$_rewrite_location || ! is_main_site() ) {
 			return;
 		}
 		?>
