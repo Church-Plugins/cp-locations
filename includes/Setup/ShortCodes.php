@@ -84,6 +84,10 @@ class ShortCodes {
 		$days = [];
 		
 		foreach( $times as $time ) {
+			if ( ! empty( $time['special'] ) ) {
+				continue;
+			}
+			
 			$day = ucwords( $time['day'] );
 			if ( empty( $days[ $day ] ) ) {
 				$days[ $day ] = [];

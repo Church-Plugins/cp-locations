@@ -239,6 +239,13 @@ class Location extends PostType {
 			'description' => __( 'Description of the time. When this is not blank it will be used instead of Time.', 'cp-locations' ),
 		] );
 		
+		$cmb->add_group_field( $group_field_id, [
+			'name'        => __( 'Special Service', 'cp-locations' ),
+			'id'          => 'is_special',
+			'type'        => 'checkbox',
+			'description' => __( 'Check to designate this as a special service that shouldn\'t show in the normal times list.', 'cp-locations' ),
+		] );
+		
 		do_action( 'cploc_location_meta_details', $cmb, $this );
 
 	}
