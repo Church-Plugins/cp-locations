@@ -84,7 +84,7 @@ class ShortCodes {
 		$days = [];
 		
 		foreach( $times as $time ) {
-			if ( ! empty( $time['special'] ) ) {
+			if ( ! empty( $time['is_special'] ) ) {
 				continue;
 			}
 			
