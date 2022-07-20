@@ -53,7 +53,7 @@ class ShortCodes {
 			return;
 		}
 		
-		switch_to_blog( get_main_site_id() );
+		do_action( 'cploc_multisite_switch_to_main_site' );
 		
 		switch ( $atts['field'] ) {
 			case 'title':
@@ -67,7 +67,7 @@ class ShortCodes {
 				break;
 		}
 		
-		restore_current_blog();
+		do_action( 'cploc_multisite_restore_current_blog' );
 		
 		if ( ! $data = apply_filters( 'cp-location-data', $data, $location_id ) ) {
 			return;
