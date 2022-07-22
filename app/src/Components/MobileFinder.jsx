@@ -25,7 +25,6 @@ const MobileFinder = ({
 	}
 	
 	const selectLocation = async ( index ) => {
-		console.log( "SelectLocation: " + index );
 		setCurrentLocation( locations[ index ] );
 		setMode( 'location' );
 		await listPane.moveToBreak('bottom');
@@ -41,10 +40,6 @@ const MobileFinder = ({
 		// current breakpoint is set after transition, so need to set this manually
 		setMode( listPane.currentBreak() === 'top' ? 'list' : 'map' )
 	};
-	
-	useEffect( () => {
-		console.log( "New mode: " + mode );
-	}, [mode]);
 	
 	useEffect( () => {
 		const html = document.documentElement;
@@ -165,8 +160,6 @@ const MobileFinder = ({
 								        icon={('location' === mode && currentLocation == location) ? iconLocationCurrent : iconLocation }
 								        eventHandlers={{
 									        click: (e) => {
-														console.log( 'CLICK' );
-														console.log( e );
 										        selectLocation( index );
 									        },
 								        }}/>
