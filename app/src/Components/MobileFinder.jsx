@@ -194,14 +194,7 @@ const MobileFinder = ({
 								</div>
 								<div className="cploc-map-location--content">
 									<h3 className="cploc-map-location--title">{currentLocation.title}</h3>
-									<div className="cploc-map-location--address">
-										{currentLocation.geodata.attr.place}, {currentLocation.geodata.attr.region}
-										{(
-										 userGeo && currentLocation.distanceDesc
-										 ) && (
-											 <span className="cploc-map-location--distance">({currentLocation.distanceDesc}mi)</span>
-										 )}
-									</div>
+									<div className="cploc-map-location--desc">{currentLocation.pastor}</div>
 								</div>
 							</div>
 
