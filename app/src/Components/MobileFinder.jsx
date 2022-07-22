@@ -41,6 +41,10 @@ const MobileFinder = ({
 	};
 	
 	useEffect( () => {
+		console.log( "New mode: " + mode );
+	}, [mode]);
+	
+	useEffect( () => {
 		const html = document.documentElement;
 		html.style.setProperty('--cploc-app-height', window.innerHeight + 'px');
 		
