@@ -41,12 +41,12 @@ const MobileFinder = ({
 	};
 	
 	useEffect( () => {
+		const html = document.documentElement;
+		html.style.setProperty('--cploc-app-height', window.innerHeight + 'px');
 		
 		if ( /iP(ad|od|hone)/i.test(window.navigator.userAgent)
 		     && !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/) ) {
-			const html = document.documentElement;
 			html.className = html.className.concat( ' is-ios-safari' );
-			html.style.setProperty('--cploc-app-height', window.innerHeight + 'px');
 		}
 		
 		var blockScroll = false;
@@ -123,7 +123,7 @@ const MobileFinder = ({
 		}
 
 		const paddingTopLeft = [50, 100];
-		const paddingBottomRight = [50, 100];
+		const paddingBottomRight = [100, 100];
 		fitBoundsTimeout = setTimeout(
 			() => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight}),
 			100);
