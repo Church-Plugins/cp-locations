@@ -24,30 +24,21 @@ const MobileFinder = ({
 		window.location = url;
 	}
 	
-	const selectLocation = ( index ) => {
+	const selectLocation = async ( index ) => {
 		setCurrentLocation( locations[ index ] );
+		await listPane.moveToBreak('bottom');
 		setMode( 'location' );
 	};
 	
-	const switchPaneMode = () => {
-		setMode(listPane.currentBreak() === 'top' ? 'map' : 'list' );
-	};
-	
-	useEffect( () => {
-		if ( undefined === listPane.moveToBreak ) {
-			return;
-		}
+	const switchPaneMode = async () => {
+		// give instant feedback
+		setMode( listPane.currentBreak() === 'bottom' ? 'list' : 'map' )
 		
-		switch ( mode ) {
-			case 'list' :
-				listPane.moveToBreak('top');
-				break;
-			case 'map' :
-			case 'location' :
-				listPane.moveToBreak('bottom');
-				break;
-		}
-	}, [mode] );
+		await listPane.moveToBreak('list' !== mode ? 'top' : 'bottom' );
+		
+		// current breakpoint is set after transition, so need to set this manually
+		setMode( listPane.currentBreak() === 'top' ? 'list' : 'map' )
+	};
 	
 	useEffect( () => {
 		var blockScroll = false;
@@ -89,8 +80,9 @@ const MobileFinder = ({
 			bottomOffset: 15,
 			topperOverflowOffset: bottomOffset(),
 			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ],
-			onDragEnd : () => setMode( locationPane.currentBreak() === 'bottom' ? 'map' : 'list' ),
 		} );
+		
+		locationPane.on('onTransitionEnd', () => setMode( locationPane.currentBreak() === 'top' ? 'list' : 'map' ) );
 
 		locationPane.updateScreenHeights = () => {
 			locationPane.screen_height = window.innerHeight;
@@ -174,7 +166,7 @@ const MobileFinder = ({
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 									<div className="cploc-map-location--content">
 										<h3 className="cploc-map-location--title">{location.title}</h3>
-										<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc) && (<span className="cploc-map-location--distance">({location.distanceDesc}mi)</span>)}</div>
+										<div className="cploc-map-location--desc">{location.pastor}</div>
 		
 										<div className="cploc-map-location--times"></div>
 									</div>
