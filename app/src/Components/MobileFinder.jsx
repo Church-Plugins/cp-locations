@@ -25,6 +25,7 @@ const MobileFinder = ({
 	}
 	
 	const selectLocation = async ( index ) => {
+		console.log( "SelectLocation: " + index );
 		setCurrentLocation( locations[ index ] );
 		await listPane.moveToBreak('bottom');
 		setMode( 'location' );
