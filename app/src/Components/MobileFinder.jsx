@@ -72,14 +72,13 @@ const MobileFinder = ({
 			}
 		}, { passive: false } );
 		
-		const bottomOffset = window.innerHeight - document.querySelector('.cploc-map .leaflet-container').offsetHeight;
+		const bottomOffset = () => { return window.innerHeight - document.querySelector('.cploc-map .leaflet-container').offsetHeight };
 		const headerHeight = document.querySelector('.cploc-map--locations--header').offsetHeight + 15;
 		
-//		debugger;
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: '.cploc-map',
 			breaks: {
-				bottom: { enabled: true, height: headerHeight + bottomOffset },
+				bottom: { enabled: true, height: headerHeight + bottomOffset() },
 				middle: { enabled: false }
 			},
 			initialBreak: 'bottom',
@@ -92,6 +91,14 @@ const MobileFinder = ({
 			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ],
 			onDragEnd : () => setMode( locationPane.currentBreak() === 'bottom' ? 'map' : 'list' ),
 		} );
+
+		locationPane.breakpoints.beforeBuildBreakpoints = () => {
+			return new Promise(resolve => {
+				locationPane.settings.maxFitHeight = document.querySelector('.cploc-map .leaflet-container').offsetHeight;
+				locationPane.settings.breaks.bottom = {enabled: true, height: headerHeight + bottomOffset() };
+				resolve();
+			})
+		}
 		
 		locationPane.present({animate: true}).then();
 		setListPane( locationPane );

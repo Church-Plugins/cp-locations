@@ -51,7 +51,7 @@ let fitBoundsTimeout;
 
 function ChangeView (locations, userGeo) {
 	const isDesktop = useMediaQuery('(min-width:1025px)');
-	console.log( 'change view' );
+	
 	if (typeof fitBoundsTimeout === 'number') {
 		clearTimeout(fitBoundsTimeout);
 	}
