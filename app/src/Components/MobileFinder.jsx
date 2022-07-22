@@ -46,6 +46,7 @@ const MobileFinder = ({
 		     && !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/) ) {
 			const html = document.documentElement;
 			html.className = html.className.concat( ' is-ios-safari' );
+			html.style.setProperty('--cploc-app-height', window.innerHeight + 'px');
 		}
 		
 		var blockScroll = false;

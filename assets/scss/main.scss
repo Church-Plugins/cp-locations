@@ -5,6 +5,10 @@
 @import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
+:root {
+	--cploc-app-height: 100vh;
+}
+
 html.is-ios-safari,
 html.is-ios-safari body {
 	/* Allows content to fill the viewport and go beyond the bottom */
@@ -22,11 +26,11 @@ html.is-ios-safari body {
 	min-height: 300px;
 
 	.leaflet-container {
-		padding-bottom: min( 80%, calc(100vh - var(--cp-header-height) ) );
+		padding-bottom: min( 80%, calc(var(--cploc-app-height) - var(--cp-header-height) ) );
 	}
 	
 	.cploc-container--mobile .leaflet-container {
-		padding-bottom: calc(100vh - var(--cp-header-height)); // bottom padding minus (80px) header height (70px)
+		padding-bottom: calc(var(--cploc-app-height) - var(--cp-header-height)); // bottom padding minus (80px) header height (70px)
 	}
 	
 	.marker-pin {
