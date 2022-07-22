@@ -82,7 +82,7 @@ const MobileFinder = ({
 			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ],
 		} );
 		
-		locationPane.on('onTransitionEnd', () => setMode( locationPane.currentBreak() === 'top' ? 'list' : 'map' ) );
+		locationPane.on('onTransitionEnd', () => setMode( locationPane.currentBreak() === 'bottom' ? 'map' : 'list' ) );
 
 		locationPane.updateScreenHeights = () => {
 			locationPane.screen_height = window.innerHeight;
