@@ -163,6 +163,8 @@ const MobileFinder = ({
 								        icon={('location' === mode && currentLocation == location) ? iconLocationCurrent : iconLocation }
 								        eventHandlers={{
 									        click: (e) => {
+														console.log( 'CLICK' );
+														console.log( e );
 										        selectLocation( index );
 									        },
 								        }}/>
