@@ -81,7 +81,7 @@ const DesktopFinder = ({
 	
 						<div className="cploc-map--locations--list--cont">
 							<div className="cploc-map--locations--list">
-								<div className="cploc-map--locations--mode">
+								<div className="cploc-map--locations--mode" style={{display: 'none'}}>
 									<span className="cploc--mode-switch" onClick={() => {
 										closePopups();
 										setMode('list');
