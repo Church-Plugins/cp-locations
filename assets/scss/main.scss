@@ -5,6 +5,18 @@
 @import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
+html.is-ios-safari,
+html.is-ios-safari body {
+	/* Allows content to fill the viewport and go beyond the bottom */
+	height: 100%;
+
+	/* Allows you to scroll below the viewport; default value is visible */
+	overflow-y: scroll;
+
+	/* To smooth any scrolling behavior */
+	-webkit-overflow-scrolling: touch;
+}
+
 #cploc_root {
 	--cpl-map-control-gap: min(2vw, var(--cp-gap--lg));
 	min-height: 300px;

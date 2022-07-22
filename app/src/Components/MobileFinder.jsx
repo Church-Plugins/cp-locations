@@ -41,6 +41,13 @@ const MobileFinder = ({
 	};
 	
 	useEffect( () => {
+		
+		if ( /iP(ad|od|hone)/i.test(window.navigator.userAgent)
+		     && !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/) ) {
+			const html = document.documentElement;
+			html.className = html.className.concat( ' is-ios-safari' );
+		}
+		
 		var blockScroll = false;
 		document.addEventListener('touchmove', (e) => {
 			if ( blockScroll ) {
