@@ -72,7 +72,7 @@ const MobileFinder = ({
 		}, { passive: false } );
 		
 		const bottomOffset = () => { return window.innerHeight - document.querySelector('.cploc-map .leaflet-container').offsetHeight };
-		const headerHeight = document.querySelector('.cploc-map--locations--header').offsetHeight + 15;
+		const headerHeight = document.querySelector('.cploc-map--locations--header').offsetHeight;
 		
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: '.cploc-map',
