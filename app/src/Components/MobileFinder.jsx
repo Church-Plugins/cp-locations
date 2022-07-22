@@ -174,7 +174,7 @@ const MobileFinder = ({
 								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(location.permalink)}>
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 									<div className="cploc-map-location--content">
-										<h3 className="cploc-map-location--title">{location.title}</h3>
+										<h3 className="cploc-map-location--title">{location.title} {(userGeo && location.distanceDesc) && (<small className="cploc-map-location--distance">({location.distanceDesc}mi)</small>)}</h3>
 										<div className="cploc-map-location--desc">{location.pastor}</div>
 		
 										<div className="cploc-map-location--times"></div>
@@ -193,8 +193,8 @@ const MobileFinder = ({
 									<div style={{backgroundImage: 'url(' + currentLocation.thumb.thumb + ')'}}/>
 								</div>
 								<div className="cploc-map-location--content">
-									<h3 className="cploc-map-location--title">{currentLocation.title}</h3>
-									<div className="cploc-map-location--desc">{currentLocation.pastor}</div>
+									<h3 className="cploc-map-location--title">{currentLocation.title} {(userGeo && currentLocation.distanceDesc) && (<span className="cploc-map-location--distance">({currentLocation.distanceDesc}mi)</span>)}</h3>
+									<div className="cploc-map-location--desc">{location.pastor}</div>
 								</div>
 							</div>
 
