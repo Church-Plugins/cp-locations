@@ -87,17 +87,19 @@ const MobileFinder = ({
 			fitScreenHeight: false,
 			maxFitHeight: document.querySelector('.cploc-map .leaflet-container').offsetHeight,
 			bottomOffset: 15,
-			topperOverflowOffset: bottomOffset,
+			topperOverflowOffset: bottomOffset(),
 			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ],
 			onDragEnd : () => setMode( locationPane.currentBreak() === 'bottom' ? 'map' : 'list' ),
 		} );
 
-		locationPane.breakpoints.beforeBuildBreakpoints = () => {
-			return new Promise(resolve => {
-				locationPane.settings.maxFitHeight = document.querySelector('.cploc-map .leaflet-container').offsetHeight;
-				locationPane.settings.breaks.bottom = {enabled: true, height: headerHeight + bottomOffset() };
-				resolve();
-			})
+		locationPane.updateScreenHeights = () => {
+			locationPane.screen_height = window.innerHeight;
+			locationPane.screenHeightOffset = window.innerHeight;
+			locationPane.settings.maxFitHeight = document.querySelector('.cploc-map .leaflet-container').offsetHeight;
+			locationPane.settings.topperOverflowOffset = bottomOffset();
+			locationPane.settings.breaks.bottom = {enabled: true, height: headerHeight + bottomOffset()};
+			locationPane.settings.breaks.top = {enabled: true, height: locationPane.settings.maxFitHeight};
+			locationPane.breakpoints.lockedBreakpoints = JSON.stringify(locationPane.settings.breaks);
 		}
 		
 		locationPane.present({animate: true}).then();
