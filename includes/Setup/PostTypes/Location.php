@@ -70,7 +70,7 @@ class Location extends PostType {
 			return false;
 		}
 		
-		return $type->rewrite['slug'];
+		return false;
 	}	
 
 	/**

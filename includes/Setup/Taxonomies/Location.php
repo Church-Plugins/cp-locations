@@ -578,6 +578,10 @@ class Location extends Taxonomy  {
 			return $where;
 		}
 		
+		if ( $query->queried_object_id == $id ) {
+			return $where;
+		}
+		
 		global $wpdb;
 		
 		if ( ! empty( $query->queried_object_id ) ) {
@@ -637,7 +641,9 @@ class Location extends Taxonomy  {
 		$last_changed = wp_cache_get_last_changed( 'posts' );
 
 		// add location_id to the cache_key
-		$location_id = self::get_rewrite_location()['ID'];
+		$location = self::get_rewrite_location();
+		
+		$location_id = empty( $location['ID'] ) ? 0 : $location['ID'];
 		$hash        = md5( $page_path . serialize( $post_type ) . $location_id );
 		$cache_key   = "get_page_by_path:$hash:$last_changed";
 		$cached      = wp_cache_get( $cache_key, 'posts' );
