@@ -174,9 +174,16 @@ class Init {
 	 */
 	protected function actions() {
 		add_action( 'wp_head', [ $this, 'global_css_vars' ] );
+		add_action( 'plugins_loaded', [ $this, 'load_integrations' ] );
 	}
 
 	/** Actions **************************************/
+	
+	public function load_integrations() {
+		if ( defined( 'TRIBE_EVENTS_FILE' ) ) {
+			Integrations\TheEventsCalendar::get_instance();
+		}
+	}
 
 	public function global_css_vars() {
 		?>

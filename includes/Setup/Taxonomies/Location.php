@@ -34,12 +34,17 @@ class Location extends Taxonomy  {
 	protected static $_locations_regex = false;
 
 	/**
+	 * @var string 
+	 */
+	public static $_taxonomy = 'cp_location';
+
+	/**
 	 * Child class constructor. Punts to the parent.
 	 *
 	 * @author costmo
 	 */
 	protected function __construct() {
-		$this->taxonomy = "cp_location";
+		$this->taxonomy = self::$_taxonomy;
 
 		$this->single_label = apply_filters( "{$this->taxonomy}_single_label", 'Location' );
 		$this->plural_label = apply_filters( "{$this->taxonomy}_plural_label", 'Locations' );
