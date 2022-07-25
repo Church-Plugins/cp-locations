@@ -3,6 +3,7 @@
 namespace CP_Locations\Integrations;
 
 use CP_Locations\Integrations\TheEventsCalendar\FilterLocation;
+use CP_Locations\Setup\Taxonomies\Location;
 use PHP_CodeSniffer\Filters\Filter;
 
 class TheEventsCalendar {
@@ -45,6 +46,9 @@ class TheEventsCalendar {
 		add_filter( 'tribe_context_locations', [ $this, 'filter_context_locations' ] );
 		add_filter( 'tribe_events_filter_bar_context_to_filter_map', [ $this, 'filter_map' ] );
 		add_action( 'tribe_events_filters_create_filters', [ $this, 'create_filter' ] );
+		
+		add_filter( 'home_url', [ $this, 'event_location_url' ], 10, 2 );
+		add_filter( 'cploc_parse_location_request_uri', [ $this, 'event_api_request_location' ] );
 
 	}
 
@@ -109,5 +113,84 @@ class TheEventsCalendar {
 			__( 'Locations', 'cp-locations' ),
 			'filterbar_cploc_location'
 		);
+	}
+
+	/**
+	 * Rewrite Event path to use location url
+	 * 
+	 * @param $url
+	 * @param $path
+	 *
+	 * @return array|mixed|string|string[]
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function event_location_url( $url, $path ) {
+		if ( empty( $path ) || '/' === $path || ! function_exists( 'tribe_get_option' ) ) {
+			return $url;
+		}
+
+		// make sure this is an event URL
+		$events_archive_base = tribe_get_option( 'eventsSlug', 'events' );
+		if ( ! strstr( $path, $events_archive_base ) ) {
+			return $url;
+		}
+
+		// make sure we are on a location page
+		$rewrite_location = cp_locations()->setup->taxonomies->location::get_rewrite_location();
+		if ( empty( $rewrite_location['path'] ) ) {
+			return $url;
+		}
+		
+		// location has already been added to this url
+		if ( strpos( $url, $rewrite_location['path'] ) ) {
+			return $url;
+		}
+
+		$locations_regex = cp_locations()->setup->taxonomies->location->locations_regex();
+
+		$slug = trim( cp_locations()->setup->post_types->locations->get_slug(), '/' );
+
+		// don't rewrite for urls with location already set
+		if ( preg_match( "/$slug\/($locations_regex)/", $url ) ) {
+			return $url;
+		}
+
+		$url = str_replace( $path, $rewrite_location['path'] . '/' . $path, $url );
+		$url = str_replace( '//', '/', $url );
+		$url = str_replace( ':/', '://', $url );
+		
+		return $url;
+	}
+
+	/**
+	 * Handle API requests from event calendar on location pages
+	 * 
+	 * @param $request_uri
+	 *
+	 * @return array|mixed|string|string[]
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function event_api_request_location( $request_uri ) {
+		if ( ! strstr( $request_uri, 'wp-json/tribe' ) || empty( $_POST['url'] ) ) {
+			return $request_uri;
+		}
+		
+		$url = $_POST['url'];
+
+		$locations_regex = cp_locations()->setup->taxonomies->location->locations_regex();
+		$slug            = trim( cp_locations()->setup->post_types->locations->get_slug(), '/' );
+
+		// don't rewrite for urls with location already set
+		if ( ! preg_match( "/$slug\/($locations_regex)/", $url, $matches ) ) {
+			return $url;
+		}		
+		
+		$_POST['url'] = str_replace( $matches[0], '', $url );
+		
+		return str_replace( home_url( '/' ), '', $url );
 	}
 }

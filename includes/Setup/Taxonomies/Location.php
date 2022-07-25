@@ -214,11 +214,16 @@ class Location extends Taxonomy  {
 		
 		if ( empty( $locations_regex ) ) {
 			return true;
-		}
+		} 
 		
 		self::$_request_uri = $_SERVER['REQUEST_URI'];
 		
-		list( $req_uri, $query_params ) = explode( '?', $_SERVER['REQUEST_URI'] );
+		$request_uri = apply_filters( 'cploc_parse_location_request_uri', $_SERVER['REQUEST_URI'] );
+
+		// only update the request URI if it hasn't been filtered.
+		$update_request_uri = ( $request_uri === $_SERVER['REQUEST_URI'] );
+		
+		list( $req_uri, $query_params ) = explode( '?', $request_uri );
 		
 		$pathinfo         = isset( $_SERVER['PATH_INFO'] ) ? $_SERVER['PATH_INFO'] : '';
 		list( $pathinfo ) = explode( '?', $pathinfo );
@@ -246,7 +251,13 @@ class Location extends Taxonomy  {
 				];
 				
 				// BB passes a page_id and expects the match to be empty
-				if ( ! empty( $matches[2] ) || isset( $_GET['fl_builder'], $_GET['page_id'] ) ) { // || isset( $_GET['fl_builder'], $_GET['fl_builder_load_settings_config'] ) ) {
+				if ( $update_request_uri && 
+					 ( 
+						! empty( $matches[2] ) || 
+						isset( $_GET['fl_builder'], $_GET['page_id'] ) 
+					 ) 
+				) {
+					
 					$_SERVER['REQUEST_URI'] = $matches[2];
 					
 					if ( $query_params ) {
