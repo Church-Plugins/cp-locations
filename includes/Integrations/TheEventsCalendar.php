@@ -41,11 +41,14 @@ class TheEventsCalendar {
 	protected function includes() {}
 
 	protected function actions() {
-		
+
 		// filterbar
 		add_filter( 'tribe_context_locations', [ $this, 'filter_context_locations' ] );
 		add_filter( 'tribe_events_filter_bar_context_to_filter_map', [ $this, 'filter_map' ] );
 		add_action( 'tribe_events_filters_create_filters', [ $this, 'create_filter' ] );
+		if ( class_exists( 'Tribe__Events__Filterbar__Settings' ) ) {
+			add_filter( 'option_' . \Tribe__Events__Filterbar__Settings::OPTION_ACTIVE_FILTERS, [ $this, 'active_filters' ] );
+		}
 		
 		add_filter( 'home_url', [ $this, 'event_location_url' ], 10, 2 );
 		add_filter( 'cploc_parse_location_request_uri', [ $this, 'event_api_request_location' ] );
@@ -115,6 +118,35 @@ class TheEventsCalendar {
 		);
 	}
 
+	/**
+	 * Don't show location filter if we are on a location page
+	 * 
+	 * @param $filters
+	 *
+	 * @return mixed
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function active_filters( $filters ) {
+		if ( ! cp_locations()->setup->taxonomies->location::get_rewrite_location() ) {
+			return $filters;
+		}
+		
+		if ( apply_filters( 'cploc_show_location_filter_on_location', false, $filters ) ) {
+			return $filters;
+		}
+
+		if ( empty( $filters ) ) {
+			return $filters;
+		}
+		
+		// unset filterbar filter if it exists
+		unset( $filters[ 'filterbar_cploc_location' ] );
+		
+		return $filters;
+	}
+	
 	/**
 	 * Rewrite Event path to use location url
 	 * 
