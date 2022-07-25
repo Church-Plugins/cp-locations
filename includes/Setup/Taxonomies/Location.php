@@ -664,7 +664,7 @@ class Location extends Taxonomy  {
 		$cache_key   = "get_page_by_path:$hash:$last_changed";
 		$cached      = wp_cache_get( $cache_key, 'posts' );
 		
-		if ( false !== $cached ) {
+		if ( 0 && false !== $cached ) {
 			// Special case: '0' is a bad `$page_path`.
 			if ( '0' === $cached || 0 === $cached ) {
 				return false;
@@ -713,16 +713,19 @@ class Location extends Taxonomy  {
 			
 			// if the location_id is not set but this page has a term, continue
 			// we don't allow location pages to be accessed outside of the location context
-			if ( ! $location_id && has_term( '', $this->taxonomy, $page ) ) {
-				continue;
-			}			
+			
+			// @todo rethinking this. Sometimes we want a page that has a location to also be available outside the location context
+//			if ( ! $location_id && has_term( '', $this->taxonomy, $page ) ) {
+//				continue;
+//			}			
 			
 			if ( $location_id && has_term( "location_$location_id", $this->taxonomy, $page ) ) {
 				$valid_pages[ $id ] = $page;
 			}
 			
 			// use top level pages as a fallback
-			if ( ! has_term( '', $this->taxonomy, $page ) ) {
+			// Use all pages as fallback for top level
+			if ( ! $location_id || ! has_term( '', $this->taxonomy, $page ) ) {
 				$fallback_pages[ $id ] = $page;
 			}
 		}
