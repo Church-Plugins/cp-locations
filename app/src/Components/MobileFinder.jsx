@@ -24,32 +24,32 @@ const MobileFinder = ({
 		window.location = url;
 	}
 	
-	const selectLocation = ( index ) => {
+	const selectLocation = async ( index ) => {
 		setCurrentLocation( locations[ index ] );
+		setMode( 'location' );
+		await listPane.moveToBreak('bottom');
 		setMode( 'location' );
 	};
 	
-	const switchPaneMode = () => {
-		setMode(listPane.currentBreak() === 'top' ? 'map' : 'list' );
+	const switchPaneMode = async () => {
+		// give instant feedback
+		setMode( listPane.currentBreak() === 'bottom' ? 'list' : 'map' )
+		
+		await listPane.moveToBreak('list' !== mode ? 'top' : 'bottom' );
+		
+		// current breakpoint is set after transition, so need to set this manually
+		setMode( listPane.currentBreak() === 'top' ? 'list' : 'map' )
 	};
 	
 	useEffect( () => {
-		if ( undefined === listPane.moveToBreak ) {
-			return;
+		const html = document.documentElement;
+		html.style.setProperty('--cploc-app-height', window.innerHeight + 'px');
+		
+		if ( /iP(ad|od|hone)/i.test(window.navigator.userAgent)
+		     && !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/) ) {
+			html.className = html.className.concat( ' is-ios-safari' );
 		}
 		
-		switch ( mode ) {
-			case 'list' :
-				listPane.moveToBreak('top');
-				break;
-			case 'map' :
-			case 'location' :
-				listPane.moveToBreak('bottom');
-				break;
-		}
-	}, [mode] );
-	
-	useEffect( () => {
 		var blockScroll = false;
 		document.addEventListener('touchmove', (e) => {
 			if ( blockScroll ) {
@@ -72,14 +72,13 @@ const MobileFinder = ({
 			}
 		}, { passive: false } );
 		
-		const bottomOffset = window.innerHeight - document.querySelector('.cploc-map .leaflet-container').offsetHeight;
-		const headerHeight = document.querySelector('.cploc-map--locations--header').offsetHeight + 15;
+		const bottomOffset = () => { return window.innerHeight - document.querySelector('.cploc-map .leaflet-container').offsetHeight };
+		const headerHeight = document.querySelector('.cploc-map--locations--header').offsetHeight;
 		
-//		debugger;
 		const locationPane = new CupertinoPane( '.cploc-map--locations-mobile', {
 			parentElement: '.cploc-map',
 			breaks: {
-				bottom: { enabled: true, height: headerHeight + bottomOffset },
+				bottom: { enabled: true, height: headerHeight + bottomOffset() },
 				middle: { enabled: false }
 			},
 			initialBreak: 'bottom',
@@ -88,10 +87,21 @@ const MobileFinder = ({
 			fitScreenHeight: false,
 			maxFitHeight: document.querySelector('.cploc-map .leaflet-container').offsetHeight,
 			bottomOffset: 15,
-			topperOverflowOffset: bottomOffset,
+			topperOverflowOffset: bottomOffset(),
 			dragBy: ['.pane .draggable', '.cploc-map--locations--header' ],
-			onDragEnd : () => setMode( locationPane.currentBreak() === 'bottom' ? 'map' : 'list' ),
 		} );
+		
+		locationPane.on('onTransitionEnd', () => setMode( locationPane.currentBreak() === 'bottom' ? 'map' : 'list' ) );
+
+		locationPane.updateScreenHeights = () => {
+			locationPane.screen_height = window.innerHeight;
+			locationPane.screenHeightOffset = window.innerHeight;
+			locationPane.settings.maxFitHeight = document.querySelector('.cploc-map .leaflet-container').offsetHeight;
+			locationPane.settings.topperOverflowOffset = bottomOffset();
+			locationPane.settings.breaks.bottom = {enabled: true, height: headerHeight + bottomOffset()};
+			locationPane.settings.breaks.top = {enabled: true, height: locationPane.settings.maxFitHeight};
+			locationPane.breakpoints.lockedBreakpoints = JSON.stringify(locationPane.settings.breaks);
+		}
 		
 		locationPane.present({animate: true}).then();
 		setListPane( locationPane );
@@ -114,7 +124,7 @@ const MobileFinder = ({
 		}
 
 		const paddingTopLeft = [50, 100];
-		const paddingBottomRight = [50, 100];
+		const paddingBottomRight = [100, 100];
 		fitBoundsTimeout = setTimeout(
 			() => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight}),
 			100);
@@ -164,8 +174,8 @@ const MobileFinder = ({
 								<div className="cploc-map--locations--location cploc-map-location" key={index} onClick={() => onClick(location.permalink)}>
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 									<div className="cploc-map-location--content">
-										<h3 className="cploc-map-location--title">{location.title}</h3>
-										<div className="cploc-map-location--address">{location.geodata.attr.place}, {location.geodata.attr.region} {(userGeo && location.distanceDesc) && (<span className="cploc-map-location--distance">({location.distanceDesc}mi)</span>)}</div>
+										<h3 className="cploc-map-location--title">{location.title} {(userGeo && location.distanceDesc) && (<small className="cploc-map-location--distance">({location.distanceDesc}mi)</small>)}</h3>
+										<div className="cploc-map-location--desc">{location.pastor}</div>
 		
 										<div className="cploc-map-location--times"></div>
 									</div>
@@ -183,15 +193,8 @@ const MobileFinder = ({
 									<div style={{backgroundImage: 'url(' + currentLocation.thumb.thumb + ')'}}/>
 								</div>
 								<div className="cploc-map-location--content">
-									<h3 className="cploc-map-location--title">{currentLocation.title}</h3>
-									<div className="cploc-map-location--address">
-										{currentLocation.geodata.attr.place}, {currentLocation.geodata.attr.region}
-										{(
-										 userGeo && currentLocation.distanceDesc
-										 ) && (
-											 <span className="cploc-map-location--distance">({currentLocation.distanceDesc}mi)</span>
-										 )}
-									</div>
+									<h3 className="cploc-map-location--title">{currentLocation.title} {(userGeo && currentLocation.distanceDesc) && (<span className="cploc-map-location--distance">({currentLocation.distanceDesc}mi)</span>)}</h3>
+									<div className="cploc-map-location--desc">{currentLocation.pastor}</div>
 								</div>
 							</div>
 

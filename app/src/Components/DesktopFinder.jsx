@@ -81,7 +81,7 @@ const DesktopFinder = ({
 	
 						<div className="cploc-map--locations--list--cont">
 							<div className="cploc-map--locations--list">
-								<div className="cploc-map--locations--mode">
+								<div className="cploc-map--locations--mode" style={{display: 'none'}}>
 									<span className="cploc--mode-switch" onClick={() => {
 										closePopups();
 										setMode('list');
@@ -106,7 +106,7 @@ const DesktopFinder = ({
 									>
 										<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumbnail + ')'}} /></div>
 										<div className="cploc-map-location--content">
-											<h3 className="cploc-map-location--title">{location.title}</h3>
+											<h3 className="cploc-map-location--title">{location.title} {(userGeo && location.distanceDesc) && (<small className="cploc-map-location--distance">({location.distanceDesc}mi)</small>)}</h3>
 											<div className="cploc-map-location--desc">{location.pastor}</div>
 			
 											<div className="cploc-map-location--times"></div>

@@ -51,7 +51,7 @@ let fitBoundsTimeout;
 
 function ChangeView (locations, userGeo) {
 	const isDesktop = useMediaQuery('(min-width:1025px)');
-	console.log( 'change view' );
+	
 	if (typeof fitBoundsTimeout === 'number') {
 		clearTimeout(fitBoundsTimeout);
 	}
@@ -68,7 +68,7 @@ function ChangeView (locations, userGeo) {
 	}
 	
 	const paddingTopLeft = [50,100];
-	const paddingBottomRight = isDesktop ? [50,100] : [50, 150];
+	const paddingBottomRight = isDesktop ? [50,100] : [100, 150];
 	
 	fitBoundsTimeout = setTimeout( () => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight} ), 100 );
 	return null;

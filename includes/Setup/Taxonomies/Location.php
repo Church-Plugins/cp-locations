@@ -34,12 +34,17 @@ class Location extends Taxonomy  {
 	protected static $_locations_regex = false;
 
 	/**
+	 * @var string 
+	 */
+	public static $_taxonomy = 'cp_location';
+
+	/**
 	 * Child class constructor. Punts to the parent.
 	 *
 	 * @author costmo
 	 */
 	protected function __construct() {
-		$this->taxonomy = "cp_location";
+		$this->taxonomy = self::$_taxonomy;
 
 		$this->single_label = apply_filters( "{$this->taxonomy}_single_label", 'Location' );
 		$this->plural_label = apply_filters( "{$this->taxonomy}_plural_label", 'Locations' );
@@ -209,11 +214,16 @@ class Location extends Taxonomy  {
 		
 		if ( empty( $locations_regex ) ) {
 			return true;
-		}
+		} 
 		
 		self::$_request_uri = $_SERVER['REQUEST_URI'];
 		
-		list( $req_uri, $query_params ) = explode( '?', $_SERVER['REQUEST_URI'] );
+		$request_uri = apply_filters( 'cploc_parse_location_request_uri', $_SERVER['REQUEST_URI'] );
+
+		// only update the request URI if it hasn't been filtered.
+		$update_request_uri = ( $request_uri === $_SERVER['REQUEST_URI'] );
+		
+		list( $req_uri, $query_params ) = explode( '?', $request_uri );
 		
 		$pathinfo         = isset( $_SERVER['PATH_INFO'] ) ? $_SERVER['PATH_INFO'] : '';
 		list( $pathinfo ) = explode( '?', $pathinfo );
@@ -241,7 +251,13 @@ class Location extends Taxonomy  {
 				];
 				
 				// BB passes a page_id and expects the match to be empty
-				if ( ! empty( $matches[2] ) || isset( $_GET['fl_builder'], $_GET['page_id'] ) ) { // || isset( $_GET['fl_builder'], $_GET['fl_builder_load_settings_config'] ) ) {
+				if ( $update_request_uri && 
+					 ( 
+						! empty( $matches[2] ) || 
+						isset( $_GET['fl_builder'], $_GET['page_id'] ) 
+					 ) 
+				) {
+					
 					$_SERVER['REQUEST_URI'] = $matches[2];
 					
 					if ( $query_params ) {
@@ -648,7 +664,7 @@ class Location extends Taxonomy  {
 		$cache_key   = "get_page_by_path:$hash:$last_changed";
 		$cached      = wp_cache_get( $cache_key, 'posts' );
 		
-		if ( false !== $cached ) {
+		if ( 0 && false !== $cached ) {
 			// Special case: '0' is a bad `$page_path`.
 			if ( '0' === $cached || 0 === $cached ) {
 				return false;
@@ -697,16 +713,19 @@ class Location extends Taxonomy  {
 			
 			// if the location_id is not set but this page has a term, continue
 			// we don't allow location pages to be accessed outside of the location context
-			if ( ! $location_id && has_term( '', $this->taxonomy, $page ) ) {
-				continue;
-			}			
+			
+			// @todo rethinking this. Sometimes we want a page that has a location to also be available outside the location context
+//			if ( ! $location_id && has_term( '', $this->taxonomy, $page ) ) {
+//				continue;
+//			}			
 			
 			if ( $location_id && has_term( "location_$location_id", $this->taxonomy, $page ) ) {
 				$valid_pages[ $id ] = $page;
 			}
 			
 			// use top level pages as a fallback
-			if ( ! has_term( '', $this->taxonomy, $page ) ) {
+			// Use all pages as fallback for top level
+			if ( ! $location_id || ! has_term( '', $this->taxonomy, $page ) ) {
 				$fallback_pages[ $id ] = $page;
 			}
 		}
