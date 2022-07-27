@@ -452,7 +452,7 @@ class Location extends Taxonomy  {
 		}
 		
 		foreach ( $locations as $location ) {
-			if ( $location->slug === self::$_rewrite_location['term'] ) {
+			if (self::$_rewrite_location && $location->slug === self::$_rewrite_location['term'] ) {
 				break;
 			}
 		}
