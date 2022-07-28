@@ -183,7 +183,7 @@ const App = () => {
 	) : ( 
 		<div className="cploc">
 			
-			{loading && (
+			{ loading && (
 				<div className="cploc-container--loading">
 					<CircularProgress/>
 				</div>

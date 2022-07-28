@@ -193,7 +193,7 @@ const DesktopFinder = ({
 							<div className="cploc-list--item" key={index}>
 								<div dangerouslySetInnerHTML={{__html: location.templates.popup }} />
 								{(userGeo !== false && location.distanceDesc) && (<div className="cploc-list-item--distance">{location.distanceDesc} miles away</div>)}
-								<div className="cp-button" onClick={() => { setMode('map'); setTimeout(() => onClick(index), 250); }}>View on Map ></div>
+								<div className="cp-button" onClick={() => { setMode('map'); setTimeout(() => focusLocation(index), 250); }}>View on Map ></div>
 							</div>
 						))}
 					</div>
