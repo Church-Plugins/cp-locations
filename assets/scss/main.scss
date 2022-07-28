@@ -385,6 +385,7 @@ body .cploc-map-popup {
 		padding-bottom: calc( 56.25% + var(--cp-gap--md) * 2 );
 		background-size: cover;
 		background-position: center center;
+		display: block;
 		
 		img {
 			display: none;

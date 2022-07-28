@@ -16,8 +16,8 @@ $data = $location->get_api_data( false );
 ?>
 
 <div class="cploc-map-popup">
-	<div class="cploc-map-popup--thumb" style="background-image: url('<?php echo get_the_post_thumbnail_url( $location->post->ID, 'large' ); ?>')"><?php echo get_the_post_thumbnail( $location->post->ID, 'large' ); ?></div>
-	<h4 class="cploc-map-popup--title"><?php echo $data['title']; ?></h4>
+	<a class="cploc-map-popup--thumb" href="<?php echo get_the_permalink( $location->post->ID ); ?>" style="background-image: url('<?php echo get_the_post_thumbnail_url( $location->post->ID, 'large' ); ?>')"><?php echo get_the_post_thumbnail( $location->post->ID, 'large' ); ?></a>
+	<h4 class="cploc-map-popup--title"><a href="<?php echo get_the_permalink( $location->post->ID ); ?>"><?php echo $data['title']; ?></a></h4>
 	<div class="cploc-map-popup--info">
 		<div class="cploc-map-popup--address"><?php echo Helpers::get_icon( 'location' ); ?> <?php echo $data['address']; ?></div>
 		<div class="cploc-map-popup--times"><?php echo Helpers::get_icon( 'date' ); ?> <?php echo $data['times']; ?></div>
