@@ -93,6 +93,47 @@ class Location extends Controller {
 		];
 	}
 
+	public function get_formatted_times() {
+		$times = $this->service_times;
+		
+		if ( empty( $times ) || ! is_array( $times ) ) {
+			return $times;
+		}
+
+		$days = [];
+
+		foreach ( $times as $time ) {
+			if ( ! empty( $time['is_special'] ) ) {
+				continue;
+			}
+
+			$day = ucwords( $time['day'] );
+			if ( empty( $days[ $day ] ) ) {
+				$days[ $day ] = [];
+			}
+
+			$t              = new \DateTime( '2000-01-01 ' . $time['time'] );
+			$days[ $day ][] = empty( $time['time_desc'] ) ? $t->format( 'g:ia' ) : $time['time_desc'];
+		}
+
+		$formatted_times = [];
+		foreach ( $days as $day => $times ) {
+			if ( count( $times ) > 1 ) {
+				$day                          .= 's'; // make day plural
+				$times[ count( $times ) - 1 ] = 'and ' . $times[ count( $times ) - 1 ]; // add conjunction to last time if we have multiple
+			}
+
+			$separator = ' ';
+			if ( count( $times ) > 2 ) {
+				$separator = ', ';
+			}
+
+			$formatted_times[] = sprintf( '%s at %s', $day, implode( $separator, $times ) );
+		}
+
+		return apply_filters( 'cploc_format_times', implode( '<br />', $formatted_times ) );
+	}
+
 	public function get_api_data( $templates = true ) {
 		$data = [
 			'id'        => $this->model->id,
@@ -106,7 +147,7 @@ class Location extends Controller {
 			'address'   => wp_kses_post( $this->address ),
 			'phone'     => $this->phone,
 			'email'     => $this->email,
-			'times'     => $this->service_times,
+			'times'     => $this->get_formatted_times(),
 			'geodata'   => $this->get_geo(),
 			'templates' => [
 				'card' => '',
