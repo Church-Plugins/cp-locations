@@ -368,9 +368,9 @@ body .cploc-map-location {
 }
 
 body .cploc-map-popup {
-	.material-icons-outlined {
-		font-size: 1em;
-	}
+	display: flex;
+	flex-flow: column;
+	height: 100%;
 	
 	> * {
 		margin-top: var(--cp-gap--sm);
@@ -383,9 +383,26 @@ body .cploc-map-popup {
 
 	&--info {
 		font-size: var(--cp-font-size--sm);
+		flex-grow: 1;
+		
+		> * {
+			line-height: 1.25;
+			display: flex;
+			align-items: center;			
+			
+			&:not(:last-child) {
+				margin-bottom: var(--cp-gap--sm);
+			}
+			
+			span {
+				font-size: 1em;
+				margin-right: 1em;
+			}
+		}
 	}
+	
 	&--thumb {
-		margin: calc(var(--cp-gap--md) * -1) calc(var(--cp-gap--md) * -1) var(--cp-gap--sm);
+		margin: calc(var(--cp-gap--md) * -1) calc(var(--cp-gap--md) * -1) 0;
 		padding-bottom: calc( 56.25% + var(--cp-gap--md) * 2 );
 		background-size: cover;
 		background-position: center center;
