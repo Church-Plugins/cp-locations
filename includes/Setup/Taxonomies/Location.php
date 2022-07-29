@@ -254,11 +254,10 @@ class Location extends Taxonomy  {
 				if ( $update_request_uri && 
 					 ( 
 						! empty( $matches[2] ) 
-						|| isset( $_GET['fl_builder'], $_GET['page_id'] ) 
-						|| isset( $_GET['fl_builder'], $_GET['p'] ) 
+						|| isset( $_GET['fl_builder'], $_GET['page_id'] ) // page, post
+						|| isset( $_GET['fl_builder'], $_GET['p'] ) // custom post type
 					 ) 
 				) {
-					
 					$_SERVER['REQUEST_URI'] = $matches[2];
 					
 					if ( $query_params ) {
