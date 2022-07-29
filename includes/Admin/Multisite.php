@@ -127,7 +127,7 @@ class Multisite {
 	 * @author Tanner Moushey
 	 */
 	public static function get_location_site_map( $id = null ) {
-		$map = apply_filters( 'cploc_get_location_site_map', [ 4 => 164 ] );
+		$map = apply_filters( 'cploc_get_location_site_map', [] );
 		
 		if ( ! $id ) {
 			return $map;
