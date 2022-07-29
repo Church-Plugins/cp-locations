@@ -81,11 +81,11 @@ const DesktopFinder = ({
 	
 						<div className="cploc-map--locations--list--cont">
 							<div className="cploc-map--locations--list">
-								<div className="cploc-map--locations--mode" style={{display: 'none'}}>
+								<div className="cploc-map--locations--mode">
 									<span className="cploc--mode-switch" onClick={() => {
 										closePopups();
 										setMode('list');
-									}}>Hide map</span>
+									}}>Show as Cards</span>
 								</div>
 
 								{userGeo !== false && (
@@ -193,7 +193,6 @@ const DesktopFinder = ({
 							<div className="cploc-list--item" key={index}>
 								<div dangerouslySetInnerHTML={{__html: location.templates.popup }} />
 								{(userGeo !== false && location.distanceDesc) && (<div className="cploc-list-item--distance">{location.distanceDesc} miles away</div>)}
-								<div className="cp-button" onClick={() => { setMode('map'); setTimeout(() => onClick(index), 250); }}>View on Map ></div>
 							</div>
 						))}
 					</div>
