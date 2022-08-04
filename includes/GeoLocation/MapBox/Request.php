@@ -30,7 +30,7 @@ class Request extends RequestJSON {
 	 */
 	public function __construct() {
 		$this->method = 'GET';
-		$this->api_key = 'pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaTkwdWcwcm9yM2NueGRhdmR3M3Y1In0.Su6h_mXCh6WfLO4aJ5uMFg';
+		$this->api_key = apply_filters( 'cp_loc_mapbox_api_key', '' );
 	}
 
 	/**

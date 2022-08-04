@@ -31,11 +31,26 @@ class ShortCodes {
 	 */
 	protected function __construct() {
 		add_shortcode( 'cp-location-data', [ $this, 'location_data_cb' ] );
+		add_shortcode( 'cp-locations', [ $this, 'locations_cb' ] );
 	}
 
 	protected function actions() {}
 
 	/** Actions ***************************************************/
+
+	/**
+	 * Print locations container
+	 * 
+	 * @param $atts
+	 *
+	 * @return string
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function locations_cb( $atts ) {
+		return '<div id="cploc_root"></div>';
+	}
 	
 	public function location_data_cb( $atts ) {
 		$atts = shortcode_atts( [
