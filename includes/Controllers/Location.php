@@ -26,17 +26,15 @@ class Location extends Controller {
 		return $this->filter( get_permalink( $this->post->ID ), __FUNCTION__ );
 	}
 	
-	public function get_geo() {
+	public function get_geo( $force = false ) {
 		
 		if ( ! $this->address ) {
 			return [];
 		}
 
-		$cach_key    = 'cploc_geo_data';
-		$address_key = md5( $this->address );
-		$geo_data    = get_option( $cach_key, [] );
+		$geo_data    = $this->geo;
 		
-		if ( empty( $geo_data[ $address_key ] ) ) {
+		if ( $force || empty( $geo_data ) ) {
 			$request_url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' . urlencode( $this->address ) . '.json';
 			$request_url = add_query_arg( [
 				'types'        => 'address',
@@ -69,11 +67,16 @@ class Location extends Controller {
 				}
 			}
 			
-			$geo_data[ $address_key ] = $data;
-			update_option( $cach_key, $geo_data, false );
+			$geo_data = $data;
+			update_post_meta( $this->post->ID, 'geo', $geo_data );
 		}
 		
-		return $geo_data[ $address_key ];
+		// allow overwriting the coordinates
+		if ( $coordinates = $this->geo_coordinates ) {
+			$geo_data['center'] = array_map( 'trim', explode( ',', $coordinates ) );
+		}
+		
+		return $geo_data;
 	}
 	
 	public function __get( $name ) {

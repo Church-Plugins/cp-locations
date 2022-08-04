@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 use ChurchPlugins\Setup\Tables\SourceMeta;
 use CP_Locations\Admin\Settings;
+use CP_Locations\Controllers\Location as Controller;
 
 use ChurchPlugins\Setup\PostTypes\PostType;
 
@@ -184,6 +185,13 @@ class Location extends PostType {
 		], 10 );
 
 		$cmb->add_field( [
+			'name' => __( 'Geolocation', 'cp-locations' ),
+			'desc' => __( 'The geo coordinates of this location.', 'cp-locations' ),
+			'id'   => 'geo_coordinates',
+			'type' => 'text',
+		], 10 );
+
+		$cmb->add_field( [
 			'name' => __( 'Phone Number', 'cp-locations' ),
 			'desc' => __( 'The phone number for this location.', 'cp-locations' ),
 			'id'   => 'phone',
@@ -267,6 +275,16 @@ class Location extends PostType {
 			wp_insert_term( $post->post_title, $tax, [ 'slug' => 'location_' . $post_id ] );
 		} else {
 			wp_update_term( $term->term_id, $tax, [ 'name' => $post->post_title, 'slug' => 'location_' . $post_id ] );
+		}
+		
+		// save geo data
+		if ( ! get_post_meta( $post_id, 'geo_coordinates', true ) ) {
+			$location = new Controller( $post_id );
+			$geo      = $location->get_geo( true );
+			
+			if ( ! empty( $geo['center'] ) ) {
+				update_post_meta( $post_id, 'geo_coordinates', implode( ', ', $geo['center'] ) );
+			}
 		}
 		
 		// our permastructure is based on this 
