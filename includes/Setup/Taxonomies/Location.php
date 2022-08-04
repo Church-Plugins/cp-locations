@@ -95,7 +95,9 @@ class Location extends Taxonomy  {
 	 */
 	public function get_terms() {
 		$data = $this->get_term_data();
-		$terms = [];
+		$terms = [
+			'global' => __( 'Global (All Locations)', 'cp-location' ),
+		];
 		
 		foreach( $data as $location ) {
 			$terms[ 'location_' . $location->origin_id ] = $location->title;
@@ -168,6 +170,8 @@ class Location extends Taxonomy  {
 		if ( is_wp_error( $terms ) ) {
 			return $data;
 		}
+		
+		
 
 		return $terms;
 	}
@@ -456,21 +460,33 @@ class Location extends Taxonomy  {
 			return $link;
 		}
 		
+		$path = isset( self::$_rewrite_location['path'] ) ? self::$_rewrite_location['path'] : false;
+		
 		// if we are looking at a location page and the url already has the location path, return early
-		if ( isset( self::$_rewrite_location['path'] ) && strstr( $link, self::$_rewrite_location['path'] ) ) {
+		if ( $path && strstr( $link, $path ) ) {
 			return $link;
 		}
 		
+		$is_global = has_term( 'global', $this->taxonomy, $post );
 		$locations = get_the_terms( $post, $this->taxonomy );
+		$found     = false;
 		
 		if ( is_wp_error( $locations ) || ! $locations ) {
 			return $link;
 		}
 		
-		foreach ( $locations as $location ) {
-			if (self::$_rewrite_location && $location->slug === self::$_rewrite_location['term'] ) {
+		$location = apply_filters( 'cp_loc_default_location_term', $locations[0], $post->ID );
+		foreach ( $locations as $loc ) {
+			if ( $loc->slug === $path ) {
+				$location = $loc;
+				$found    = true;
 				break;
 			}
+		}
+		
+		// use the default link if we didn't find the location specific term
+		if ( ! $found && $is_global ) {
+			return $link;
 		}
 		
 		$id = self::get_id_from_term( $location->slug );
@@ -711,21 +727,22 @@ class Location extends Taxonomy  {
 				continue;
 			}
 			
-			// if the location_id is not set but this page has a term, continue
-			// we don't allow location pages to be accessed outside of the location context
+			$is_global = has_term( 'global', $this->taxonomy, $page );
 			
-			// @todo rethinking this. Sometimes we want a page that has a location to also be available outside the location context
-//			if ( ! $location_id && has_term( '', $this->taxonomy, $page ) ) {
-//				continue;
-//			}			
+			// if the location_id is not set but this page has a location and is not global, continue
+			// we don't allow location pages to be accessed outside of the location context
+			if ( ! $location_id && 
+				 ( ! $is_global && has_term( '', $this->taxonomy, $page ) ) 
+			) {
+				continue;
+			}			
 			
 			if ( $location_id && has_term( "location_$location_id", $this->taxonomy, $page ) ) {
 				$valid_pages[ $id ] = $page;
 			}
 			
-			// use top level pages as a fallback
-			// Use all pages as fallback for top level
-			if ( ! $location_id || ! has_term( '', $this->taxonomy, $page ) ) {
+			// use global pages as a fallback
+			if ( ! $location_id || $is_global  ) {
 				$fallback_pages[ $id ] = $page;
 			}
 		}
