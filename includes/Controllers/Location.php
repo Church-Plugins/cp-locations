@@ -9,6 +9,24 @@ use function CP_Locations\get_template_part;
 
 class Location extends Controller {
 
+	/**
+	 * constructor.
+	 *
+	 * @param $id
+	 * @param bool $use_origin whether or not to use the origin id
+	 *
+	 * @throws Exception
+	 */
+	public function __construct( $id, $use_origin = true ) {
+		// handle our global placeholder, it doesn't have an associated post
+		if ( $id == 'global' ) {
+			$this->model = new LocationModel();
+			$this->post  = new \WP_Post( new \stdClass() );
+		} else {
+			parent::__construct( $id, $use_origin );
+		}
+	}
+	
 	public function get_content( $raw = false ) {
 		$content = get_the_content( null, false, $this->post );
 		if ( ! $raw ) {
