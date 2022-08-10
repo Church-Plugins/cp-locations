@@ -131,6 +131,10 @@ class Init {
 			$post_id = $args[0];
 			$post_type = get_post_type( $post_id );
 			
+			if ( 'auto-draft' == get_post_status( $post_id ) ) {
+				return $caps;
+			}
+			
 			if ( cp_locations()->setup->post_types->locations->post_type === $post_type ) {
 				if ( in_array( $post_id, $user_locations ) ) {
 					return $caps;
