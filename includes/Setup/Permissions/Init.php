@@ -143,7 +143,13 @@ class Init {
 				return $caps;
 			}
 			
-			$terms = get_the_terms( $post_id, cp_locations()->setup->taxonomies->location->taxonomy );
+			$tax = cp_locations()->setup->taxonomies->location->taxonomy;
+			
+			if ( isset( $_POST[ $tax ] ) ) {
+				wp_set_post_terms( $post_id, $_POST[ $tax ], $tax );
+			}
+			
+			$terms = get_the_terms( $post_id, $tax );
 			
 			if ( empty( $terms ) ) {
 				return [ 'do_not_allow' ];
