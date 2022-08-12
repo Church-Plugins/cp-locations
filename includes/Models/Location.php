@@ -62,7 +62,7 @@ ORDER BY %2$s.order ASC', $instance->table_name, $meta->table_name, $type_id );
 		if ( $origin ) {
 			do_action( 'cploc_multisite_switch_to_main_site' );
 			$ids = wp_list_pluck( $locations, 'origin_id' );
-			$locations = get_posts( [ 'post_type' => $instance->post_type, 'post__in' => $ids, 'posts_per_page' => 999 ] );
+			$locations = get_posts( [ 'post_type' => $instance->post_type, 'post__in' => $ids, 'posts_per_page' => 999, 'orderby' => 'menu_order', 'order' => 'ASC' ] );
 			do_action( 'cploc_multisite_restore_current_blog' );
 		}
 
