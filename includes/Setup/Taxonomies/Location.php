@@ -227,6 +227,11 @@ class Location extends Taxonomy  {
 		// only update the request URI if it hasn't been filtered.
 		$update_request_uri = ( $request_uri === $_SERVER['REQUEST_URI'] );
 		
+		// make sure we have a ? to explode
+		if ( !strstr( $request_uri, '?' ) ) {
+			$request_uri .= '?';
+		}
+		
 		list( $req_uri, $query_params ) = explode( '?', $request_uri );
 		
 		$pathinfo         = isset( $_SERVER['PATH_INFO'] ) ? $_SERVER['PATH_INFO'] : '';
@@ -619,7 +624,7 @@ class Location extends Taxonomy  {
 		if ( ! empty( $query->queried_object_id ) ) {
 			$where = str_replace( $query->queried_object_id, $id, $where );
 			$query->queried_object_id = $id;
-			$query->queried_object = $posts[0];
+			$query->queried_object = get_post( $id );
 		} else {
 			$where .= " AND $wpdb->posts.ID = '$id'";
 		}
