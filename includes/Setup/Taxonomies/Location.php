@@ -590,12 +590,12 @@ class Location extends Taxonomy  {
 			$posts = get_posts( $query_vars );
 
 			// if the taxonomy is set for this query, return the first found post
-			// if the taxonomy is not set, return the first post without a taxonomy term
+			// if the taxonomy is not set, return the first post with the global tax
 			if ( $has_tax && ! empty( $posts ) ) {
 				$id = $posts[0]->ID;
 			} else if ( ! empty( $posts ) ) {
 				foreach ( $posts as $post ) {
-					if ( ! has_term( '', $this->taxonomy, $post ) ) {
+					if ( has_term( 'global', $this->taxonomy, $post ) ) {
 						$id = $post->ID;
 						break;
 					}
