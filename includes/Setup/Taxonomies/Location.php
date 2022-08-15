@@ -563,6 +563,7 @@ class Location extends Taxonomy  {
 	public function single_page_with_location( $where, $query ) {
 
 		// make sure we are only modifying queries for post_types that are using this tax
+		// @todo make this support arrays
 		if ( isset( $query->query['post_type'] ) && ! in_array( $query->query['post_type'], $this->get_object_types() ) ) {
 			return $where;
 		}
