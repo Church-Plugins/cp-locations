@@ -466,6 +466,7 @@ class Location extends Taxonomy  {
 		}
 		
 		$path = isset( self::$_rewrite_location['path'] ) ? self::$_rewrite_location['path'] : false;
+		$term = isset( self::$_rewrite_location['term'] ) ? self::$_rewrite_location['term'] : false;
 		
 		// if we are looking at a location page and the url already has the location path, return early
 		if ( $path && strstr( $link, $path ) ) {
@@ -482,7 +483,7 @@ class Location extends Taxonomy  {
 		
 		$location = apply_filters( 'cp_loc_default_location_term', $locations[0], $post->ID );
 		foreach ( $locations as $loc ) {
-			if ( $loc->slug === $path ) {
+			if ( $loc->slug === $term ) {
 				$location = $loc;
 				$found    = true;
 				break;
