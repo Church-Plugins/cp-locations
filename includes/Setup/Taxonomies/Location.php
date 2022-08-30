@@ -568,6 +568,7 @@ class Location extends Taxonomy  {
 			return $where;
 		}
 		
+		// does this query already have the location set?
 		$has_tax = isset( $query->query[ $this->taxonomy ] );
 		
 		// if the queried post has the correct taxonomy, return early
@@ -593,16 +594,26 @@ class Location extends Taxonomy  {
 			$query_vars['post_name__in'] = [ $query->query['name'] ];
 			unset( $query_vars['name'] );
 
+			// remove location query filter so we don't get global content
+			add_filter( 'cploc_add_location_to_query', '__return_false' );
 			$posts = get_posts( $query_vars );
-
-			// if the taxonomy is set for this query, return the first found post
-			// if the taxonomy is not set, return the first post with the global tax or
-			// the first post without a taxonomy set if we are not on a location page
-			if ( $has_tax && ! empty( $posts ) ) {
-				$id = $posts[0]->ID;
-			} else if ( ! empty( $posts ) ) {
+			remove_filter( 'cploc_add_location_to_query', '__return_false' );
+			
+			if ( ! empty( $posts ) ) {
 				foreach ( $posts as $post ) {
-					if ( has_term( 'global', $this->taxonomy, $post ) || ( ! has_term( '', $this->taxonomy, $post ) && ! $has_tax ) ) {
+					// set the global post initially as a fallback, we'll overwrite the variable if we find a better option
+					if ( has_term( 'global', $this->taxonomy, $post ) ) {
+						$id = $post->ID;
+					}
+					
+					// we have a location and it matches this post
+					if ( $has_tax && has_term( $query->query[ $this->taxonomy ], $this->taxonomy, $post->ID ) ) {
+						$id = $post->ID;
+						break;
+					}
+					
+					// we do not have a location and neither does this post
+					if ( ! $has_tax && ! has_term( '', $this->taxonomy, $post ) ) {
 						$id = $post->ID;
 						break;
 					}
