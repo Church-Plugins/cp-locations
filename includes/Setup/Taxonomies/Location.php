@@ -267,6 +267,7 @@ class Location extends Taxonomy  {
 					if ( $query_params ) {
 						$_SERVER['REQUEST_URI'] .= '?' . $query_params;
 					}
+					add_action( 'template_redirect', [ $this, 'reset_request_uri' ], 11 );
 				}
 			}
 			
@@ -360,15 +361,24 @@ class Location extends Taxonomy  {
 			return;
 		}
 		
-		// reset REQUEST_URI
-		if ( empty( $_GET['fl_builder'] ) ) {
-			$_SERVER['REQUEST_URI'] = self::$_request_uri;
-		}
-
 		if ( ! isset( $query->query_vars[ 'post_type' ] ) || in_array( $query->query_vars[ 'post_type' ], $this->get_object_types() ) ) {
 			$query->query_vars[ $this->taxonomy ] = self::$_rewrite_location['term'];
 		}
 		
+	}
+
+	/**
+	 * Reset REQUEST_URI
+	 * 
+	 * @since  1.0.1
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function reset_request_uri() {
+		// reset REQUEST_URI
+		if ( empty( $_GET['fl_builder'] ) ) {
+			$_SERVER['REQUEST_URI'] = self::$_request_uri;
+		}
 	}
 
 	/**
