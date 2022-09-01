@@ -227,6 +227,11 @@ class Location extends Taxonomy  {
 		// only update the request URI if it hasn't been filtered.
 		$update_request_uri = ( $request_uri === $_SERVER['REQUEST_URI'] );
 		
+		// make sure we have a ? to explode
+		if ( !strstr( $request_uri, '?' ) ) {
+			$request_uri .= '?';
+		}
+		
 		list( $req_uri, $query_params ) = explode( '?', $request_uri );
 		
 		$pathinfo         = isset( $_SERVER['PATH_INFO'] ) ? $_SERVER['PATH_INFO'] : '';
@@ -411,7 +416,7 @@ class Location extends Taxonomy  {
 		}
 
 		if ( apply_filters( 'cploc_add_location_to_query', ( isset( $query->query_vars['post_type'] ) && in_array( $query->query_vars['post_type'], $this->get_object_types() ) ), $query ) ) {
-			$query->set( $this->taxonomy, self::$_rewrite_location['term'] );
+			$query->set( $this->taxonomy, [ self::$_rewrite_location['term'], 'global' ] );
 		}
 	}
 
@@ -471,6 +476,7 @@ class Location extends Taxonomy  {
 		}
 		
 		$path = isset( self::$_rewrite_location['path'] ) ? self::$_rewrite_location['path'] : false;
+		$term = isset( self::$_rewrite_location['term'] ) ? self::$_rewrite_location['term'] : false;
 		
 		// if we are looking at a location page and the url already has the location path, return early
 		if ( $path && strstr( $link, $path ) ) {
@@ -487,7 +493,7 @@ class Location extends Taxonomy  {
 		
 		$location = apply_filters( 'cp_loc_default_location_term', $locations[0], $post->ID );
 		foreach ( $locations as $loc ) {
-			if ( $loc->slug === $path ) {
+			if ( $loc->slug === $term ) {
 				$location = $loc;
 				$found    = true;
 				break;
@@ -567,6 +573,13 @@ class Location extends Taxonomy  {
 	 */
 	public function single_page_with_location( $where, $query ) {
 
+		// make sure we are only modifying queries for post_types that are using this tax
+		// @todo make this support arrays
+		if ( isset( $query->query['post_type'] ) && ! in_array( $query->query['post_type'], $this->get_object_types() ) ) {
+			return $where;
+		}
+		
+		// does this query already have the location set?
 		$has_tax = isset( $query->query[ $this->taxonomy ] );
 		
 		// if the queried post has the correct taxonomy, return early
@@ -592,15 +605,26 @@ class Location extends Taxonomy  {
 			$query_vars['post_name__in'] = [ $query->query['name'] ];
 			unset( $query_vars['name'] );
 
+			// remove location query filter so we don't get global content
+			add_filter( 'cploc_add_location_to_query', '__return_false' );
 			$posts = get_posts( $query_vars );
-
-			// if the taxonomy is set for this query, return the first found post
-			// if the taxonomy is not set, return the first post without a taxonomy term
-			if ( $has_tax && ! empty( $posts ) ) {
-				$id = $posts[0]->ID;
-			} else if ( ! empty( $posts ) ) {
+			remove_filter( 'cploc_add_location_to_query', '__return_false' );
+			
+			if ( ! empty( $posts ) ) {
 				foreach ( $posts as $post ) {
-					if ( ! has_term( '', $this->taxonomy, $post ) ) {
+					// set the global post initially as a fallback, we'll overwrite the variable if we find a better option
+					if ( has_term( 'global', $this->taxonomy, $post ) ) {
+						$id = $post->ID;
+					}
+					
+					// we have a location and it matches this post
+					if ( $has_tax && has_term( $query->query[ $this->taxonomy ], $this->taxonomy, $post->ID ) ) {
+						$id = $post->ID;
+						break;
+					}
+					
+					// we do not have a location and neither does this post
+					if ( ! $has_tax && ! has_term( '', $this->taxonomy, $post ) ) {
 						$id = $post->ID;
 						break;
 					}
@@ -629,7 +653,7 @@ class Location extends Taxonomy  {
 		if ( ! empty( $query->queried_object_id ) ) {
 			$where = str_replace( $query->queried_object_id, $id, $where );
 			$query->queried_object_id = $id;
-			$query->queried_object = $posts[0];
+			$query->queried_object = get_post( $id );
 		} else {
 			$where .= " AND $wpdb->posts.ID = '$id'";
 		}
