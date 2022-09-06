@@ -3,7 +3,7 @@
  * Plugin Name: Church Plugins - Locations
  * Plugin URL: https://churchplugins.com
  * Description: Church locations plugin for managing campuses
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Church Plugins
  * Author URI: https://churchplugins.com
  * Text Domain: cp-locations
