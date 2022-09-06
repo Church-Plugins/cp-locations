@@ -474,30 +474,36 @@ class Location extends Taxonomy  {
 		}
 		
 		$is_global = has_term( 'global', $this->taxonomy, $post );
+		
+		// use the default link if it is a global item and we are not on a location page
+		if ( ! $term && $is_global ) {
+			return $link;
+		}
+		
 		$locations = get_the_terms( $post, $this->taxonomy );
 		$found     = false;
 		
 		if ( is_wp_error( $locations ) || ! $locations ) {
 			return $link;
 		}
-		
-		$location = apply_filters( 'cp_loc_default_location_term', $locations[0], $post->ID );
+
+		$location    = apply_filters( 'cp_loc_default_location_term', $locations[0], $post->ID );
+		$location_id = self::get_id_from_term( $location->slug );
 		foreach ( $locations as $loc ) {
 			if ( $loc->slug === $term ) {
-				$location = $loc;
-				$found    = true;
+				$location    = $loc;
+				$found       = true;
+				$location_id = self::get_id_from_term( $location->slug );
 				break;
 			}
 		}
 		
-		// use the default link if we didn't find the location specific term
-		if ( ! $found && $is_global ) {
-			return $link;
+		// if we didn't find a match, we are on a location page, and the current content is global, use the current location term
+		if ( ! $found && $term && $is_global ) {
+			$location_id = self::get_id_from_term( $term );
 		}
 		
-		$id = self::get_id_from_term( $location->slug );
-		
-		if ( ! $loc = get_post( $id ) ) {
+		if ( ! $loc = get_post( $location_id ) ) {
 			return $link;
 		}
 		

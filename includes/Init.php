@@ -183,6 +183,11 @@ class Init {
 		if ( defined( 'TRIBE_EVENTS_FILE' ) ) {
 			Integrations\TheEventsCalendar::get_instance();
 		}
+		
+		if ( defined( 'CP_GROUPS_PLUGIN_VERSION' ) ) {
+			Integrations\CP_Groups::get_instance();
+		}
+		
 	}
 
 	public function global_css_vars() {
