@@ -106,28 +106,14 @@ class Locations extends WP_REST_Controller {
 	 */
 	public function get_locations( $request ) {
 
-		$return_value = [];
-
-		$args = [
-			'post_type'			=> $this->post_type,
-			'post_status'		=> 'publish',
-			'posts_per_page'	=> -1,
-			'orderby’'			=> 'title'
-		];
-		$posts = new \WP_Query( $args );
-
-		if( empty( $posts->post_count ) ) {
-			return $return_value;
-		}
+		$posts = \CP_Locations\Models\Location::get_all_locations( true );
 		
 		$return_value = [
-			'count' => $posts->post_count,
-			'total' => $posts->found_posts,
-			'pages' => $posts->max_num_pages,
+			'count' => count( $posts ),
 			'locations' => [],
 		];
 
-		foreach( $posts->posts as $post ) {
+		foreach( $posts as $post ) {
 			try {
 				$location = new Location( $post->ID );
 				$return_value['locations'][] = $location->get_api_data(); 
