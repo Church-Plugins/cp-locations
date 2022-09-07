@@ -168,6 +168,13 @@ class Location extends PostType {
 		] );
 
 		$cmb->add_field( [
+			'name' => __( 'Subtitle', 'cp-locations' ),
+			'desc' => __( 'The text to show under the location name on dropdowns and maps.', 'cp-locations' ),
+			'id'   => 'subtitle',
+			'type' => 'text',
+		], 5 );
+
+		$cmb->add_field( [
 			'name' => __( 'Pastor', 'cp-locations' ),
 			'desc' => __( 'The name of the lead pastor at this location.', 'cp-locations' ),
 			'id'   => 'pastor',

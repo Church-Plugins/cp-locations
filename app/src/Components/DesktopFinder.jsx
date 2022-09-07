@@ -107,7 +107,7 @@ const DesktopFinder = ({
 										<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumbnail + ')'}} /></div>
 										<div className="cploc-map-location--content">
 											<h3 className="cploc-map-location--title">{location.title} {(userGeo && location.distanceDesc) && (<small className="cploc-map-location--distance">({location.distanceDesc}mi)</small>)}</h3>
-											<div className="cploc-map-location--desc">{location.pastor}</div>
+											<div className="cploc-map-location--desc">{location.subtitle}</div>
 			
 											<div className="cploc-map-location--times"></div>
 										</div>
