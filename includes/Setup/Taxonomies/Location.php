@@ -611,10 +611,7 @@ class Location extends Taxonomy  {
 			$query_vars['post_name__in'] = [ $query->query['name'] ];
 			unset( $query_vars['name'] );
 
-			// remove location query filter so we don't get global content
-			add_filter( 'cploc_add_location_to_query', '__return_false' );
 			$posts = get_posts( $query_vars );
-			remove_filter( 'cploc_add_location_to_query', '__return_false' );
 			
 			if ( ! empty( $posts ) ) {
 				foreach ( $posts as $post ) {
