@@ -171,7 +171,10 @@ class Location extends PostType {
 			'name' => __( 'Subtitle', 'cp-locations' ),
 			'desc' => __( 'The text to show under the location name on dropdowns and maps.', 'cp-locations' ),
 			'id'   => 'subtitle',
-			'type' => 'text',
+			'type' => 'textarea_small',
+			'attributes' => [
+				'rows' => 1,
+			],
 		], 5 );
 
 		$cmb->add_field( [
