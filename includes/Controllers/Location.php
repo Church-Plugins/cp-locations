@@ -163,7 +163,7 @@ class Location extends Controller {
 			'slug'      => $this->post->post_name,
 			'thumb'     => $this->get_thumbnail(),
 			'title'     => htmlspecialchars_decode( $this->get_title(), ENT_QUOTES | ENT_HTML401 ),
-			'subtitle'  => $this->subtitle,
+			'subtitle'  => nl2br( esc_html( $this->subtitle ) ),
 			'pastor'    => $this->pastor,
 			'desc'      => $this->get_content(),
 			'address'   => wp_kses_post( $this->address ),
