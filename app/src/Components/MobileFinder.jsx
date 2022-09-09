@@ -175,7 +175,7 @@ const MobileFinder = ({
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 									<div className="cploc-map-location--content">
 										<h3 className="cploc-map-location--title">{location.title} {(userGeo && location.distanceDesc) && (<small className="cploc-map-location--distance">({location.distanceDesc}mi)</small>)}</h3>
-										<div className="cploc-map-location--desc">{location.subtitle}</div>
+										<div className="cploc-map-location--desc" dangerouslySetInnerHTML={{__html: location.subtitle }} />
 		
 										<div className="cploc-map-location--times"></div>
 									</div>
@@ -194,7 +194,7 @@ const MobileFinder = ({
 								</div>
 								<div className="cploc-map-location--content">
 									<h3 className="cploc-map-location--title">{currentLocation.title} {(userGeo && currentLocation.distanceDesc) && (<span className="cploc-map-location--distance">({currentLocation.distanceDesc}mi)</span>)}</h3>
-									<div className="cploc-map-location--desc">{currentLocation.subtitle}</div>
+									<div className="cploc-map-location--desc" dangerouslySetInnerHTML={{__html: currentLocation.subtitle }}/>
 								</div>
 							</div>
 
