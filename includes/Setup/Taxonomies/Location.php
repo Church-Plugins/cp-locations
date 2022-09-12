@@ -553,12 +553,16 @@ class Location extends Taxonomy  {
 			return $slug;
 		}
 
+		// get the existing permalink
 		$permalink = str_replace( $slug, $original_slug, get_permalink( $post_ID ) );
+		
+		// Get all content in this post type with the same name (excluding the current item)
 		$check_sql = "SELECT * FROM $wpdb->posts WHERE post_name = %s AND post_type = %s AND ID != %d LIMIT 999";
 		$posts     = $wpdb->get_results( $wpdb->prepare( $check_sql, $original_slug, $post_type, $post_ID ) );
 		
 		foreach( $posts as $post ) {
-			if ( get_the_permalink( $post->ID ) == $permalink ) {
+			// if the permalink of an existing post matches (including location), let WP do its thing
+			if ( get_the_permalink( $post->ID ) == $permalink && ! has_term( 'global', $this->taxonomy, $post ) ) {
 				return $slug;
 			}
 		}
