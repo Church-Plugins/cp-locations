@@ -55,6 +55,7 @@ class Location extends Taxonomy  {
 		
 		// run these actions every time, even if we aren't fully enabled
 		add_filter( 'body_class', [ $this, 'body_class' ] );
+		add_action( 'wp_head', [ $this, 'location_css' ] );
 		add_action( 'template_redirect', [ $this, 'add_location_query_var' ] );
 	}
 
@@ -668,6 +669,35 @@ class Location extends Taxonomy  {
 		return $where;
 	}
 
+	/**
+	 * Print location visibility CSS
+	 * 
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function location_css() {
+		$locations = \CP_Locations\Models\Location::get_all_locations( true );
+		
+		echo '<!-- CP Location visibility styles -->';
+		echo '<style id="cp-location-visibility">';
+		echo '.cp_location-found .location-hide { display: none !important; }';
+		echo '.cp_location-none .location-show { display: none !important; }';
+		
+		foreach ( $locations as $location ) {
+			printf( '.cp_location-%1$s .location-%1$s-hide { display: none !important; }', $location->ID );
+			foreach ( $locations as $loc ) {
+				if ( $loc->ID == $location->ID ) {
+					continue;
+				}
+				
+				printf( '.cp_location-%s .location-%s-show { display: none !important; }', $loc->ID, $location->ID );
+			}
+		}
+		
+		echo '</style>';
+	}
+	
 	/**
 	 * Add the location parameter to the body class if it exists
 	 * 
