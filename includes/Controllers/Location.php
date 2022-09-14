@@ -166,7 +166,7 @@ class Location extends Controller {
 			'subtitle'  => nl2br( esc_html( $this->subtitle ) ),
 			'pastor'    => $this->pastor,
 			'desc'      => $this->get_content(),
-			'address'   => wp_kses_post( $this->address ),
+			'address'   => wp_kses_post( nl2br( $this->address ) ),
 			'phone'     => $this->phone,
 			'email'     => $this->email,
 			'times'     => $this->get_formatted_times(),

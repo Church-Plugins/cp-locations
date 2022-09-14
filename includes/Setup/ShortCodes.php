@@ -78,7 +78,7 @@ class ShortCodes {
 				$data = self::format_times( get_post_meta( $location_id, 'service_times', true ) );
 				break;
 			default:
-				$data = get_post_meta( $location_id, $atts['field'], true );
+				$data = wp_kses_post( nl2br( get_post_meta( $location_id, $atts['field'], true ) ) );
 				break;
 		}
 		
