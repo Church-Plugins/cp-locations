@@ -201,7 +201,7 @@ const MobileFinder = ({
 						</div>
 					)}
 					
-					<div className="cploc-map--locations--mode" onClick={switchPaneMode}>{'list' === mode ? (<span><span className="material-icons">map</span> Map View</span>) : (<span><span className="material-icons">list</span> List View</span>) }</div>
+					<div className={"cploc-map--locations--mode cploc-map-mode--" + mode} onClick={switchPaneMode}>{'list' === mode ? (<span><span className="material-icons">map</span> <span className="cploc-map--locations--mode--text">Map View</span></span>) : (<span><span className="material-icons">list</span> <span className="cploc-map--locations--mode--text">List View</span></span>) }</div>
 
 				</div>
 
