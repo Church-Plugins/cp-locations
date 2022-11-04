@@ -267,7 +267,7 @@ class Location extends Taxonomy  {
 						|| isset( $_GET['fl_builder'], $_GET['p'] ) // custom post type
 					 ) 
 				) {
-					$_SERVER['REQUEST_URI'] = $matches[2];
+					$_SERVER['REQUEST_URI'] = '/' . ltrim( $matches[2], '/' );
 					
 					if ( $query_params ) {
 						$_SERVER['REQUEST_URI'] .= '?' . $query_params;
@@ -607,7 +607,7 @@ class Location extends Taxonomy  {
 
 			// remove location query filter so we don't get global content
 			add_filter( 'cploc_add_location_to_query', '__return_false' );
-			$posts = get_posts( $query_vars );
+			$posts = ( function_exists( 'tribe_get_events' ) && 'tribe_events' == $query_vars['post_type'] ) ? tribe_get_events( $query_vars ) : get_posts( $query_vars );
 			remove_filter( 'cploc_add_location_to_query', '__return_false' );
 			
 			if ( ! empty( $posts ) ) {
@@ -654,10 +654,10 @@ class Location extends Taxonomy  {
 			$where = str_replace( $query->queried_object_id, $id, $where );
 			$query->queried_object_id = $id;
 			$query->queried_object = get_post( $id );
-		} else {
+		} else if ( 'tribe_events' !== get_post_type( $id ) ) {
 			$where .= " AND $wpdb->posts.ID = '$id'";
 		}
-		
+
 		return $where;
 	}
 
