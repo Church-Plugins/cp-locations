@@ -11,6 +11,7 @@
 namespace CP_Locations\GeoLocation\MapBox;
 
 use ChurchPlugins\RequestAPI\ResponseJSON;
+use CP_Locations\Exception;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -26,6 +27,10 @@ class Response extends ResponseJSON {
 			return [];
 		}
 
+		if ( empty( $this->response_data->features ) ) {
+			throw new Exception( 'Could not find the provided location' );
+		}
+		
 		$feature = $this->response_data->features[0];
 		
 		$data    = [

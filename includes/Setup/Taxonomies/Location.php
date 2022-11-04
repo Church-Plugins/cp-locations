@@ -55,6 +55,7 @@ class Location extends Taxonomy  {
 		
 		// run these actions every time, even if we aren't fully enabled
 		add_filter( 'body_class', [ $this, 'body_class' ] );
+		add_action( 'wp_head', [ $this, 'location_css' ] );
 		add_action( 'template_redirect', [ $this, 'add_location_query_var' ] );
 	}
 
@@ -484,30 +485,36 @@ class Location extends Taxonomy  {
 		}
 		
 		$is_global = has_term( 'global', $this->taxonomy, $post );
+		
+		// use the default link if it is a global item and we are not on a location page
+		if ( ! $term && $is_global ) {
+			return $link;
+		}
+		
 		$locations = get_the_terms( $post, $this->taxonomy );
 		$found     = false;
 		
 		if ( is_wp_error( $locations ) || ! $locations ) {
 			return $link;
 		}
-		
-		$location = apply_filters( 'cp_loc_default_location_term', $locations[0], $post->ID );
+
+		$location    = apply_filters( 'cp_loc_default_location_term', $locations[0], $post->ID );
+		$location_id = self::get_id_from_term( $location->slug );
 		foreach ( $locations as $loc ) {
 			if ( $loc->slug === $term ) {
-				$location = $loc;
-				$found    = true;
+				$location    = $loc;
+				$found       = true;
+				$location_id = self::get_id_from_term( $location->slug );
 				break;
 			}
 		}
 		
-		// use the default link if we didn't find the location specific term
-		if ( ! $found && $is_global ) {
-			return $link;
+		// if we didn't find a match, we are on a location page, and the current content is global, use the current location term
+		if ( ! $found && $term && $is_global ) {
+			$location_id = self::get_id_from_term( $term );
 		}
 		
-		$id = self::get_id_from_term( $location->slug );
-		
-		if ( ! $loc = get_post( $id ) ) {
+		if ( ! $loc = get_post( $location_id ) ) {
 			return $link;
 		}
 		
@@ -547,12 +554,16 @@ class Location extends Taxonomy  {
 			return $slug;
 		}
 
+		// get the existing permalink
 		$permalink = str_replace( $slug, $original_slug, get_permalink( $post_ID ) );
+		
+		// Get all content in this post type with the same name (excluding the current item)
 		$check_sql = "SELECT * FROM $wpdb->posts WHERE post_name = %s AND post_type = %s AND ID != %d LIMIT 999";
 		$posts     = $wpdb->get_results( $wpdb->prepare( $check_sql, $original_slug, $post_type, $post_ID ) );
 		
 		foreach( $posts as $post ) {
-			if ( get_the_permalink( $post->ID ) == $permalink ) {
+			// if the permalink of an existing post matches (including location), let WP do its thing
+			if ( get_the_permalink( $post->ID ) == $permalink && ! has_term( 'global', $this->taxonomy, $post ) ) {
 				return $slug;
 			}
 		}
@@ -661,6 +672,35 @@ class Location extends Taxonomy  {
 		return $where;
 	}
 
+	/**
+	 * Print location visibility CSS
+	 * 
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function location_css() {
+		$locations = \CP_Locations\Models\Location::get_all_locations( true );
+		
+		echo '<!-- CP Location visibility styles -->';
+		echo '<style id="cp-location-visibility">';
+		echo '.cp_location-found .location-hide { display: none !important; }';
+		echo '.cp_location-none .location-show { display: none !important; }';
+		
+		foreach ( $locations as $location ) {
+			printf( '.cp_location-%1$s .location-%1$s-hide { display: none !important; }', $location->ID );
+			foreach ( $locations as $loc ) {
+				if ( $loc->ID == $location->ID ) {
+					continue;
+				}
+				
+				printf( '.cp_location-%s .location-%s-show { display: none !important; }', $loc->ID, $location->ID );
+			}
+		}
+		
+		echo '</style>';
+	}
+	
 	/**
 	 * Add the location parameter to the body class if it exists
 	 * 

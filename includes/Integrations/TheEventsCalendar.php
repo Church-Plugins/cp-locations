@@ -52,6 +52,7 @@ class TheEventsCalendar {
 		
 		add_filter( 'home_url', [ $this, 'event_location_url' ], 10, 2 );
 		add_filter( 'cploc_parse_location_request_uri', [ $this, 'event_api_request_location' ] );
+		add_filter( 'tribe_events_views_v2_request_uri', [ $this, 'clean_views_request_uri' ] );
 
 	}
 
@@ -223,6 +224,32 @@ class TheEventsCalendar {
 		
 		$_POST['url'] = str_replace( $matches[0], '', $url );
 		
+		if ( isset( $_POST['prev_url'] ) ) {
+			$_POST['prev_url'] = str_replace( $matches[0], '', $_POST['prev_url'] );
+		}
+		
 		return str_replace( home_url( '/' ), '', $url );
+	}
+
+	/**
+	 * Filter views request_uri to remove location param
+	 * 
+	 * @param $request_uri
+	 *
+	 * @return array|mixed|string|string[]
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function clean_views_request_uri( $request_uri ) {
+		$locations_regex = cp_locations()->setup->taxonomies->location->locations_regex();
+		$slug            = trim( cp_locations()->setup->post_types->locations->get_slug(), '/' );
+
+		// don't rewrite for urls with location already set
+		if ( ! preg_match( "/$slug\/($locations_regex)/", $request_uri, $matches ) ) {
+			return $request_uri;
+		}
+
+		return str_replace( $matches[0], '', $request_uri );
 	}
 }

@@ -175,7 +175,7 @@ const MobileFinder = ({
 									<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
 									<div className="cploc-map-location--content">
 										<h3 className="cploc-map-location--title">{location.title} {(userGeo && location.distanceDesc) && (<small className="cploc-map-location--distance">({location.distanceDesc}mi)</small>)}</h3>
-										<div className="cploc-map-location--desc">{location.pastor}</div>
+										<div className="cploc-map-location--desc" dangerouslySetInnerHTML={{__html: location.subtitle }} />
 		
 										<div className="cploc-map-location--times"></div>
 									</div>
@@ -194,14 +194,14 @@ const MobileFinder = ({
 								</div>
 								<div className="cploc-map-location--content">
 									<h3 className="cploc-map-location--title">{currentLocation.title} {(userGeo && currentLocation.distanceDesc) && (<span className="cploc-map-location--distance">({currentLocation.distanceDesc}mi)</span>)}</h3>
-									<div className="cploc-map-location--desc">{currentLocation.pastor}</div>
+									<div className="cploc-map-location--desc" dangerouslySetInnerHTML={{__html: currentLocation.subtitle }}/>
 								</div>
 							</div>
 
 						</div>
 					)}
 					
-					<div className="cploc-map--locations--mode" onClick={switchPaneMode}>{'list' === mode ? (<span><span className="material-icons">map</span> Map View</span>) : (<span><span className="material-icons">list</span> List View</span>) }</div>
+					<div className={"cploc-map--locations--mode cploc-map-mode--" + mode} onClick={switchPaneMode}>{'list' === mode ? (<span><span className="material-icons">map</span> <span className="cploc-map--locations--mode--text">Map View</span></span>) : (<span><span className="material-icons">list</span> <span className="cploc-map--locations--mode--text">List View</span></span>) }</div>
 
 				</div>
 
