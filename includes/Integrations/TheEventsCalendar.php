@@ -13,6 +13,8 @@ class TheEventsCalendar {
 	 */
 	protected static $_instance;
 
+	protected static $_redirected = false;
+	
 	/**
 	 * Only make one instance of Locations
 	 *
@@ -53,10 +55,73 @@ class TheEventsCalendar {
 		add_filter( 'home_url', [ $this, 'event_location_url' ], 10, 2 );
 		add_filter( 'cploc_parse_location_request_uri', [ $this, 'event_api_request_location' ] );
 		add_filter( 'tribe_events_views_v2_request_uri', [ $this, 'clean_views_request_uri' ] );
-
+		add_filter( 'old_slug_redirect_url', [ $this, 'old_slug_redirect_occurence' ], 11 );
+		add_filter( 'redirect_canonical', [ $this, 'canonical_occurence' ], 10, 2 );
 	}
 
 	/** Actions ***************************************************/
+
+	/**
+	 * Make sure canonical redirect for events point to the correct occurence.
+	 *
+	 * By default TEC will set the canonical link to the first event an in a series. When we
+	 * force a location prefix on an event, the canonical redirect is triggered and we need to 
+	 * make sure that we maintain the correct event date.
+	 *
+	 * @param $redirect_url
+	 * @param $requested_url
+	 *
+	 * @return false|mixed|string
+	 * @since  1.0.1
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function canonical_occurence( $redirect_url, $requested_url ) {
+		global $wp;
+		
+		// redirect_canonical double checks the redirected url to make sure a redirect loop
+		// isn't triggered. We need to short circuit that check. 
+		if ( self::$_redirected ) {
+			return false;
+		}
+		
+		// make sure we are looking at a recurring event
+		if ( empty( $wp->query_vars['eventDate'] ) ) {
+			return $redirect_url;
+		}
+		
+		$slug = '/' . \Tribe__Events__Main::instance()->getRewriteSlugSingular() . '/';
+		
+		$redirect = explode( $slug, $redirect_url );
+		$request = explode( $slug, $requested_url );
+		
+		if ( count( $redirect ) > 1 && $redirect[0] !== $request[0] ) {
+			$redirect_url = $redirect[0] . $slug . $request[1];
+			self::$_redirected = true;
+		}
+		
+		return $redirect_url;
+	}
+	
+	/**
+	 * Old slug redirect does not work correctly with recurring events. Disable it.
+	 * 
+	 * @param $link
+	 *
+	 * @return false|mixed
+	 * @since  1.0.1
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function old_slug_redirect_occurence( $link ) {
+		global $wp;
+		
+		if ( ! empty( $wp->query_vars['eventDate'] ) ) {
+			return false;
+		}
+		
+		return $link;
+	}
 
 	/**
 	 * Filters the Context locations to let the Context know how to fetch the value of the filter from a request.
