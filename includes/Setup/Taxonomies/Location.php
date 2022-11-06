@@ -183,7 +183,7 @@ class Location extends Taxonomy  {
 		add_filter( 'wp_unique_post_slug', [ $this, 'unique_slug' ], 10, 6 );
 		add_filter( 'page_link', [ $this, 'location_permalink' ], 10, 2 );
 		add_filter( 'post_link', [ $this, 'location_permalink' ], 10, 2 );
-		add_filter( 'post_type_link', [ $this, 'location_permalink' ], 10, 2 );
+		add_filter( 'post_type_link', [ $this, 'location_permalink' ], 20, 2 );
 		
 		parent::add_actions();
 	}
