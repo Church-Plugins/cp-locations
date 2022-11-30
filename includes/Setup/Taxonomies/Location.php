@@ -416,7 +416,14 @@ class Location extends Taxonomy  {
 			return;
 		}
 
-		if ( apply_filters( 'cploc_add_location_to_query', ( isset( $query->query_vars['post_type'] ) && in_array( $query->query_vars['post_type'], $this->get_object_types() ) ), $query ) ) {
+		if ( empty( $query->query_vars['post_type'] ) ) {
+			return;
+		}
+		
+		// add location if we only have location post_types
+		$add_location = empty( array_diff( (array) $query->query_vars['post_type'], $this->get_object_types() ) );
+		
+		if ( apply_filters( 'cploc_add_location_to_query', $add_location, $query ) ) {
 			$query->set( $this->taxonomy, [ self::$_rewrite_location['term'], 'global' ] );
 		}
 	}
