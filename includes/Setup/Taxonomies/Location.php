@@ -413,6 +413,10 @@ class Location extends Taxonomy  {
 	 * @author Tanner Moushey
 	 */
 	public function include_global_items( $query ) {
+		
+		if ( is_admin() ) {
+			return;
+		}
 
 		// allow short circuit of global query add
 		if ( ! apply_filters( 'cploc_show_global_in_all_queries', true, $query ) ) {
