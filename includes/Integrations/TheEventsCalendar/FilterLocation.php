@@ -64,6 +64,11 @@ class FilterLocation extends \Tribe__Events__Filterbar__Filter {
 		$values         = (array) $this->currentValue;
 
 		$values      = ! empty( $values[0] ) ? explode( ',', $values[0] ) : $values;
+		
+		if ( apply_filters( 'cploc_show_global_in_all_queries', true, $query ) ) {
+			$values[] = 'global';
+		}
+		
 		$new_rules[] = array(
 			'taxonomy' => Location::$_taxonomy,
 			'operator' => 'IN',

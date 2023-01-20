@@ -57,6 +57,7 @@ class Location extends Taxonomy  {
 		add_filter( 'body_class', [ $this, 'body_class' ] );
 		add_action( 'wp_head', [ $this, 'location_css' ] );
 		add_action( 'template_redirect', [ $this, 'add_location_query_var' ] );
+		add_action( 'pre_get_posts', [ $this, 'include_global_items'] );
 	}
 
 	/**
@@ -402,6 +403,34 @@ class Location extends Taxonomy  {
 		}
 		
 		set_query_var( 'cp_location_id', $location['ID'] );
+	}
+
+	/**
+	 * @param $query \WP_Query
+	 *
+	 * @since  1.0.2
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function include_global_items( $query ) {
+
+		// allow short circuit of global query add
+		if ( ! apply_filters( 'cploc_show_global_in_all_queries', true, $query ) ) {
+			return;
+		}
+
+		$locations = $query->get( $this->taxonomy );
+		if ( empty( $locations ) ) {
+			return;
+		}
+
+		if ( false !== array_search( 'global', $locations ) ) {
+			return;
+		}
+
+		// add global term to all locations queries
+		$locations[] = 'global';
+		$query->set( $this->taxonomy, $locations );
 	}
 
 	/**
