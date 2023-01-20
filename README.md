@@ -24,5 +24,9 @@ npm run build
 #### 1.0.2
 * Include global Locations in all queries
 
+#### 1.0.1
+* Fix canonical link creation
+* Support The Events Calendar recurring event url structure
+
 #### 1.0.0
 * Initial release

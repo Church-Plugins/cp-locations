@@ -423,6 +423,10 @@ class Location extends Taxonomy  {
 		if ( empty( $locations ) ) {
 			return;
 		}
+		
+		if ( ! is_array( $locations ) ) {
+			$locations = [ $locations ];
+		}
 
 		if ( false !== array_search( 'global', $locations ) ) {
 			return;
