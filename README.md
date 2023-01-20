@@ -21,5 +21,8 @@ npm run build
 
 ### Change Log
 
+#### 1.0.2
+* Include global Locations in all queries
+
 #### 1.0.0
 * Initial release
