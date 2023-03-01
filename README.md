@@ -21,6 +21,9 @@ npm run build
 
 ### Change Log
 
+#### 1.0.3
+* Include global Locations in Events query
+
 #### 1.0.2
 * Include global Locations in all queries
 
