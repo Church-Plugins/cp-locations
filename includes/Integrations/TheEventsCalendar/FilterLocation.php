@@ -14,7 +14,7 @@ class FilterLocation extends \Tribe__Events__Filterbar__Filter {
 
 	// Use the trait required for filters to correctly work with Views V2 code.
     use Context_Filter;
-	
+
 	public $type = 'select';
 
 	public function get_admin_form() {
@@ -25,13 +25,13 @@ class FilterLocation extends \Tribe__Events__Filterbar__Filter {
 	}
 
 	protected function get_values() {
-		
+
 		$locations = LocationModel::get_all_locations( true );
-		
+
 		if ( empty( $locations ) || is_wp_error( $locations ) ) {
 			return array();
 		}
-		
+
 		$list = [];
 
 		foreach( $locations as $location ) {
@@ -44,7 +44,7 @@ class FilterLocation extends \Tribe__Events__Filterbar__Filter {
 				'class' => 'tribe-parent-cat cploc-location tribe-events-category-' . $slug
 			);
 		}
-		
+
 		return $list;
 	}
 
@@ -63,12 +63,10 @@ class FilterLocation extends \Tribe__Events__Filterbar__Filter {
 		$existing_rules = (array) $query->get( 'tax_query' );
 		$values         = (array) $this->currentValue;
 
-		$values      = ! empty( $values[0] ) ? explode( ',', $values[0] ) : $values;
-		
 		if ( apply_filters( 'cploc_show_global_in_all_queries', true, $query ) ) {
 			$values[] = 'global';
 		}
-		
+
 		$new_rules[] = array(
 			'taxonomy' => Location::$_taxonomy,
 			'operator' => 'IN',
@@ -113,8 +111,9 @@ class FilterLocation extends \Tribe__Events__Filterbar__Filter {
 
 		// Apply our new meta query rules
 		$query->set( 'tax_query', $tax_query );
+		$query->set( 'taxonomy', 'cp_location' );
 	}
-	
+
 	/**
 	 * Parses the raw value from the context to the format used by the filter.
 	 *
@@ -141,5 +140,5 @@ class FilterLocation extends \Tribe__Events__Filterbar__Filter {
 	 */
 	public static function build_query_arg_value( $value, $context_key, Context $context ) {
 		return Arr::list_to_array( $value, ',' );
-	}	
+	}
 }
