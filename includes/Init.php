@@ -26,10 +26,10 @@ class Init {
 	public $api;
 
 	/**
-	 * @var 
+	 * @var
 	 */
 	public $geoAPI;
-	
+
 	public $enqueue;
 
 	/**
@@ -62,6 +62,13 @@ class Init {
 	 */
 	public function maybe_setup() {
 		if ( ! $this->check_required_plugins() ) {
+			return;
+		}
+
+		$cp = \ChurchPlugins\Setup\Init::get_instance();
+
+		// make sure needed tables are installed
+		if ( ! $cp->is_installed() ) {
 			return;
 		}
 
@@ -178,16 +185,16 @@ class Init {
 	}
 
 	/** Actions **************************************/
-	
+
 	public function load_integrations() {
 		if ( defined( 'TRIBE_EVENTS_FILE' ) ) {
 			Integrations\TheEventsCalendar::get_instance();
 		}
-		
+
 		if ( defined( 'CP_GROUPS_PLUGIN_VERSION' ) ) {
 			Integrations\CP_Groups::get_instance();
 		}
-		
+
 	}
 
 	public function global_css_vars() {
@@ -298,7 +305,7 @@ class Init {
 
 	/**
 	 * Get the key for the geo api
-	 * 
+	 *
 	 * @return string
 	 * @since  1.0.0
 	 *
@@ -307,12 +314,12 @@ class Init {
 	public function get_api_key() {
 		return 'pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaTkwdWcwcm9yM2NueGRhdmR3M3Y1In0.Su6h_mXCh6WfLO4aJ5uMFg';
 	}
-	
+
 	public function enabled() {
 		if ( is_multisite() && ( ! is_main_site() || is_network_admin() ) ) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
