@@ -51,7 +51,7 @@ class Init {
 	 */
 	protected function __construct() {
 		$this->enqueue = new \WPackio\Enqueue( 'cpLocations', 'dist', $this->get_version(), 'plugin', CP_LOCATIONS_PLUGIN_FILE );
-		add_action( 'plugins_loaded', [ $this, 'maybe_setup' ], - 9999 );
+		add_action( 'cp_core_loaded', [ $this, 'maybe_setup' ], - 9999 );
 		add_action( 'init', [ $this, 'maybe_init' ] );
 	}
 
