@@ -75,6 +75,7 @@ class Init {
 		$this->includes();
 		$this->actions();
 		$this->app_init();
+		$this->load_integrations();
 	}
 
 	/**
@@ -181,7 +182,6 @@ class Init {
 	 */
 	protected function actions() {
 		add_action( 'wp_head', [ $this, 'global_css_vars' ] );
-		add_action( 'plugins_loaded', [ $this, 'load_integrations' ] );
 	}
 
 	/** Actions **************************************/
