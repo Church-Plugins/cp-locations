@@ -275,7 +275,7 @@ class Location extends PostType {
 	 *
 	 * @return bool|\ChurchPlugins\Models\Item|\ChurchPlugins\Models\ItemType|\ChurchPlugins\Models\Source
 	 * @since  1.0.0
-	 * @updated
+	 * @updated 1.0.4 - handle auto-drafts and other statuses that shouldn't be saved
 	 *
 	 * @author Tanner Moushey
 	 */
