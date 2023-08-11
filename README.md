@@ -21,6 +21,9 @@ npm run build
 
 ### Change Log
 
+#### 1.0.4
+* Fix error thrown when creating new Location
+
 #### 1.0.3
 * Include global Locations in Events query
 

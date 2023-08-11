@@ -17,12 +17,12 @@ use ChurchPlugins\Setup\PostTypes\PostType;
  * @since 1.0
  */
 class Location extends PostType {
-	
+
 	/**
-	 * @var array 
+	 * @var array
 	 */
 	protected static $_locations_regex = false;
-	
+
 	/**
 	 * Child class constructor. Punts to the parent.
 	 *
@@ -45,7 +45,7 @@ class Location extends PostType {
 
 	/**
 	 * Add custom meta keys for locations
-	 * 
+	 *
 	 * @param $keys
 	 *
 	 * @return mixed
@@ -57,10 +57,10 @@ class Location extends PostType {
 //		$keys[] = 'address';
 		return $keys;
 	}
-	
+
 	/**
 	 * Get the slug for this taxonomy
-	 * 
+	 *
 	 * @return false|mixed
 	 * @since  1.0.0
 	 *
@@ -70,9 +70,9 @@ class Location extends PostType {
 		if ( ! $type = get_post_type_object( $this->post_type ) ) {
 			return false;
 		}
-		
+
 		return false;
-	}	
+	}
 
 	/**
 	 * Return custom meta keys
@@ -100,19 +100,19 @@ class Location extends PostType {
 		$args['rewrite'] = false; // we handle this in register_post_type
 		return $args;
 	}
-	
+
 	public function locations_regex() {
 		if ( false === self::$_locations_regex ) {
 			$locations = \CP_Locations\Models\Location::get_all_locations( true );
-			self::$_locations_regex = implode( '|', wp_list_pluck( $locations, 'post_name' ) ); 
+			self::$_locations_regex = implode( '|', wp_list_pluck( $locations, 'post_name' ) );
 		}
-		
+
 		return self::$_locations_regex;
 	}
 
 	/**
 	 * Register post type and handle custom permastructure
-	 * 
+	 *
 	 * @throws \ChurchPlugins\Exception
 	 * @since  1.0.0
 	 *
@@ -123,7 +123,7 @@ class Location extends PostType {
 
 		// we need to filter the auto generated rules
 		add_filter( "{$this->post_type}_rewrite_rules", [ $this, 'permastructure' ] );
-		
+
 		// grab locations and create our custom rewrite tag
 		$locations = $this->locations_regex();
 		add_rewrite_tag( "%$this->post_type%", "($locations)", "post_type=$this->post_type&name=" );
@@ -142,17 +142,17 @@ class Location extends PostType {
 	 */
 	public function permastructure( $rules ) {
 		$locations = $this->locations_regex();
-		
+
 		$new_rules = [];
 		foreach( $rules as $match => $rule ) {
 			// re-insert non-matching group
 			$new_match = str_replace( $locations . '/', "(?:$locations)/", $match );
 			$new_rules[ $new_match ] = $rule;
 		}
-		
+
 		return $new_rules;
 	}
-	
+
 	public function register_metaboxes() {
 		$this->meta_details();
 	}
@@ -226,7 +226,7 @@ class Location extends PostType {
 				'sortable'      => true,
 			),
 		], 25 );
-	
+
 		$cmb->add_group_field( $group_field_id, [
 			'name' => __( 'Day of Week', 'cp-locations' ),
 			'id'   => 'day',
@@ -242,7 +242,7 @@ class Location extends PostType {
 				'saturday'  => __( 'Saturday', 'cp-locations' ),
 			],
 		], 30 );
-		
+
 		$cmb->add_group_field( $group_field_id, [
 			'name'    => __( 'Time', 'cp-locations' ),
 			'id'      => 'time',
@@ -256,29 +256,34 @@ class Location extends PostType {
 			'type'        => 'text',
 			'description' => __( 'Description of the time. When this is not blank it will be used instead of Time.', 'cp-locations' ),
 		] );
-		
+
 		$cmb->add_group_field( $group_field_id, [
 			'name'        => __( 'Special Service', 'cp-locations' ),
 			'id'          => 'is_special',
 			'type'        => 'checkbox',
 			'description' => __( 'Check to designate this as a special service that shouldn\'t show in the normal times list.', 'cp-locations' ),
 		] );
-		
+
 		do_action( 'cploc_location_meta_details', $cmb, $this );
 
 	}
 
 	/**
 	 * Save term data and update rewrite rules
-	 * 
+	 *
 	 * @param $post_id
 	 *
 	 * @return bool|\ChurchPlugins\Models\Item|\ChurchPlugins\Models\ItemType|\ChurchPlugins\Models\Source
 	 * @since  1.0.0
+	 * @updated
 	 *
 	 * @author Tanner Moushey
 	 */
 	public function save_post( $post_id ) {
+		if ( 'auto-draft' == get_post_status( $post_id ) || wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) || ! $this->model ) {
+			return false;
+		}
+
 		$post = get_post();
 		$tax = cp_locations()->setup->taxonomies->location->taxonomy;
 		if ( ! $term = get_term_by( 'slug', 'location_' . $post_id, $tax ) ) {
@@ -286,20 +291,20 @@ class Location extends PostType {
 		} else {
 			wp_update_term( $term->term_id, $tax, [ 'name' => $post->post_title, 'slug' => 'location_' . $post_id ] );
 		}
-		
+
 		// save geo data
 		if ( ! get_post_meta( $post_id, 'geo_coordinates', true ) ) {
 			$location = new Controller( $post_id );
 			$geo      = $location->get_geo( true );
-			
+
 			if ( ! empty( $geo['center'] ) ) {
 				update_post_meta( $post_id, 'geo_coordinates', implode( ', ', $geo['center'] ) );
 			}
 		}
-		
-		// our permastructure is based on this 
+
+		// our permastructure is based on this
 		flush_rewrite_rules( true );
 		return parent::save_post( $post_id );
 	}
-	
+
 }
