@@ -558,7 +558,7 @@ class Location extends Taxonomy  {
 			$location_id = self::get_id_from_term( $term );
 		}
 		
-		if ( ! $loc = get_post( $location_id ) ) {
+		if ( empty( $location_id ) || ! $loc = get_post( $location_id ) ) {
 			return $link;
 		}
 		
