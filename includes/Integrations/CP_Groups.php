@@ -61,8 +61,9 @@ class CP_Groups {
 		if ( get_query_var( 'cp_location_id' ) ) {
 			return $facets;
 		}
-		
-		$facets[] = cp_locations()->setup->taxonomies->location;
+
+		array_unshift( $facets, cp_locations()->setup->taxonomies->location );
+			
 		return $facets;
 	}
 
