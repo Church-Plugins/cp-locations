@@ -13,28 +13,28 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 1.0
  */
 class Location extends Taxonomy  {
-	
+
 	/**
 	 * Store the found location
-	 * 
-	 * @var bool 
+	 *
+	 * @var bool
 	 */
 	protected static $_rewrite_location = false;
 
 	/**
 	 * Store the request URI
-	 * 
-	 * @var bool 
+	 *
+	 * @var bool
 	 */
 	protected static $_request_uri = false;
 
 	/**
-	 * @var array 
+	 * @var array
 	 */
 	protected static $_locations_regex = false;
 
 	/**
-	 * @var string 
+	 * @var string
 	 */
 	public static $_taxonomy = 'cp_location';
 
@@ -48,11 +48,11 @@ class Location extends Taxonomy  {
 
 		$this->single_label = apply_filters( "{$this->taxonomy}_single_label", 'Location' );
 		$this->plural_label = apply_filters( "{$this->taxonomy}_plural_label", 'Locations' );
-		
+
 		$this->field_type = 'multicheck';
 
 		parent::__construct();
-		
+
 		// run these actions every time, even if we aren't fully enabled
 		add_filter( 'body_class', [ $this, 'body_class' ] );
 		add_action( 'wp_head', [ $this, 'location_css' ] );
@@ -62,7 +62,7 @@ class Location extends Taxonomy  {
 
 	/**
 	 * Get the slug for this taxonomy
-	 * 
+	 *
 	 * @return false|mixed
 	 * @since  1.0.0
 	 *
@@ -72,10 +72,10 @@ class Location extends Taxonomy  {
 		if ( ! $tax = get_taxonomy( $this->taxonomy ) ) {
 			return false;
 		}
-		
+
 		return $tax->rewrite['slug'];
 	}
-	
+
 	/**
 	 * Return the object types for this taxonomy
 	 *
@@ -100,7 +100,7 @@ class Location extends Taxonomy  {
 		$terms = [
 			'global' => __( 'Global (All Locations)', 'cp-location' ),
 		];
-		
+
 		foreach( $data as $location ) {
 			$terms[ 'location_' . $location->origin_id ] = $location->title;
 		}
@@ -110,7 +110,7 @@ class Location extends Taxonomy  {
 
 	/**
 	 * Get the id from the location slug
-	 * 
+	 *
 	 * @param $term
 	 *
 	 * @return array|string|string[]
@@ -132,11 +132,11 @@ class Location extends Taxonomy  {
 	 */
 	public function get_term_data() {
 		$locations = \CP_Locations\Models\Location::get_all_locations();
-		
+
 		if ( empty( $locations ) ) {
 			return [];
 		}
-		
+
 		return apply_filters( "{$this->taxonomy}_get_term_data", $locations );
 	}
 
@@ -172,8 +172,8 @@ class Location extends Taxonomy  {
 		if ( is_wp_error( $terms ) ) {
 			return $data;
 		}
-		
-		
+
+
 
 		return $terms;
 	}
@@ -185,13 +185,13 @@ class Location extends Taxonomy  {
 		add_filter( 'page_link', [ $this, 'location_permalink' ], 10, 2 );
 		add_filter( 'post_link', [ $this, 'location_permalink' ], 10, 2 );
 		add_filter( 'post_type_link', [ $this, 'location_permalink' ], 20, 2 );
-		
+
 		parent::add_actions();
 	}
 
 	/**
 	 * Build the location regex string
-	 * 
+	 *
 	 * @return array|bool|string
 	 * @since  1.0.0
 	 *
@@ -200,84 +200,84 @@ class Location extends Taxonomy  {
 	public function locations_regex() {
 		if ( false === self::$_locations_regex ) {
 			$locations = \CP_Locations\Models\Location::get_all_locations( true );
-			self::$_locations_regex = implode( '|', wp_list_pluck( $locations, 'post_name' ) ); 
+			self::$_locations_regex = implode( '|', wp_list_pluck( $locations, 'post_name' ) );
 		}
-		
+
 		return self::$_locations_regex;
 	}
 
 	/**
 	 * Parse the request before WordPress to see if this is a location page
-	 * 
+	 *
 	 * @return bool
 	 * @since  1.0.0
 	 *
 	 * @author Tanner Moushey
 	 */
 	public function parse_location_request() {
-		
+
 		$locations_regex = $this->locations_regex();
-		
+
 		if ( empty( $locations_regex ) ) {
 			return true;
-		} 
-		
+		}
+
 		self::$_request_uri = $_SERVER['REQUEST_URI'];
-		
+
 		$request_uri = apply_filters( 'cploc_parse_location_request_uri', $_SERVER['REQUEST_URI'] );
 
 		// only update the request URI if it hasn't been filtered.
 		$update_request_uri = ( $request_uri === $_SERVER['REQUEST_URI'] );
-		
+
 		// make sure we have a ? to explode
 		if ( !strstr( $request_uri, '?' ) ) {
 			$request_uri .= '?';
 		}
-		
+
 		list( $req_uri, $query_params ) = explode( '?', $request_uri );
-		
+
 		$pathinfo         = isset( $_SERVER['PATH_INFO'] ) ? $_SERVER['PATH_INFO'] : '';
 		list( $pathinfo ) = explode( '?', $pathinfo );
 		$pathinfo         = str_replace( '%', '%25', $pathinfo );
-		
+
 		$req_uri = str_replace( $pathinfo, '', $req_uri );
 		$req_uri = trailingslashit( trim( $req_uri, '/' ) );
 		$slug    = trim( cp_locations()->setup->post_types->locations->get_slug(), '/' );
-		
+
 		if ( $slug ) {
 			$slug = trailingslashit( $slug );
 		}
-		
+
 		$match = $slug . "($locations_regex)\/(.*)$";
-		
+
 		if ( preg_match( "#^$match#", $req_uri, $matches ) ||
 		     preg_match( "#^$match#", urldecode( $req_uri ), $matches ) ) {
-			
+
 			if ( $location = get_page_by_path( $matches[1], OBJECT, cp_locations()->setup->post_types->locations->post_type ) ) {
-				
+
 				self::$_rewrite_location = [
 					'ID' => $location->ID,
 					'term' => 'location_' . $location->ID,
 					'path' => '/' . $slug . $matches[1],
 				];
-				
+
 				// BB passes a page_id and expects the match to be empty
-				if ( $update_request_uri && 
-					 ( 
-						! empty( $matches[2] ) 
+				if ( $update_request_uri &&
+					 (
+						! empty( $matches[2] )
 						|| isset( $_GET['fl_builder'], $_GET['page_id'] ) // page, post
 						|| isset( $_GET['fl_builder'], $_GET['p'] ) // custom post type
-					 ) 
+					 )
 				) {
 					$_SERVER['REQUEST_URI'] = '/' . ltrim( $matches[2], '/' );
-					
+
 					if ( $query_params ) {
 						$_SERVER['REQUEST_URI'] .= '?' . $query_params;
 					}
 					add_action( 'template_redirect', [ $this, 'reset_request_uri' ], 11 );
 				}
 			}
-			
+
 			// add filters to customize for this location
 			add_action( 'parse_request', [ $this, 'add_location_to_main_query' ] );
 			add_action( 'pre_get_posts', [ $this, 'maybe_add_location_to_query' ] );
@@ -285,13 +285,13 @@ class Location extends Taxonomy  {
 //			add_filter( 'wp_footer', [ $this, 'stop_home_url' ] );
 			add_filter( 'wp_footer', [ $this, 'update_relative_urls' ] );
 		}
-		
+
 		return true;
 	}
 
 	/**
 	 * start home url filter
-	 * 
+	 *
 	 * @param $classes
 	 *
 	 * @return mixed
@@ -306,13 +306,13 @@ class Location extends Taxonomy  {
 
 	/**
 	 * remove home url filter
-	 * 
+	 *
 	 * @since  1.0.0
 	 *
 	 * @author Tanner Moushey
 	 */
 	public function stop_home_url() {
-		remove_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );			
+		remove_filter( 'home_url', [ $this, 'location_home' ], 10, 2 );
 	}
 
 	/**
@@ -329,9 +329,9 @@ class Location extends Taxonomy  {
 		<script>
 			var cplocAnchors = document.getElementsByTagName('a');
 			var cplocAnchorPath = "<?php echo self::$_rewrite_location['path']; ?>";
-			
+
 			for (var i = 0; i < cplocAnchors.length; i++) {
-				if (cplocAnchors[i].getAttribute('href').startsWith('/') 
+				if (cplocAnchors[i].getAttribute('href').startsWith('/')
 					&& !cplocAnchors[i].getAttribute('href').startsWith('//')
 					&& !cplocAnchors[i].getAttribute('href').startsWith(cplocAnchorPath)
 				) {
@@ -344,7 +344,7 @@ class Location extends Taxonomy  {
 
 	/**
 	 * return rewrite location
-	 * 
+	 *
 	 * @return bool
 	 * @since  1.0.0
 	 *
@@ -355,8 +355,8 @@ class Location extends Taxonomy  {
 	}
 
 	/**
-	 * Add query params for locations 
-	 * 
+	 * Add query params for locations
+	 *
 	 * @param $query
 	 *
 	 * @since  1.0.0
@@ -367,16 +367,16 @@ class Location extends Taxonomy  {
 		if ( ! self::$_rewrite_location ) {
 			return;
 		}
-		
+
 		if ( ! isset( $query->query_vars[ 'post_type' ] ) || in_array( $query->query_vars[ 'post_type' ], $this->get_object_types() ) ) {
 			$query->query_vars[ $this->taxonomy ] = self::$_rewrite_location['term'];
 		}
-		
+
 	}
 
 	/**
 	 * Reset REQUEST_URI
-	 * 
+	 *
 	 * @since  1.0.1
 	 *
 	 * @author Tanner Moushey
@@ -389,8 +389,8 @@ class Location extends Taxonomy  {
 	}
 
 	/**
-	 * Add query param for locations 
-	 * 
+	 * Add query param for locations
+	 *
 	 * @param $query
 	 *
 	 * @since  1.0.0
@@ -401,7 +401,7 @@ class Location extends Taxonomy  {
 		if ( ! $location = self::get_rewrite_location() ) {
 			return;
 		}
-		
+
 		set_query_var( 'cp_location_id', $location['ID'] );
 	}
 
@@ -413,7 +413,7 @@ class Location extends Taxonomy  {
 	 * @author Tanner Moushey
 	 */
 	public function include_global_items( $query ) {
-		
+
 		if ( is_admin() ) {
 			return;
 		}
@@ -427,7 +427,7 @@ class Location extends Taxonomy  {
 		if ( empty( $locations ) ) {
 			return;
 		}
-		
+
 		if ( ! is_array( $locations ) ) {
 			$locations = [ $locations ];
 		}
@@ -456,10 +456,10 @@ class Location extends Taxonomy  {
 		if ( empty( $query->query_vars['post_type'] ) ) {
 			return;
 		}
-		
+
 		// add location if we only have location post_types
 		$add_location = empty( array_diff( (array) $query->query_vars['post_type'], $this->get_object_types() ) );
-		
+
 		if ( apply_filters( 'cploc_add_location_to_query', $add_location, $query ) ) {
 			$query->set( $this->taxonomy, [ self::$_rewrite_location['term'], 'global' ] );
 		}
@@ -467,7 +467,7 @@ class Location extends Taxonomy  {
 
 	/**
 	 * Overwrite the home link to include the location url
-	 * 
+	 *
 	 * @param $url
 	 * @param $path
 	 *
@@ -480,31 +480,31 @@ class Location extends Taxonomy  {
 		if ( empty( $path ) || '/' === $path ) {
 			return $url;
 		}
-		
+
 		// location has already been added to this url
 		if ( strpos( $url, self::$_rewrite_location['path'] ) ) {
 			return $url;
 		}
-		
+
 		$locations_regex = $this->locations_regex();
 
 		$slug    = trim( cp_locations()->setup->post_types->locations->get_slug(), '/' );
-		
+
 		// don't rewrite for urls with location already set
 		if ( preg_match( "/$slug\/($locations_regex)/", $url ) ) {
 			return $url;
-		} 
-		
+		}
+
 		$url = str_replace( $path, self::$_rewrite_location['path'] . '/' . $path, $url );
 		$url = str_replace( '//', '/', $url );
 		$url = str_replace( ':/', '://', $url );
-		
+
 		return $url;
 	}
 
 	/**
 	 * Customize location permalink to include location at the base
-	 * 
+	 *
 	 * @param $link
 	 * @param $post
 	 *
@@ -515,29 +515,29 @@ class Location extends Taxonomy  {
 	 */
 	public function location_permalink( $link, $post ) {
 		$post = get_post( $post );
-		
+
 		if ( ! in_array( get_post_type( $post ), $this->get_object_types() ) ) {
 			return $link;
 		}
-		
+
 		$path = isset( self::$_rewrite_location['path'] ) ? self::$_rewrite_location['path'] : false;
 		$term = isset( self::$_rewrite_location['term'] ) ? self::$_rewrite_location['term'] : false;
-		
+
 		// if we are looking at a location page and the url already has the location path, return early
 		if ( $path && strstr( $link, $path ) ) {
 			return $link;
 		}
-		
+
 		$is_global = has_term( 'global', $this->taxonomy, $post );
-		
+
 		// use the default link if it is a global item and we are not on a location page
 		if ( ! $term && $is_global ) {
 			return $link;
 		}
-		
+
 		$locations = get_the_terms( $post, $this->taxonomy );
 		$found     = false;
-		
+
 		if ( is_wp_error( $locations ) || ! $locations ) {
 			return $link;
 		}
@@ -552,29 +552,29 @@ class Location extends Taxonomy  {
 				break;
 			}
 		}
-		
+
 		// if we didn't find a match, we are on a location page, and the current content is global, use the current location term
 		if ( ! $found && $term && $is_global ) {
 			$location_id = self::get_id_from_term( $term );
 		}
-		
+
 		if ( empty( $location_id ) || ! $loc = get_post( $location_id ) ) {
 			return $link;
 		}
-		
+
 		$location_url = get_permalink( $loc->ID );
-		
+
 		// check to see if the link already has the url associated
 		if ( strstr( $link, $location_url ) ) {
 			return $link;
 		}
-		
+
 		return str_replace( home_url( '/' ), get_permalink( $loc->ID ), $link );
 	}
 
 	/**
 	 * Allow non-unique post names if the post type uses our location taxonomy, we handle the unique permalink
-	 * 
+	 *
 	 * @param $slug
 	 * @param $post_ID
 	 * @param $post_status
@@ -589,22 +589,22 @@ class Location extends Taxonomy  {
 	 */
 	public function unique_slug( $slug, $post_ID, $post_status, $post_type, $post_parent, $original_slug ) {
 		global $wpdb;
-		
+
 		if ( $slug === $original_slug ) {
 			return $slug;
 		}
-		
+
 		if ( ! in_array( $post_type, $this->get_object_types() ) ) {
 			return $slug;
 		}
 
 		// get the existing permalink
 		$permalink = str_replace( $slug, $original_slug, get_permalink( $post_ID ) );
-		
+
 		// Get all content in this post type with the same name (excluding the current item)
 		$check_sql = "SELECT * FROM $wpdb->posts WHERE post_name = %s AND post_type = %s AND ID != %d LIMIT 999";
 		$posts     = $wpdb->get_results( $wpdb->prepare( $check_sql, $original_slug, $post_type, $post_ID ) );
-		
+
 		foreach( $posts as $post ) {
 			// if the permalink of an existing post matches (including location), let WP do its thing
 			if ( get_the_permalink( $post->ID ) == $permalink && ! has_term( 'global', $this->taxonomy, $post ) ) {
@@ -617,7 +617,7 @@ class Location extends Taxonomy  {
 
 	/**
 	 * Since we are allowing for the same slug, this makes sure the right item is queried
-	 * 
+	 *
 	 * @param $where
 	 * @param $query
 	 *
@@ -633,18 +633,17 @@ class Location extends Taxonomy  {
 		if ( isset( $query->query['post_type'] ) && ! in_array( $query->query['post_type'], $this->get_object_types() ) ) {
 			return $where;
 		}
-		
+
 		// does this query already have the location set?
 		$has_tax = isset( $query->query[ $this->taxonomy ] );
-		
+
 		// if the queried post has the correct taxonomy, return early
 		if ( ! empty( $query->queried_object_id ) && $has_tax ) {
 			if ( has_term( $query->query[ $this->taxonomy ], $this->taxonomy, $query->queried_object_id ) ) {
 				return $where;
 			}
 		}
-		
-		$query_vars = $query->query;
+
 		$post_type  = empty( $query->queried_object_id ) ? false : get_post_type( $query->queried_object_id );
 		$id         = false;
 
@@ -652,59 +651,57 @@ class Location extends Taxonomy  {
 		if ( isset( $query->query['pagename'] ) ) {
 			$id = $this->get_page_id_by_path( $query->query['pagename'], $post_type );
 		} elseif ( isset( $query->query['name'] ) ) {
-			
-			if ( $post_type ) {
-				$query_vars['post_type'] = $post_type;
-			}
-			
-			$query_vars['post_name__in'] = [ $query->query['name'] ];
-			unset( $query_vars['name'] );
 
-			// remove location query filter so we don't get global content
-			add_filter( 'cploc_add_location_to_query', '__return_false' );
-			$posts = ( function_exists( 'tribe_get_events' ) && 'tribe_events' == $query_vars['post_type'] ) ? tribe_get_events( $query_vars ) : get_posts( $query_vars );
-			remove_filter( 'cploc_add_location_to_query', '__return_false' );
-			
+			global $wpdb;
+
+			$sql = "
+				SELECT ID, post_name, post_parent, post_type
+				FROM $wpdb->posts
+				WHERE 1=1 $where
+			";
+
+			$posts = $wpdb->get_results( $sql, OBJECT_K );
+
 			if ( ! empty( $posts ) ) {
 				foreach ( $posts as $post ) {
 					// set the global post initially as a fallback, we'll overwrite the variable if we find a better option
-					if ( has_term( 'global', $this->taxonomy, $post ) ) {
+					if ( has_term( 'global', $this->taxonomy, $post->ID ) ) {
 						$id = $post->ID;
 					}
-					
+
 					// we have a location and it matches this post
 					if ( $has_tax && has_term( $query->query[ $this->taxonomy ], $this->taxonomy, $post->ID ) ) {
 						$id = $post->ID;
 						break;
 					}
-					
+
 					// we do not have a location and neither does this post
-					if ( ! $has_tax && ! has_term( '', $this->taxonomy, $post ) ) {
+					if ( ! $has_tax && ! has_term( '', $this->taxonomy, $post->ID ) ) {
 						$id = $post->ID;
 						break;
 					}
 				}
 			}
-			
+
 		} else {
 			return $where;
 		}
-		
+
 		// don't allow location pages to be accessed without the location permalink
 		if ( empty( $id ) && ( ! $has_tax || ( $has_tax && empty( $posts ) ) ) ) {
 			$id = -1;
 		}
-		
+
 		if ( false === $id ) {
 			return $where;
 		}
-		
+
 		if ( $query->queried_object_id == $id ) {
 			return $where;
 		}
-		
+
 		global $wpdb;
-		
+
 		if ( ! empty( $query->queried_object_id ) ) {
 			$where = str_replace( $query->queried_object_id, $id, $where );
 			$query->queried_object_id = $id;
@@ -718,36 +715,36 @@ class Location extends Taxonomy  {
 
 	/**
 	 * Print location visibility CSS
-	 * 
+	 *
 	 * @since  1.0.0
 	 *
 	 * @author Tanner Moushey
 	 */
 	public function location_css() {
 		$locations = \CP_Locations\Models\Location::get_all_locations( true );
-		
+
 		echo '<!-- CP Location visibility styles -->';
 		echo '<style id="cp-location-visibility">';
 		echo '.cp_location-found .location-hide { display: none !important; }';
 		echo '.cp_location-none .location-show { display: none !important; }';
-		
+
 		foreach ( $locations as $location ) {
 			printf( '.cp_location-%1$s .location-%1$s-hide { display: none !important; }', $location->ID );
 			foreach ( $locations as $loc ) {
 				if ( $loc->ID == $location->ID ) {
 					continue;
 				}
-				
+
 				printf( '.cp_location-%s .location-%s-show { display: none !important; }', $loc->ID, $location->ID );
 			}
 		}
-		
+
 		echo '</style>';
 	}
-	
+
 	/**
 	 * Add the location parameter to the body class if it exists
-	 * 
+	 *
 	 * @param $classes
 	 *
 	 * @return mixed
@@ -762,17 +759,17 @@ class Location extends Taxonomy  {
 			$classes[] = $this->taxonomy . '-' . $location_id;
 			$classes[] = $this->taxonomy . '-found';
 		}
-		
+
 		return $classes;
 	}
-	
+
 	protected function get_page_by_name( $name, $post_type = false ) {
-		
-	} 
+
+	}
 
 	/**
 	 * Custom get_page_by_path to allow for location
-	 * 
+	 *
 	 * @param $page_path
 	 * @param $post_type
 	 *
@@ -783,7 +780,7 @@ class Location extends Taxonomy  {
 	 */
 	protected function get_page_id_by_path( $page_path, $post_type = 'page' ) {
 		global $wpdb;
-		
+
 		if ( ! $post_type ) {
 			$post_type = 'page';
 		}
@@ -792,12 +789,12 @@ class Location extends Taxonomy  {
 
 		// add location_id to the cache_key
 		$location = self::get_rewrite_location();
-		
+
 		$location_id = empty( $location['ID'] ) ? 0 : $location['ID'];
 		$hash        = md5( $page_path . serialize( $post_type ) . $location_id );
 		$cache_key   = "get_page_by_path:$hash:$last_changed";
 		$cached      = wp_cache_get( $cache_key, 'posts' );
-		
+
 		if ( 0 && false !== $cached ) {
 			// Special case: '0' is a bad `$page_path`.
 			if ( '0' === $cached || 0 === $cached ) {
@@ -838,37 +835,37 @@ class Location extends Taxonomy  {
 		$foundid        = 0;
 		$valid_pages    = [];
 		$fallback_pages = [];
-		
+
 		// build an array of primary and fallback pages
 		foreach( (array) $pages as $id => $page ) {
 			if ( $page->post_name != $revparts[0] ) {
 				continue;
 			}
-			
+
 			$is_global = has_term( 'global', $this->taxonomy, $page );
-			
+
 			// if the location_id is not set but this page has a location and is not global, continue
 			// we don't allow location pages to be accessed outside of the location context
-			if ( ! $location_id && 
-				 ( ! $is_global && has_term( '', $this->taxonomy, $page ) ) 
+			if ( ! $location_id &&
+				 ( ! $is_global && has_term( '', $this->taxonomy, $page ) )
 			) {
 				continue;
-			}			
-			
+			}
+
 			if ( $location_id && has_term( "location_$location_id", $this->taxonomy, $page ) ) {
 				$valid_pages[ $id ] = $page;
 			}
-			
+
 			// use global pages as a fallback
 			if ( ! $location_id || $is_global  ) {
 				$fallback_pages[ $id ] = $page;
 			}
 		}
-		
+
 		$page_sets = [ $valid_pages, $fallback_pages ];
-		
+
 		foreach( $page_sets as $page_set ) {
-			
+
 			foreach ( $page_set as $page ) {
 				$count = 0;
 				$p     = $page;
@@ -893,10 +890,10 @@ class Location extends Taxonomy  {
 					}
 				}
 			}
-			
+
 			if ( $foundid ) {
 				break;
-			}			
+			}
 		}
 
 		// We cache misses as well as hits.
@@ -906,6 +903,6 @@ class Location extends Taxonomy  {
 			return $foundid;
 		}
 
-		return false;		
+		return false;
 	}
 }
