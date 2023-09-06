@@ -706,7 +706,7 @@ class Location extends Taxonomy  {
 			$where = str_replace( $query->queried_object_id, $id, $where );
 			$query->queried_object_id = $id;
 			$query->queried_object = get_post( $id );
-		} else if ( 'tribe_events' !== get_post_type( $id ) ) {
+		} else { // if ( 'tribe_events' !== get_post_type( $id ) ) { - not sure why this was here originally, removing for now
 			$where .= " AND $wpdb->posts.ID = '$id'";
 		}
 
