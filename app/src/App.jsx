@@ -1,43 +1,123 @@
-import { hot } from 'react-hot-loader';
-import { useRef, createRef, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { MapContainer, Marker, Popup, TileLayer, useMap, latLngBounds } from 'react-leaflet';
+import { useEffect, useState } from 'react';
+import { useMap } from 'react-leaflet';
 import Controllers_WP_REST_Request from './Controllers/WP_REST_Request';
-
+import debounce from '@mui/utils/debounce';
+import CircularProgress from '@mui/material/CircularProgress';
+import Toast from '../../includes/ChurchPlugins/assets/js/toast';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import DesktopFinder from './Components/DesktopFinder';
+import MobileFinder from './Components/MobileFinder';
+import { GestureHandling } from 'leaflet-gesture-handling';
+import {LocationOn, MyLocation} from '@mui/icons-material';
+import { distance, point } from "turf";
 import L from "leaflet";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import markerIcon from '../../assets/images/marker-icon.png'; // "leaflet/dist/images/marker-icon.png";
+import markerIconAlt from '../../assets/images/marker-icon-alt.png'; // "leaflet/dist/images/marker-icon.png";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
 	iconUrl: markerIcon,
-	iconRetinaUrl: markerIcon2x,
-	shadowUrl: markerShadow,
+	iconSize: [26.5, 35],
+	iconRetinaUrl: undefined,
+	shadowUrl: undefined,
+});
+
+L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
+
+const pcIcon = L.divIcon({
+	className : 'custom-div-icon',
+	html      : "<div class='marker-pin marker-pin--person'><i class='material-icons'>person_pin_circle</i></div>",
+	iconSize  : [24, 24],
+	iconAnchor: [12, 24]
+});
+
+const iconLocation = L.divIcon({
+	className : 'custom-div-icon',
+	html      : "<div class='marker-pin  marker-pin--location'><i class='material-icons'>location_on</i></div>",
+	iconSize  : [24, 24],
+	iconAnchor: [12, 24]
+});
+
+const iconLocationCurrent = L.divIcon({
+	className : 'custom-div-icon',
+	html      : "<div class='marker-pin marker-pin--current'><i class='material-icons'>location_on</i></div>",
+	iconSize  : [30, 30],
+	iconAnchor: [15, 30]
 });
 
 
-function ChangeView({ locations }) {
-	if ( ! locations.length ) {
-		return null;
+
+let fitBoundsTimeout;
+
+function ChangeView (locations, userGeo) {
+	const isDesktop = useMediaQuery('(min-width:1025px)');
+	
+	if (typeof fitBoundsTimeout === 'number') {
+		clearTimeout(fitBoundsTimeout);
 	}
 	
-    const map = useMap();
-    map.fitBounds(locations.map((location) => location.geodata.center));
-		map.zoomOut();
-    return null;
+	if (!locations.length) {
+		return null;
+	}
+
+	const map = useMap();
+	const features = [...locations];
+	
+	if ( userGeo ) {
+		features.push( { geodata : { center: userGeo.center } } );
+	}
+	
+	const paddingTopLeft = [50,100];
+	const paddingBottomRight = isDesktop ? [50,100] : [100, 150];
+	
+	fitBoundsTimeout = setTimeout( () => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight} ), 100 );
+	return null;
 }
 
 const App = () => {
-	let markerRef = useRef([]);
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(false);
 	const [locations, setLocations] = useState([]);
-	const [markers, setMarkers] = useState([]);
-	const mapRef = useRef();
-	const searchCenter = [51.505, -0.09];
-	const onClick = ( index ) => {
-		markerRef.current[index].openPopup();
+	const [initLocations, setInitLocations] = useState([]);
+	const [userGeo, setUserGeo] = useState( false );
+	const isDesktop = useMediaQuery('(min-width:1025px)');
+
+	const getMyLocation = () => {
+		navigator.geolocation.getCurrentPosition((position) => {
+			setUserGeo( {
+				attr : { postcode : 'current location' },
+				center : [ position.coords.latitude, position.coords.longitude ],
+			} );
+			console.log('Latitude is :', position.coords.latitude);
+			console.log('Longitude is :', position.coords.longitude);
+		}, () => {
+			Toast.error( 'Location sharing is disabled in your browser.' );
+		} );
 	}
+	
+	const handleSearchInputChange = debounce((value) => {
+		
+		if ( 5 !== value.length ) {
+			setUserGeo( false );
+			return;
+		}
+
+		(
+			async () => {
+				try {
+					setLoading(true);
+					const restRequest = new Controllers_WP_REST_Request();
+					const data = await restRequest.get({endpoint: 'locations/postcode/' + value});
+					setUserGeo( data );
+				} catch (error) {
+					setError(error);
+				} finally {
+					setLoading(false);
+				}
+			}
+		)();
+		
+	}, 100);
 	
 	useEffect(() => {
 		(
@@ -46,50 +126,75 @@ const App = () => {
 					setLoading(true);
 					const restRequest = new Controllers_WP_REST_Request();
 					const data = await restRequest.get({endpoint: 'locations'});
-					setLocations(data.locations);
+					setLocations(JSON.parse(JSON.stringify(data.locations)));
+					setInitLocations( JSON.parse(JSON.stringify(data.locations)) );
 				} catch (error) {
-//					setError(error);
+					setError(error);
 				} finally {
-//					setLoading(false);
+					setLoading(false);
 				}
 			}
 		)();
 	}, [] );
 	
-	return (
-		<div>
+	useEffect( () => {
+		let data = [];
+		
+		if ( ! userGeo ) {
+			setLocations( JSON.parse(JSON.stringify(initLocations)) );
+			return;
+		}
+		
+		const userCenter = point([...userGeo.center].reverse());
+		for (const location of locations) {
+			location.distance = distance(
+				userCenter,
+				point( [...location.geodata.center].reverse() ),
+				'miles'
+			);
 			
-			<div className="cploc-map">
-				<div className="cploc-map--tabs">
-					{locations.map((location, index) => (
-						<div className="cploc-map--tabs--tab cploc-map-tab" key={index} onMouseOver={() => onClick(index)}>
-							<div className="cploc-map-tab--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumb + ')'}} /></div>
-							<div className="cploc-map-tab--content">
-								<h3 className="cploc-map-tab--title">{location.title}</h3>
-								<div className="cploc-map-tab--address">{location.geodata.attr.place}, {location.geodata.attr.region}</div>
-								<div className="cploc-map-tab--times"></div>
-							</div>
-						</div>
-					))}
-				</div>
-				<div className="cploc-map--map">
-					<MapContainer>
-						<TileLayer
-							attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-							url="https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaWEwZ2IwaHpjM2NsZjh4Z2s3MHk2In0.QGwQkxVGACSg4yQnFhmjuw"
-						/>
-						
-						<ChangeView locations={locations} />
-						
-						{locations.map((location, index) => (
-							<Marker ref={(el) => (markerRef.current[index] = el)} key={index} position={location.geodata.center}>
-								<Popup><div dangerouslySetInnerHTML={{__html: location.templates.popup }} /></Popup>
-							</Marker>	
-						))}
-					</MapContainer>
+			location.distanceDesc = 1 > location.distance ? '< 1' : location.distance.toFixed(1);
+			
+			// don't show locations more than 100 miles away
+			if ( location.distance < 100 ) {
+				data.push(location);
+			}
+		}
+		
+		data.sort((a, b) => {
+			if (a.distance > b.distance) {
+				return 1;
+			}
+			
+			if( a.distance < b.distance) {
+				return -1;
+			}
+			
+			return 0;
+		})
+		
+		setLocations(data);
+	}, [userGeo])
+	
+	
 
+	return error ? (
+			<pre>{JSON.stringify(error, null, 2)}</pre>
+	) : ( 
+		<div className="cploc">
+			
+			{ loading && (
+				<div className="cploc-container--loading">
+					<CircularProgress/>
 				</div>
-			</div>
+			)}
+
+			{isDesktop ? (
+				<DesktopFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon} initLocations={initLocations}/>
+			) : (
+				<MobileFinder  userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon} initLocations={initLocations}/>
+			)}
+			
 		</div>
 	);
 };

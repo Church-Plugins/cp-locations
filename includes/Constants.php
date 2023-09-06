@@ -21,11 +21,6 @@ if( !defined( 'CP_LOCATIONS_PLUGIN_URL' ) ) {
 	 	plugin_dir_url( CP_LOCATIONS_PLUGIN_FILE )
 	);
 }
-if( !defined( 'CP_LOCATIONS_PLUGIN_VERSION' ) ) {
-	 define ( 'CP_LOCATIONS_PLUGIN_VERSION',
-	 	'1.0.0'
-	);
-}
 if( !defined( 'CP_LOCATIONS_INCLUDES' ) ) {
 	 define ( 'CP_LOCATIONS_INCLUDES',
 	 	plugin_dir_path( dirname( __FILE__ ) ) . 'includes'

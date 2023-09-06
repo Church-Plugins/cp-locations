@@ -67,6 +67,15 @@ class Locations extends WP_REST_Controller {
 			// 'schema' => array( $this, 'get_public_schema' ),
 		) );
 
+		register_rest_route( $this->namespace, $this->rest_base . '/postcode/(?P<postcode>[\d]+)', array(
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_postcode' ),
+				'permission_callback' => array( $this, 'get_permissions_check' ),
+			),
+			// 'schema' => array( $this, 'get_public_schema' ),
+		) );
+
 	}
 
 	/**
@@ -97,28 +106,14 @@ class Locations extends WP_REST_Controller {
 	 */
 	public function get_locations( $request ) {
 
-		$return_value = [];
-
-		$args = [
-			'post_type'			=> $this->post_type,
-			'post_status'		=> 'publish',
-			'posts_per_page'	=> -1,
-			'orderby’'			=> 'title'
-		];
-		$posts = new \WP_Query( $args );
-
-		if( empty( $posts->post_count ) ) {
-			return $return_value;
-		}
+		$posts = \CP_Locations\Models\Location::get_all_locations( true );
 		
 		$return_value = [
-			'count' => $posts->post_count,
-			'total' => $posts->found_posts,
-			'pages' => $posts->max_num_pages,
+			'count' => count( $posts ),
 			'locations' => [],
 		];
 
-		foreach( $posts->posts as $post ) {
+		foreach( $posts as $post ) {
 			try {
 				$location = new Location( $post->ID );
 				$return_value['locations'][] = $location->get_api_data(); 
@@ -140,10 +135,31 @@ class Locations extends WP_REST_Controller {
 	 * @return array|WP_Error Array on success, or WP_Error object on failure.
 	 */
 	public function get_location( $request ) {
-		return [
-		];
+		$location_id = $request->get_param( 'location_id' );
+
+		try {
+			$location                    = new Location( $location_id );
+			return $location->get_api_data();
+		} catch ( Exception $e ) {
+			error_log( $e->getMessage() );
+			return new WP_Error( $e->getMessage() );
+		}
 	}
 
+	/**
+	 * Get the geo for the provided postcode
+	 * 
+	 * @param $request
+	 *
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function get_postcode( $request ) {
+		$postcode = $request->get_param( 'postcode' );
+		return cp_locations()->geoAPI->get_location( $postcode, 'postcode' );
+	}
+	
 	/**
 	 * Expose protected namesapce property
 	 *

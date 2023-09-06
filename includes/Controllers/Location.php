@@ -2,39 +2,31 @@
 
 namespace CP_Locations\Controllers;
 
+use ChurchPlugins\Controllers\Controller;
 use CP_Locations\Models\Location as LocationModel;
 use CP_Locations\Exception;
 use function CP_Locations\get_template_part;
 
-class Location {
+class Location extends Controller {
 
 	/**
-	 * @var bool|LocationModel
-	 */
-	public $model;
-
-	/**
-	 * @var array|\WP_Post|null
-	 */
-	public $post;
-
-	/**
-	 * Location constructor.
+	 * constructor.
 	 *
 	 * @param $id
-	 * @param bool $use_origin whether or not to use the origin / post id
+	 * @param bool $use_origin whether or not to use the origin id
 	 *
 	 * @throws Exception
 	 */
 	public function __construct( $id, $use_origin = true ) {
-		$this->model = $use_origin ? LocationModel::get_instance_from_origin( $id ) : LocationModel::get_instance( $id );
-		$this->post  = get_post( $this->model->origin_id );
+		// handle our global placeholder, it doesn't have an associated post
+		if ( $id == 'global' ) {
+			$this->model = new LocationModel();
+			$this->post  = new \WP_Post( new \stdClass() );
+		} else {
+			parent::__construct( $id, $use_origin );
+		}
 	}
-
-	protected function filter( $value, $function ) {
-		return apply_filters( 'cploc_location_' . $function, $value, $this );
-	}
-
+	
 	public function get_content( $raw = false ) {
 		$content = get_the_content( null, false, $this->post );
 		if ( ! $raw ) {
@@ -52,21 +44,19 @@ class Location {
 		return $this->filter( get_permalink( $this->post->ID ), __FUNCTION__ );
 	}
 	
-	public function get_geo() {
+	public function get_geo( $force = false ) {
 		
 		if ( ! $this->address ) {
 			return [];
 		}
 
-		$cach_key    = 'cploc_geo_data';
-		$address_key = md5( $this->address );
-		$geo_data    = get_option( $cach_key, [] );
+		$geo_data    = $this->geo;
 		
-		if ( empty( $geo_data[ $address_key ] ) ) {
+		if ( $force || empty( $geo_data ) ) {
 			$request_url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' . urlencode( $this->address ) . '.json';
 			$request_url = add_query_arg( [
 				'types'        => 'address',
-				'access_token' => 'pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaTkwdWcwcm9yM2NueGRhdmR3M3Y1In0.Su6h_mXCh6WfLO4aJ5uMFg',
+				'access_token' => cp_locations()->get_api_key(),
 				'limit'        => 1,
 			], $request_url );
 			$response    = wp_remote_get( $request_url );
@@ -95,11 +85,16 @@ class Location {
 				}
 			}
 			
-			$geo_data[ $address_key ] = $data;
-			update_option( $cach_key, $geo_data, false );
+			$geo_data = $data;
+			update_post_meta( $this->post->ID, 'geo', $geo_data );
 		}
 		
-		return $geo_data[ $address_key ];
+		// allow overwriting the coordinates
+		if ( $coordinates = $this->geo_coordinates ) {
+			$geo_data['center'] = array_map( 'trim', explode( ',', $coordinates ) );
+		}
+		
+		return $geo_data;
 	}
 	
 	public function __get( $name ) {
@@ -112,10 +107,52 @@ class Location {
 	public function get_thumbnail() {
 		return  [
 			'thumb' => get_the_post_thumbnail_url( $this->post->ID ),
+			'thumbnail' => get_the_post_thumbnail_url( $this->post->ID, 'thumbnail' ),
 			'medium' => get_the_post_thumbnail_url( $this->post->ID, 'medium' ),
 			'large' => get_the_post_thumbnail_url( $this->post->ID, 'large' ),
 			'full' => get_the_post_thumbnail_url( $this->post->ID, 'full' ),
 		];
+	}
+
+	public function get_formatted_times() {
+		$times = $this->service_times;
+		
+		if ( empty( $times ) || ! is_array( $times ) ) {
+			return $times;
+		}
+
+		$days = [];
+
+		foreach ( $times as $time ) {
+			if ( ! empty( $time['is_special'] ) ) {
+				continue;
+			}
+
+			$day = ucwords( $time['day'] );
+			if ( empty( $days[ $day ] ) ) {
+				$days[ $day ] = [];
+			}
+
+			$t              = new \DateTime( '2000-01-01 ' . $time['time'] );
+			$days[ $day ][] = empty( $time['time_desc'] ) ? $t->format( 'g:ia' ) : $time['time_desc'];
+		}
+
+		$formatted_times = [];
+		foreach ( $days as $day => $times ) {
+			if ( count( $times ) > 1 ) {
+				$day                          .= 's'; // make day plural
+				$times[ count( $times ) - 1 ] = 'and ' . $times[ count( $times ) - 1 ]; // add conjunction to last time if we have multiple
+			}
+
+			$separator = ' ';
+			if ( count( $times ) > 2 ) {
+				$separator = ', ';
+			}
+
+			$formatted_times[] = sprintf( '%s at %s', $day, implode( $separator, $times ) );
+		}
+
+		return apply_filters( 'cploc_format_times', implode( '<br />', $formatted_times ) );
 	}
 
 	public function get_api_data( $templates = true ) {
@@ -126,11 +163,13 @@ class Location {
 			'slug'      => $this->post->post_name,
 			'thumb'     => $this->get_thumbnail(),
 			'title'     => htmlspecialchars_decode( $this->get_title(), ENT_QUOTES | ENT_HTML401 ),
+			'subtitle'  => nl2br( esc_html( $this->subtitle ) ),
+			'pastor'    => $this->pastor,
 			'desc'      => $this->get_content(),
-			'address'   => wp_kses_post( $this->address ),
+			'address'   => wp_kses_post( nl2br( $this->address ) ),
 			'phone'     => $this->phone,
 			'email'     => $this->email,
-			'times'     => $this->service_times,
+			'times'     => $this->get_formatted_times(),
 			'geodata'   => $this->get_geo(),
 			'templates' => [
 				'card' => '',

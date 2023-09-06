@@ -3,16 +3,24 @@
  * Plugin Name: Church Plugins - Locations
  * Plugin URL: https://churchplugins.com
  * Description: Church locations plugin for managing campuses
- * Version: 1.0.0
+ * Version: 1.0.4
  * Author: Church Plugins
  * Author URI: https://churchplugins.com
  * Text Domain: cp-locations
  * Domain Path: languages
  */
 
+if( !defined( 'CP_LOCATIONS_PLUGIN_VERSION' ) ) {
+	 define ( 'CP_LOCATIONS_PLUGIN_VERSION',
+	 	'1.0.4'
+	);
+}
+
 require_once( dirname( __FILE__ ) . "/includes/Constants.php" );
+
 require_once( CP_LOCATIONS_PLUGIN_DIR . "/includes/ChurchPlugins/init.php" );
 require_once( CP_LOCATIONS_PLUGIN_DIR . 'vendor/autoload.php' );
+
 
 use CP_Locations\Init as Init;
 

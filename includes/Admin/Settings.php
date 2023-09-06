@@ -74,7 +74,7 @@ class Settings {
 	}
 
 	public static function get_location( $key, $default = '' ) {
-		return self::get( $key, $default, 'cpl_speaker_options' );
+		return self::get( $key, $default, 'cpl_location_options' );
 	}
 
 	/**

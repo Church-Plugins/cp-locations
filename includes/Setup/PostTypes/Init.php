@@ -66,15 +66,17 @@ class Init {
 	 */
 	protected function actions() {
 		add_filter( 'use_block_editor_for_post_type', [ $this, 'disable_gutenberg' ], 10, 2 );
-		add_action( 'init', [ $this, 'register_post_types' ] );
+		add_action( 'init', [ $this, 'register_post_types' ], 4 );
 	}
 
 	public function register_post_types() {
 
 		$this->locations = Location::get_instance();
-		$this->locations->add_actions();
-
-		do_action( 'cp_register_post_types' );
+		
+		if ( cp_locations()->enabled() ) {
+			$this->locations->add_actions();
+			do_action( 'cp_register_post_types' );
+		}
 	}
 
 	public function disable_gutenberg( $status, $post_type ) {

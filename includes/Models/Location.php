@@ -26,7 +26,7 @@ class Location extends Source {
 	public static $type_key = 'location';
 
 	public function init() {
-		$this->post_type = cp_locations()->setup->post_types->locations->post_type;
+		$this->post_type = 'cploc_location';
 
 		parent::init();
 	}
@@ -39,7 +39,7 @@ class Location extends Source {
 	 *
 	 * @author Tanner Moushey
 	 */
-	public static function get_all_locations() {
+	public static function get_all_locations( $origin = false ) {
 		global $wpdb;
 
 
@@ -47,19 +47,26 @@ class Location extends Source {
 		$meta     = SourceMetaTable::get_instance();
 		$instance = new self();
 
-		$sql = 'SELECT %1$s.* FROM %1$s
+		$sql = sprintf( 'SELECT %1$s.* FROM %1$s
 INNER JOIN %2$s
 ON %1$s.id = %2$s.source_id
 WHERE %2$s.key = "source_type" AND %2$s.source_type_id = %3$d
-ORDER BY %2$s.order ASC';
+ORDER BY %2$s.order ASC', $instance->table_name, $meta->table_name, $type_id );
 
-		$speakers = $wpdb->get_results( $wpdb->prepare( $sql, $instance->table_name, $meta->table_name, $type_id ) );
+		$locations = $wpdb->get_results( $sql );
 
-		if ( ! $speakers ) {
-			$speakers = [];
+		if ( ! $locations ) {
+			$locations = [];
+		}
+		
+		if ( $origin ) {
+			do_action( 'cploc_multisite_switch_to_main_site' );
+			$ids = wp_list_pluck( $locations, 'origin_id' );
+			$locations = get_posts( [ 'post_type' => $instance->post_type, 'post__in' => $ids, 'posts_per_page' => 999, 'orderby' => 'menu_order', 'order' => 'ASC' ] );
+			do_action( 'cploc_multisite_restore_current_blog' );
 		}
 
-		return apply_filters( 'cpl_get_all_speakers', $speakers );
+		return apply_filters( 'cpl_get_all_locations', $locations, $origin );
 	}
 
 	public static function get_type_id() {

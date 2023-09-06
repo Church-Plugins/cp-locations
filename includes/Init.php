@@ -25,6 +25,11 @@ class Init {
 	 */
 	public $api;
 
+	/**
+	 * @var
+	 */
+	public $geoAPI;
+
 	public $enqueue;
 
 	/**
@@ -46,7 +51,7 @@ class Init {
 	 */
 	protected function __construct() {
 		$this->enqueue = new \WPackio\Enqueue( 'cpLocations', 'dist', $this->get_version(), 'plugin', CP_LOCATIONS_PLUGIN_FILE );
-		add_action( 'plugins_loaded', [ $this, 'maybe_setup' ], - 9999 );
+		add_action( 'cp_core_loaded', [ $this, 'maybe_setup' ], - 9999 );
 		add_action( 'init', [ $this, 'maybe_init' ] );
 	}
 
@@ -60,9 +65,17 @@ class Init {
 			return;
 		}
 
+		$cp = \ChurchPlugins\Setup\Init::get_instance();
+
+		// make sure needed tables are installed
+		if ( ! $cp->is_installed() ) {
+			return;
+		}
+
 		$this->includes();
 		$this->actions();
 		$this->app_init();
+		$this->load_integrations();
 	}
 
 	/**
@@ -89,24 +102,6 @@ class Init {
 		add_filter( 'script_loader_tag', [ $this, 'app_load_scripts' ], 10, 3 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'app_enqueue' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_scripts' ] );
-		add_action( 'init', [ $this, 'rewrite_rules' ], 100 );
-	}
-
-	public function rewrite_rules() {
-		return;
-		
-		if ( $this->setup->post_types->item_type_enabled() ) {
-			$type = get_post_type_object( $this->setup->post_types->item_type->post_type )->rewrite['slug'];
-			add_rewrite_tag( '%type-item%', '([^&]+)' );
-			add_rewrite_rule("^$type/([^/]*)/([^/]*)?",'index.php?cpl_item_type=$matches[1]&type-item=$matches[2]','top');
-		}
-
-		$flush = '1';
-
-		if ( get_option( '_cpl_needs_flush' ) != $flush ) {
-			flush_rewrite_rules(true);
-			update_option( '_cpl_needs_flush', $flush );
-		}
 	}
 
 	/**
@@ -176,6 +171,7 @@ class Init {
 		require_once( 'Templates.php' );
 		Admin\Init::get_instance();
 		$this->setup = Setup\Init::get_instance();
+		$this->geoAPI = new GeoLocation\MapBox\MapBox();
 		API\Init::get_instance();
 	}
 
@@ -189,6 +185,17 @@ class Init {
 	}
 
 	/** Actions **************************************/
+
+	public function load_integrations() {
+		if ( defined( 'TRIBE_EVENTS_FILE' ) ) {
+			Integrations\TheEventsCalendar::get_instance();
+		}
+
+		if ( defined( 'CP_GROUPS_PLUGIN_VERSION' ) ) {
+			Integrations\CP_Groups::get_instance();
+		}
+
+	}
 
 	public function global_css_vars() {
 		?>
@@ -281,7 +288,7 @@ class Init {
 	 * @return string
 	 */
 	public function get_version() {
-		return '0.0.1';
+		return '1.0.1';
 	}
 
 	/**
@@ -294,6 +301,26 @@ class Init {
 	 */
 	public function get_api_namespace() {
 		return $this->get_id() . '/v1';
+	}
+
+	/**
+	 * Get the key for the geo api
+	 *
+	 * @return string
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function get_api_key() {
+		return 'pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaTkwdWcwcm9yM2NueGRhdmR3M3Y1In0.Su6h_mXCh6WfLO4aJ5uMFg';
+	}
+
+	public function enabled() {
+		if ( is_multisite() && ( ! is_main_site() || is_network_admin() ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 }

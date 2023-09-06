@@ -40,8 +40,12 @@ class Init {
 	 * @return void
 	 */
 	protected function includes() {
-		License::get_instance();
-		Settings::get_instance();
+//		License::get_instance();
+//		Settings::get_instance();
+		
+		if ( is_multisite() ) {
+			Multisite::get_instance();
+		}
 	}
 
 	/**

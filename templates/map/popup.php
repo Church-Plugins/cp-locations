@@ -1,5 +1,5 @@
 <?php
-
+use ChurchPlugins\Helpers;
 use \CP_Locations\Controllers\Location;
 
 global $post;
@@ -12,12 +12,16 @@ if ( isset( $args[ 'location' ] ) ) {
 } 
 
 $data = $location->get_api_data( false );
+
 ?>
 
 <div class="cploc-map-popup">
-	<h4 class="cploc-map-popup--title"><?php echo $data['title']; ?></h4>
-	<div class="cploc-map-popup--thumb"><?php echo get_the_post_thumbnail( $location->post->ID, 'large' ); ?></div>
-	<div class="cploc-map-popup--address"><?php echo wpautop( $data['address'] ); ?></div>
-	<div class="cploc-map-popup--times"></div>
-	<div class="cploc-map-popup--cta"><a href="<?php echo get_the_permalink( $location->post->ID ); ?>" class="cp-button">Learn More</a></div>
+	<a class="cploc-map-popup--thumb" href="<?php echo get_the_permalink( $location->post->ID ); ?>" style="background-image: url('<?php echo get_the_post_thumbnail_url( $location->post->ID, 'large' ); ?>')"><?php echo get_the_post_thumbnail( $location->post->ID, 'large' ); ?></a>
+	<h4 class="cploc-map-popup--title"><a href="<?php echo get_the_permalink( $location->post->ID ); ?>"><?php echo $data['title']; ?></a></h4>
+	<div class="cploc-map-popup--info">
+		<div class="cploc-map-popup--speaker"><?php echo Helpers::get_icon( 'speaker' ); ?> <?php echo $data['pastor']; ?></div>
+		<div class="cploc-map-popup--address"><?php echo Helpers::get_icon( 'location' ); ?> <?php echo $data['address']; ?></div>
+		<div class="cploc-map-popup--times"><?php echo Helpers::get_icon( 'date' ); ?> <?php echo $data['times']; ?></div>
+	</div>
+	<div class="cploc-map-popup--cta"><a href="<?php echo get_the_permalink( $location->post->ID ); ?>" class="cp-button is-transparent">Learn More</a></div>
 </div>
