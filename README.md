@@ -21,6 +21,9 @@ npm run build
 
 ### Change Log
 
+#### 1.0.5
+* Fix recurring event bug
+
 #### 1.0.4
 * Fix error thrown when creating new Location
 
