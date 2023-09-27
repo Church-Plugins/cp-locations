@@ -21,6 +21,9 @@ npm run build
 
 ### Change Log
 
+#### 1.1.0
+* Add interface to manage location mapping and synced content
+
 #### 1.0.6
 * Fix single event bug
 

@@ -38,7 +38,7 @@ class Settings {
 	 *
 	 * @author Tanner Moushey
 	 */
-	public static function get( $key, $default = '', $group = 'cpl_main_options' ) {
+	public static function get( $key, $default = '', $group = 'cp_loc_main_options' ) {
 		$options = get_option( $group, [] );
 
 		if ( isset( $options[ $key ] ) ) {
@@ -47,7 +47,7 @@ class Settings {
 			$value = $default;
 		}
 
-		return apply_filters( 'cpl_settings_get', $value, $key, $group );
+		return apply_filters( 'cp_loc_settings_get', $value, $key, $group );
 	}
 
 	/**
@@ -62,19 +62,15 @@ class Settings {
 	 * @author Tanner Moushey
 	 */
 	public static function get_advanced( $key, $default = '' ) {
-		return self::get( $key, $default, 'cpl_advanced_options' );
+		return self::get( $key, $default, 'cp_loc_advanced_options' );
 	}
 
 	public static function get_item( $key, $default = '' ) {
-		return self::get( $key, $default, 'cpl_item_options' );
-	}
-
-	public static function get_item_type( $key, $default = '' ) {
-		return self::get( $key, $default, 'cpl_item_type_options' );
+		return self::get( $key, $default, 'cp_loc_item_options' );
 	}
 
 	public static function get_location( $key, $default = '' ) {
-		return self::get( $key, $default, 'cpl_location_options' );
+		return self::get( $key, $default, 'cp_loc_location_options' );
 	}
 
 	/**
@@ -93,11 +89,11 @@ class Settings {
 		 * Registers main options page menu item and form.
 		 */
 		$args = array(
-			'id'           => 'cpl_main_options_page',
+			'id'           => 'cp_loc_main_options_page',
 			'title'        => 'Settings',
 			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
+			'option_key'   => 'cp_loc_main_options',
+			'tab_group'    => 'cp_loc_main_options',
 			'tab_title'    => 'Main',
 			'parent_slug'  => 'edit.php?post_type=' . $post_type,
 			'display_cb'   => [ $this, 'options_display_with_tabs'],
@@ -168,12 +164,12 @@ class Settings {
 		 * Registers tertiary options page, and set main item as parent.
 		 */
 		$args = array(
-			'id'           => 'cpl_license_options_page',
+			'id'           => 'cp_loc_license_options_page',
 			'title'        => 'Settings',
 			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_license',
-			'parent_slug'  => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
+			'option_key'   => 'cp_loc_license',
+			'parent_slug'  => 'cp_loc_main_options',
+			'tab_group'    => 'cp_loc_main_options',
 			'tab_title'    => 'License',
 			'display_cb'   => [ $this, 'options_display_with_tabs' ]
 		);
@@ -192,12 +188,12 @@ class Settings {
 		 * Registers secondary options page, and set main item as parent.
 		 */
 		$args = array(
-			'id'           => 'cpl_item_options_page',
+			'id'           => 'cp_loc_item_options_page',
 			'title'        => 'Settings',
 			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_item_options',
-			'parent_slug'  => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
+			'option_key'   => 'cp_loc_item_options',
+			'parent_slug'  => 'cp_loc_main_options',
+			'tab_group'    => 'cp_loc_main_options',
 			'tab_title'    => cp_library()->setup->post_types->item->plural_label,
 			'display_cb'   => [ $this, 'options_display_with_tabs' ],
 		);
@@ -227,97 +223,17 @@ class Settings {
 
 	}
 
-	protected function item_type_options() {
-		/**
-		 * Registers secondary options page, and set main item as parent.
-		 */
-		$args = array(
-			'id'           => 'cpl_item_type_options_page',
-			'title'        => 'Settings',
-			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_item_type_options',
-			'parent_slug'  => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
-			'tab_title'    => cp_library()->setup->post_types->item_type->plural_label,
-			'display_cb'   => [ $this, 'options_display_with_tabs' ],
-		);
-
-		$options = new_cmb2_box( $args );
-
-		$options->add_field( array(
-			'name' => __( 'Labels' ),
-			'id'   => 'labels',
-			'type' => 'title',
-		) );
-
-		$options->add_field( array(
-			'name'    => __( 'Singular Label', 'cp-library' ),
-			'id'      => 'singular_label',
-			'type'    => 'text',
-			'default' => cp_library()->setup->post_types->item_type->single_label,
-		) );
-
-		$options->add_field( array(
-			'name'    => __( 'Plural Label', 'cp-library' ),
-			'id'      => 'plural_label',
-			'desc'    => __( 'Caution: changing this value will also adjust the url structure and may affect your SEO.', 'cp-library' ),
-			'type'    => 'text',
-			'default' => cp_library()->setup->post_types->item_type->plural_label,
-		) );
-
-	}
-
-	protected function speaker_options() {
-		/**
-		 * Registers secondary options page, and set main item as parent.
-		 */
-		$args = array(
-			'id'           => 'cpl_speaker_options_page',
-			'title'        => 'Settings',
-			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_speaker_options',
-			'parent_slug'  => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
-			'tab_title'    => cp_library()->setup->post_types->speaker->plural_label,
-			'display_cb'   => [ $this, 'options_display_with_tabs' ],
-		);
-
-		$options = new_cmb2_box( $args );
-
-		$options->add_field( array(
-			'name' => __( 'Labels' ),
-			'id'   => 'labels',
-			'type' => 'title',
-		) );
-
-		$options->add_field( array(
-			'name'    => __( 'Singular Label', 'cp-library' ),
-			'id'      => 'singular_label',
-			'type'    => 'text',
-			'default' => cp_library()->setup->post_types->speaker->single_label,
-		) );
-
-		$options->add_field( array(
-			'name'    => __( 'Plural Label', 'cp-library' ),
-			'desc'    => __( 'Caution: changing this value will also adjust the url structure and may affect your SEO.', 'cp-library' ),
-			'id'      => 'plural_label',
-			'type'    => 'text',
-			'default' => cp_library()->setup->post_types->speaker->plural_label,
-		) );
-
-	}
-
 	protected function advanced_options() {
 		/**
 		 * Registers secondary options page, and set main item as parent.
 		 */
 		$args = array(
-			'id'           => 'cpl_advanced_options_page',
+			'id'           => 'cp_loc_advanced_options_page',
 			'title'        => 'Settings',
 			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_advanced_options',
-			'parent_slug'  => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
+			'option_key'   => 'cp_loc_advanced_options',
+			'parent_slug'  => 'cp_loc_main_options',
+			'tab_group'    => 'cp_loc_main_options',
 			'tab_title'    => 'Advanced',
 			'display_cb'   => [ $this, 'options_display_with_tabs' ],
 		);
@@ -331,8 +247,8 @@ class Settings {
 		) );
 
 		$advanced_options->add_field( array(
-			'name'    => __( 'Enable' ) . ' ' . cp_library()->setup->post_types->item_type->plural_label,
-			'id'      => 'item_type_enabled',
+			'name'    => __( 'Enable' ) . ' ' . cp_locations()->setup->post_types->locations->plural_label,
+			'id'      => 'location_type_enabled',
 			'type'    => 'radio_inline',
 			'default' => 1,
 			'options' => [
