@@ -60,6 +60,16 @@ class Location extends Taxonomy  {
 		add_action( 'pre_get_posts', [ $this, 'include_global_items'] );
 	}
 
+	public function get_args() {
+		$args = parent::get_args();
+
+		if ( isset( $_GET['debug-locations'] ) ) {
+			$args['show_ui'] = true;
+		}
+
+		return $args;
+	}
+
 	/**
 	 * Get the slug for this taxonomy
 	 *
