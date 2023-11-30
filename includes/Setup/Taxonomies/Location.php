@@ -71,6 +71,31 @@ class Location extends Taxonomy  {
 	}
 
 	/**
+	 * Get terms with those selected already at the top
+	 *
+	 * @return array
+	 * @since  1.0.0
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function get_terms_for_metabox() {
+		$terms = $this->get_terms();
+
+		if ( ! empty( $_GET['post'] ) ) {
+			$post_id = absint( $_GET['post'] );
+			$set_terms = wp_list_pluck( wp_get_post_terms( $post_id, $this->taxonomy ), 'name', 'slug' );
+
+			foreach( $set_terms as $slug => $name ) {
+				if ( ! isset( $terms[ $slug ] ) ) {
+					$terms = array_merge( [ $slug => $name ], $terms );
+				}
+			}
+		}
+
+		return $terms;
+	}
+
+	/**
 	 * Get the slug for this taxonomy
 	 *
 	 * @return false|mixed

@@ -21,6 +21,10 @@ npm run build
 
 ### Change Log
 
+#### 1.0.7
+* Update Location taxonomy metabox to lookup by slug
+* Update core
+
 #### 1.0.6
 * Fix single event bug
 
