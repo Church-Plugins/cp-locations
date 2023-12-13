@@ -21,6 +21,10 @@ npm run build
 
 ### Change Log
 
+#### 1.0.8
+* Add Settings Page
+* Disable Location taxonomy by default
+
 #### 1.0.7
 * Update Location taxonomy metabox to lookup by slug
 * Update core

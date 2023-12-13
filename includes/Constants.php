@@ -52,7 +52,7 @@ if( !defined( 'CP_LOCATIONS_STORE_URL' ) ) {
 }
 if( !defined( 'CP_LOCATIONS_ITEM_NAME' ) ) {
 	 define ( 'CP_LOCATIONS_ITEM_NAME',
-	 	'Church Plugins - Locations'
+	 	'CP Locations'
 	);
 }
 

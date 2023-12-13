@@ -213,7 +213,7 @@ class Init {
 	 * @return void
 	 */
 	public function required_plugins() {
-		printf( '<div class="error"><p>%s</p></div>', __( 'Your system does not meet the requirements for Church Plugins - Locations', 'cp-locations' ) );
+		printf( '<div class="error"><p>%s</p></div>', __( 'Your system does not meet the requirements for CP Locations', 'cp-locations' ) );
 	}
 
 	/** Helper Methods **************************************/
@@ -260,7 +260,7 @@ class Init {
 	 * @return string the plugin name
 	 */
 	public function get_plugin_name() {
-		return __( 'Church Plugins - Locations', 'cp-locations' );
+		return __( 'CP Locations', 'cp-locations' );
 	}
 
 	/**

@@ -38,7 +38,7 @@ class Settings {
 	 *
 	 * @author Tanner Moushey
 	 */
-	public static function get( $key, $default = '', $group = 'cpl_main_options' ) {
+	public static function get( $key, $default = '', $group = 'cploc_main_options' ) {
 		$options = get_option( $group, [] );
 
 		if ( isset( $options[ $key ] ) ) {
@@ -47,7 +47,7 @@ class Settings {
 			$value = $default;
 		}
 
-		return apply_filters( 'cpl_settings_get', $value, $key, $group );
+		return apply_filters( 'cploc_settings_get', $value, $key, $group );
 	}
 
 	/**
@@ -62,19 +62,11 @@ class Settings {
 	 * @author Tanner Moushey
 	 */
 	public static function get_advanced( $key, $default = '' ) {
-		return self::get( $key, $default, 'cpl_advanced_options' );
-	}
-
-	public static function get_item( $key, $default = '' ) {
-		return self::get( $key, $default, 'cpl_item_options' );
-	}
-
-	public static function get_item_type( $key, $default = '' ) {
-		return self::get( $key, $default, 'cpl_item_type_options' );
+		return self::get( $key, $default, 'cploc_advanced_options' );
 	}
 
 	public static function get_location( $key, $default = '' ) {
-		return self::get( $key, $default, 'cpl_location_options' );
+		return self::get( $key, $default, 'cploc_location_options' );
 	}
 
 	/**
@@ -88,16 +80,16 @@ class Settings {
 
 	public function register_main_options_metabox() {
 
-		$post_type = cp_library()->setup->post_types->item_type_enabled() ? cp_library()->setup->post_types->item_type->post_type : cp_library()->setup->post_types->item->post_type;
+		$post_type = cp_locations()->setup->post_types->locations->post_type;
 		/**
 		 * Registers main options page menu item and form.
 		 */
 		$args = array(
-			'id'           => 'cpl_main_options_page',
+			'id'           => 'cploc_main_options_page',
 			'title'        => 'Settings',
 			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
+			'option_key'   => 'cploc_main_options',
+			'tab_group'    => 'cploc_main_options',
 			'tab_title'    => 'Main',
 			'parent_slug'  => 'edit.php?post_type=' . $post_type,
 			'display_cb'   => [ $this, 'options_display_with_tabs'],
@@ -105,253 +97,110 @@ class Settings {
 
 		$main_options = new_cmb2_box( $args );
 
-		/**
-		 * Options fields ids only need
-		 * to be unique within this box.
-		 * Prefix is not needed.
-		 */
 		$main_options->add_field( array(
-			'name'    => __( 'Primary Color', 'cp-library' ),
-			'desc'    => __( 'The primary color to use in the templates.', 'cp-library' ),
-			'id'      => 'color_primary',
-			'type'    => 'colorpicker',
-			'default' => '#333333',
+			'name'    => __( 'Mapbox API Key', 'cp-library' ),
+			'desc'    => __( 'The API key to use for the MapBox integration. To create a new key, create a free account for MapBox and copy the key from you <a href="https://account.mapbox.com/">Account</a>.', 'cp-library' ),
+			'id'      => 'mapbox_api_key',
+			'type'    => 'text',
 		) );
 
-		$main_options->add_field( array(
-			'name'         => __( 'Site Logo', 'cp-library' ),
-			'desc'         => sprintf( __( 'The logo to use for %s.', 'cp-library' ), cp_library()->setup->post_types->item->plural_label ),
-			'id'           => 'logo',
-			'type'         => 'file',
-			// query_args are passed to wp.media's library query.
-			'query_args'   => array(
-				// Or only allow gif, jpg, or png images
-				 'type' => array(
-				     'image/gif',
-				     'image/jpeg',
-				     'image/png',
-				 ),
-			),
-			'preview_size' => 'thumbnail', // Image size to use when previewing in the admin
-		) );
+		$this->location_fields();
+		$this->shortcode_fields();
+		$this->license_fields();
 
-		$main_options->add_field( array(
-			'name'         => __( 'Default Thumbnail', 'cp-library' ),
-			'desc'         => sprintf( __( 'The default thumbnail image to use for %s.', 'cp-library' ), cp_library()->setup->post_types->item->plural_label ),
-			'id'           => 'default_thumbnail',
-			'type'         => 'file',
-			// query_args are passed to wp.media's library query.
-			'query_args'   => array(
-				// Or only allow gif, jpg, or png images
-				 'type' => array(
-				     'image/gif',
-				     'image/jpeg',
-				     'image/png',
-				 ),
-			),
-			'preview_size' => 'medium', // Image size to use when previewing in the admin
-		) );
+	}
 
-		$this->item_options();
-
-		if ( cp_library()->setup->post_types->item_type_enabled() ) {
-			$this->item_type_options();
-		}
-
-		if ( cp_library()->setup->post_types->speaker_enabled() ) {
-			$this->speaker_options();
-		}
-
-		$this->advanced_options();
+	protected function license_fields() {
+		$license = new \ChurchPlugins\Setup\Admin\License( 'cploc_license', 442, CP_LOCATIONS_STORE_URL, CP_LOCATIONS_PLUGIN_FILE, get_admin_url( null, 'admin.php?page=cploc_license' ) );
 
 		/**
-		 * Registers tertiary options page, and set main item as parent.
+		 * Registers settings page, and set main item as parent.
 		 */
 		$args = array(
-			'id'           => 'cpl_license_options_page',
-			'title'        => 'Settings',
+			'id'           => 'cploc_options_page',
+			'title'        => 'CP Locations Settings',
 			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_license',
-			'parent_slug'  => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
+			'option_key'   => 'cploc_license',
+			'parent_slug'  => 'cploc_main_options',
+			'tab_group'    => 'cploc_main_options',
 			'tab_title'    => 'License',
 			'display_cb'   => [ $this, 'options_display_with_tabs' ]
 		);
 
-		$tertiary_options = new_cmb2_box( $args );
+		$options = new_cmb2_box( $args );
+		$license->license_field( $options );
+	}
 
-		$tertiary_options->add_field( array(
-			'name' => 'License Key',
-			'id'   => 'license',
-			'type' => 'text',
+	protected function location_fields() {
+		$args = array(
+			'id'           => 'cploc_location_options_page',
+			'title'        => 'Settings',
+			'object_types' => array( 'options-page' ),
+			'option_key'   => 'cploc_location_options',
+			'tab_group'    => 'cploc_main_options',
+			'parent_slug'  => 'cploc_main_options',
+			'tab_title'    => 'Locations',
+			'display_cb'   => [ $this, 'options_display_with_tabs' ],
+		);
+
+		$main_options = new_cmb2_box( $args );
+
+		$main_options->add_field( array(
+			'name'    => __( 'Singular Label', 'cp-library' ),
+			'desc'    => __( 'The singular label to use for Locations.', 'cp-library' ),
+			'id'      => 'singular_label',
+			'type'    => 'text',
+			'default' => 'Location',
+		) );
+
+		$main_options->add_field( array(
+			'name'    => __( 'Plural Label', 'cp-library' ),
+			'desc'    => __( 'The plural label to use for Locations.', 'cp-library' ),
+			'id'      => 'plural_label',
+			'type'    => 'text',
+			'default' => 'Locations',
 		) );
 	}
 
-	protected function item_options() {
+
+	protected function shortcode_fields() {
 		/**
-		 * Registers secondary options page, and set main item as parent.
+		 * Registers settings page, and set main item as parent.
 		 */
 		$args = array(
-			'id'           => 'cpl_item_options_page',
-			'title'        => 'Settings',
+			'id'           => 'cploc_shortcode_page',
+			'title'        => 'CP Locations ShortCodes',
 			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_item_options',
-			'parent_slug'  => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
-			'tab_title'    => cp_library()->setup->post_types->item->plural_label,
-			'display_cb'   => [ $this, 'options_display_with_tabs' ],
+			'option_key'   => 'cploc_shortcode',
+			'parent_slug'  => 'cploc_main_options',
+			'tab_group'    => 'cploc_main_options',
+			'tab_title'    => 'Shortcodes',
+			'display_cb'   => [ $this, 'options_display_with_tabs' ]
 		);
 
 		$options = new_cmb2_box( $args );
 
+//cp-location-data
+//cp-locations
+
 		$options->add_field( array(
-			'name' => __( 'Labels' ),
-			'id'   => 'labels',
+			'name' => __( '[cp-locations]', 'cp-library' ),
+			'desc' => __( 'Use the [cp-locations] shortcode on your main locations page to show the locations map and cards.', 'cp-library' ),
+			'id'   => 'cp-locations-shortcode',
 			'type' => 'title',
 		) );
 
 		$options->add_field( array(
-			'name'    => __( 'Singular Label', 'cp-library' ),
-			'id'      => 'singular_label',
-			'type'    => 'text',
-			'default' => cp_library()->setup->post_types->item->single_label,
-		) );
-
-		$options->add_field( array(
-			'name'    => __( 'Plural Label', 'cp-library' ),
-			'id'      => 'plural_label',
-			'desc'    => __( 'Caution: changing this value will also adjust the url structure and may affect your SEO.', 'cp-library' ),
-			'type'    => 'text',
-			'default' => cp_library()->setup->post_types->item->plural_label,
-		) );
-
-	}
-
-	protected function item_type_options() {
-		/**
-		 * Registers secondary options page, and set main item as parent.
-		 */
-		$args = array(
-			'id'           => 'cpl_item_type_options_page',
-			'title'        => 'Settings',
-			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_item_type_options',
-			'parent_slug'  => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
-			'tab_title'    => cp_library()->setup->post_types->item_type->plural_label,
-			'display_cb'   => [ $this, 'options_display_with_tabs' ],
-		);
-
-		$options = new_cmb2_box( $args );
-
-		$options->add_field( array(
-			'name' => __( 'Labels' ),
-			'id'   => 'labels',
+			'name' => __( '[cp-locations-data]', 'cp-library' ),
+			'desc' => __( "Use the [cp-locations-data] shortcode to display information about a location.
+<br /><br />Args:<br />
+* location (the ID of the location to show data for) <br />
+* field (the data to retrieve, available options are 'title', 'service_times', 'subtitle', 'address', 'email', 'phone', 'pastor') <br /><br />
+Example: [cp-locations location=23 field='service_times']
+", 'cp-library' ),
+			'id'   => 'cp-locations-data-shortcode',
 			'type' => 'title',
 		) );
-
-		$options->add_field( array(
-			'name'    => __( 'Singular Label', 'cp-library' ),
-			'id'      => 'singular_label',
-			'type'    => 'text',
-			'default' => cp_library()->setup->post_types->item_type->single_label,
-		) );
-
-		$options->add_field( array(
-			'name'    => __( 'Plural Label', 'cp-library' ),
-			'id'      => 'plural_label',
-			'desc'    => __( 'Caution: changing this value will also adjust the url structure and may affect your SEO.', 'cp-library' ),
-			'type'    => 'text',
-			'default' => cp_library()->setup->post_types->item_type->plural_label,
-		) );
-
-	}
-
-	protected function speaker_options() {
-		/**
-		 * Registers secondary options page, and set main item as parent.
-		 */
-		$args = array(
-			'id'           => 'cpl_speaker_options_page',
-			'title'        => 'Settings',
-			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_speaker_options',
-			'parent_slug'  => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
-			'tab_title'    => cp_library()->setup->post_types->speaker->plural_label,
-			'display_cb'   => [ $this, 'options_display_with_tabs' ],
-		);
-
-		$options = new_cmb2_box( $args );
-
-		$options->add_field( array(
-			'name' => __( 'Labels' ),
-			'id'   => 'labels',
-			'type' => 'title',
-		) );
-
-		$options->add_field( array(
-			'name'    => __( 'Singular Label', 'cp-library' ),
-			'id'      => 'singular_label',
-			'type'    => 'text',
-			'default' => cp_library()->setup->post_types->speaker->single_label,
-		) );
-
-		$options->add_field( array(
-			'name'    => __( 'Plural Label', 'cp-library' ),
-			'desc'    => __( 'Caution: changing this value will also adjust the url structure and may affect your SEO.', 'cp-library' ),
-			'id'      => 'plural_label',
-			'type'    => 'text',
-			'default' => cp_library()->setup->post_types->speaker->plural_label,
-		) );
-
-	}
-
-	protected function advanced_options() {
-		/**
-		 * Registers secondary options page, and set main item as parent.
-		 */
-		$args = array(
-			'id'           => 'cpl_advanced_options_page',
-			'title'        => 'Settings',
-			'object_types' => array( 'options-page' ),
-			'option_key'   => 'cpl_advanced_options',
-			'parent_slug'  => 'cpl_main_options',
-			'tab_group'    => 'cpl_main_options',
-			'tab_title'    => 'Advanced',
-			'display_cb'   => [ $this, 'options_display_with_tabs' ],
-		);
-
-		$advanced_options = new_cmb2_box( $args );
-
-		$advanced_options->add_field( array(
-			'name' => __( 'Modules' ),
-			'id'   => 'modules_enabled',
-			'type' => 'title',
-		) );
-
-		$advanced_options->add_field( array(
-			'name'    => __( 'Enable' ) . ' ' . cp_library()->setup->post_types->item_type->plural_label,
-			'id'      => 'item_type_enabled',
-			'type'    => 'radio_inline',
-			'default' => 1,
-			'options' => [
-				1 => __( 'Enable', 'cp-library' ),
-				0 => __( 'Disable', 'cp-library' ),
-			]
-		) );
-
-		$advanced_options->add_field( array(
-			'name'    => __( 'Enable' ) . ' ' . cp_library()->setup->post_types->speaker->plural_label,
-			'id'      => 'speaker_enabled',
-			'type'    => 'radio_inline',
-			'default' => 1,
-			'options' => [
-				1 => __( 'Enable', 'cp-library' ),
-				0 => __( 'Disable', 'cp-library' ),
-			]
-		) );
-
 	}
 
 	/**

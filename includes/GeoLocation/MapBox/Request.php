@@ -11,6 +11,7 @@
 namespace CP_Locations\GeoLocation\MapBox;
 
 use ChurchPlugins\RequestAPI\RequestJSON;
+use CP_Locations\Admin\Settings;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -22,7 +23,7 @@ defined( 'ABSPATH' ) or exit;
 class Request extends RequestJSON {
 
 	protected $api_key = '';
-	
+
 	/**
 	 * Construct the request object.
 	 *
@@ -30,7 +31,7 @@ class Request extends RequestJSON {
 	 */
 	public function __construct() {
 		$this->method = 'GET';
-		$this->api_key = apply_filters( 'cp_loc_mapbox_api_key', '' );
+		$this->api_key = apply_filters( 'cp_loc_mapbox_api_key', Settings::get( 'mapbox_api_key' ) );
 	}
 
 	/**
@@ -63,5 +64,5 @@ class Request extends RequestJSON {
 			'limit'        => 1,
 		];
 	}
-	
+
 }
