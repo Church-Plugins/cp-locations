@@ -612,7 +612,7 @@ class Module extends \FLBuilderModule {
 					'alternate_images' => array(
 						'label'        => __( 'Alternate Location Image', 'cp-locations' ),
 						'type'         => 'form',
-						'form'         => 'cp_locations_image_form', // ID from registered form below
+						'form'         => 'cp_contextual_photo_form', // ID from registered form below
 						'preview_text' => 'label',
 						'multiple'     => true,
 					),
@@ -789,20 +789,13 @@ class Module extends \FLBuilderModule {
 	),
 ));
 
-
-$location_options = array();
+$location_options = [];
 foreach ( \CP_Locations\Models\Location::get_all_locations() as $location ) {
-	$location_id = absint( $location->origin_id );
-
-	if ( ! $location_id ) {
-		continue;
-	}
-
-	$location_options[ $location_id ] = $location->title;
+	$location_options[ $location->origin_id ] = $location->title;
 }
 
 \FLBuilder::register_settings_form(
-	'cp_locations_image_form',
+	'cp_contextual_photo_form',
 	array(
 		'title' => __( 'Add Image', 'cp-locations' ),
 		'tabs'  => array(
