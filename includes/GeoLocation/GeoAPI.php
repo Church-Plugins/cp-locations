@@ -87,7 +87,7 @@ abstract class GeoAPI extends Base {
 
 	/**
 	 * Stub function that we'll use to get the geo data for this location
-	 * 
+	 *
 	 * @param $location
 	 * @param $type
 	 *
@@ -96,7 +96,7 @@ abstract class GeoAPI extends Base {
 	 *
 	 * @author Tanner Moushey
 	 */
-	protected abstract function get_location_data( $location, $type );
+	abstract protected function get_location_data( $location, $type );
 	
 	/**
 	 * Store this location data in the database

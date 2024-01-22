@@ -79,7 +79,26 @@ const App = () => {
 	const [error, setError] = useState(false);
 	const [locations, setLocations] = useState([]);
 	const [initLocations, setInitLocations] = useState([]);
-	const [userGeo, setUserGeo] = useState( false );
+	const [userGeo, setUserGeo] = useState(() => {
+		const searchParams = new URLSearchParams(window.location.search);
+		const coords = searchParams.get('location')?.split?.(',');
+
+		if (coords) {
+			const lat = parseFloat(coords[0]);
+			const lng = parseFloat(coords[1]);
+
+			if ( isNaN(lat) || isNaN(lng) ) {
+				return false;
+			}
+
+			return {
+				attr: { postcode : 'current location' },
+				center: [lat, lng],
+			}
+		}
+
+		return false
+	});
 	const isDesktop = useMediaQuery('(min-width:1025px)');
 
 	const getMyLocation = () => {
