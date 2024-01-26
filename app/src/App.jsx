@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
 import Controllers_WP_REST_Request from './Controllers/WP_REST_Request';
 import debounce from '@mui/utils/debounce';
@@ -95,8 +95,7 @@ const App = () => {
 		} );
 	}
 	
-	const handleSearchInputChange = debounce((value) => {
-		
+	const handleZipCodeSearch = useMemo(() => debounce((value) => {
 		if ( 5 !== value.length || isNaN(value) ) {
 			setUserGeo( false );
 			return;
@@ -117,7 +116,22 @@ const App = () => {
 			}
 		)();
 		
-	}, 100);
+	}, 100), []);
+
+	const handleSearchInputChange = (data) => {
+		if(!data?.features?.length) {
+			return;
+		}
+
+		const feature = data.features[0]
+
+		setUserGeo({
+			attr: {
+				postcode: feature.properties.postcode
+			},
+			center: feature.geometry.coordinates.reverse()
+		})
+	}
 	
 	useEffect(() => {
 		(
