@@ -90,19 +90,11 @@ class Init {
 		return $tax;
 	}
 
-	public function enabled() {
-		if ( ! cp_locations()->enabled() ) {
-			return false;
-		}
-
-		return apply_filters( 'cploc_location_taxonomy_enabled', false );
-	}
-
 	public function register_taxonomies() {
 
 		$this->location = Location::get_instance();
 
-		if ( $this->enabled() ) {
+		if ( cp_locations()->taxonomy_enabled() ) {
 			$this->location->add_actions();
 			do_action( 'cp_register_taxonomies' );
 		} else {

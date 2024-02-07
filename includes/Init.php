@@ -315,12 +315,37 @@ class Init {
 		return 'pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaTkwdWcwcm9yM2NueGRhdmR3M3Y1In0.Su6h_mXCh6WfLO4aJ5uMFg';
 	}
 
+	/**
+	 * Whether or not the functionality is enabled or running in the background
+	 *
+	 * @since  1.0.0
+	 * @updated 1.0.9 - to check for network activation
+	 *
+	 * @return bool
+	 * @author Tanner Moushey
+	 */
 	public function enabled() {
-		if ( is_multisite() && ( ! is_main_site() || is_network_admin() ) ) {
+		if ( is_multisite() && is_plugin_active_for_network( CP_LOCATIONS_PLUGIN_FILE ) && ( ! is_main_site() || is_network_admin() ) ) {
 			return false;
 		}
 
 		return true;
+	}
+
+	/**
+	 * Whether or not the taxonomy is enabled
+	 *
+	 * @since  1.0.9
+	 *
+	 * @return false|mixed|void
+	 * @author Tanner Moushey, 2/6/24
+	 */
+	public function taxonomy_enabled() {
+		if ( ! $this->enabled() ) {
+			return false;
+		}
+
+		return apply_filters( 'cploc_location_taxonomy_enabled', false );
 	}
 
 }

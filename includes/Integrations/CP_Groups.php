@@ -39,7 +39,7 @@ class CP_Groups {
 	protected function includes() {}
 
 	protected function actions() {
-		if ( cp_locations()->enabled() ) {
+		if ( cp_locations()->taxonomy_enabled() ) {
 			add_filter( 'cp_groups_filter_facets', [ $this, 'location_facet' ] );
 			add_filter( 'cp_groups_filter_facet_terms', [ $this, 'location_facet_terms' ], 10, 3 );
 		}
@@ -49,7 +49,7 @@ class CP_Groups {
 
 	/**
 	 * Add location facet to groups filter
-	 * 
+	 *
 	 * @param $facets
 	 *
 	 * @return mixed
@@ -63,13 +63,13 @@ class CP_Groups {
 		}
 
 		array_unshift( $facets, cp_locations()->setup->taxonomies->location );
-			
+
 		return $facets;
 	}
 
 	/**
 	 * Remove global term from facets
-	 * 
+	 *
 	 * @param $terms
 	 * @param $object
 	 * @param $tax
@@ -83,17 +83,17 @@ class CP_Groups {
 		if ( $object !== cp_locations()->setup->taxonomies->location->taxonomy ) {
 			return $terms;
 		}
-		
+
 		if ( is_wp_error( $terms ) ) {
 			return $terms;
 		}
-		
+
 		foreach( $terms as $key => $term ) {
 			if ( 'global' === $term->slug ) {
 				unset( $terms[ $key ] );
 			}
 		}
-		
+
 		return $terms;
 	}
 }

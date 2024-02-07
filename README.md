@@ -21,6 +21,9 @@ npm run build
 
 ### Change Log
 
+#### 1.0.9
+* Better handling for multisite
+
 #### 1.0.8
 * Add Settings Page
 * Disable Location taxonomy by default
