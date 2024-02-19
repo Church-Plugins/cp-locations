@@ -1,7 +1,9 @@
 import { useRef, useState, useEffect } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl, useMap } from 'react-leaflet';
 import SearchInput from '../Elements/SearchInput';
-import { MyLocation } from '@mui/icons-material';
+import MyLocation from '@mui/icons-material/MyLocation';
+import HomeOutlined from '@mui/icons-material/HomeOutlined';
+import CallOutlined from '@mui/icons-material/CallOutlined';
 
 const DesktopFinder = ({
 	userGeo,
@@ -143,6 +145,7 @@ const DesktopFinder = ({
 									eventHandlers={{
 										mouseover: (e) => {
 											focusLocation(index);
+											e.target.openPopup?.();
 										},
 										mouseout: (e) => {
 											unsetActiveLocation();
@@ -152,15 +155,40 @@ const DesktopFinder = ({
 										}
 									}}
 								>
-									{activeLocation == index && (
+									{/* {activeLocation == index && (
 										<Tooltip 
 											direction="bottom"
 											interactive={true} 
 											onClick={() => onClick(index)}
 											onMouseOut={() => unsetActiveLocation()}
-											permanent>{location.title}</Tooltip>		
-									) }
+											permanent>
+												<h3>This is the header</h3>
+												<div>Hello, wolrld</div>
+											</Tooltip>		
+									) } */}
 									
+									<Popup
+										position={location.geodata.center}
+										offset={[0, -20]}
+										autoPan={true}
+										autoPanPadding={[16, 16]}
+										onClose={() => unsetActiveLocation()}
+										className='cploc-map--popup'
+									>
+										<h3 className='cploc-map--popup--title'>{location.title}</h3>
+										<div className="cploc-map--popup--row">
+											<HomeOutlined fontSize='0.9em' color="var(--cp-color-ui-info)" />
+											{location.address}
+										</div>
+										<div className="cploc-map--popup--row">
+											<CallOutlined fontSize='0.9em' color="var(--cp-color-ui-info)" />
+											{location.phone}
+											{ console.log(location) }
+										</div>
+										<div className="cploc-map--popup--row cploc-map--popup--description">
+											{location.subtitle}
+										</div>
+									</Popup>
 								</Marker>	
 							))}
 							
