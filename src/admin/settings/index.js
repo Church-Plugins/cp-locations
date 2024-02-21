@@ -9,25 +9,14 @@ import MainTab from "./MainTab";
 import LocationsTab from "./LocationsTab";
 import ShortcodesTab from "./ShortcodesTab";
 import LicenseTab from "./LicenseTab";
+import TemplateTab from "./TemplateTab";
 
 function TabContent({ tab }) {
-	const settingsGroup = tab.name
-	
-	let isStatic = false
-	let Component = MainTab // default
-
-	switch (tab.name) {
-		case 'location_options':
-			Component = LocationsTab
-			break;
-		case 'shortcodes':
-			Component = ShortcodesTab
-			isStatic = true
-			break;
-		case 'license':
-			Component = LicenseTab
-			break;
-	}
+	const {
+		component: Component,
+		isStatic,
+		name: settingsGroup
+	} = tab
 
 	const { data, isSaving, error, isDirty, isHydrating } = useSelect( ( select ) => {
 		return {
@@ -98,21 +87,32 @@ function Settings() {
 							name: 'main_options',
 							title: __( 'Main', 'cp-locations' ),
 							className: 'main-tab',
+							component: MainTab,
 						},
 						{
 							name: 'location_options',
 							title: __( 'Locations', 'cp-locations' ),
 							className: 'locations-tab',
+							component: LocationsTab,
+						},
+						{
+							name: 'templates',
+							title: __( 'Templates', 'cp-locations' ),
+							className: 'templates-tab',
+							component: TemplateTab,
 						},
 						{
 							name: 'shortcodes',
 							title: __( 'Shortcodes', 'cp-locations' ),
 							className: 'shortcodes-tab',
+							component: ShortcodesTab,
+							isStatic: true
 						},
 						{
 							name: 'license',
 							title: __( 'License', 'cp-locations' ),
 							className: 'license-tab',
+							component: LicenseTab,
 						}
 					]}
 					onSelect={(tabName) => {
