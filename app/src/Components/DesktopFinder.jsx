@@ -137,7 +137,7 @@ const DesktopFinder = ({
 							)}
 							
 							{locations.map((location, index) => (
-								<Marker 
+								<Marker
 									ref={(el) => (markerRef.current[index] = el)} 
 									key={index} 
 									position={location.geodata.center}
@@ -175,19 +175,10 @@ const DesktopFinder = ({
 										onClose={() => unsetActiveLocation()}
 										className='cploc-map--popup'
 									>
-										<h3 className='cploc-map--popup--title'>{location.title}</h3>
-										<div className="cploc-map--popup--row">
-											<HomeOutlined fontSize='0.9em' color="var(--cp-color-ui-info)" />
-											{location.address}
-										</div>
-										<div className="cploc-map--popup--row">
-											<CallOutlined fontSize='0.9em' color="var(--cp-color-ui-info)" />
-											{location.phone}
-											{ console.log(location) }
-										</div>
-										<div className="cploc-map--popup--row cploc-map--popup--description">
-											{location.subtitle}
-										</div>
+										<div
+											className="cploc-map--popup--content"
+											dangerouslySetInnerHTML={{__html: location.templates.tooltip }}
+										/>
 									</Popup>
 								</Marker>	
 							))}

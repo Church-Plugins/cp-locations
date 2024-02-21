@@ -165,6 +165,7 @@ class Location extends PostType {
 			'context' => 'normal',
 			'priority' => 'high',
 			'show_names' => true,
+			'show_in_rest' => true,
 		] );
 
 		$cmb->add_field( [
@@ -174,7 +175,7 @@ class Location extends PostType {
 			'type' => 'textarea_small',
 			'attributes' => [
 				'rows' => 1,
-			],
+			]
 		], 5 );
 
 		$cmb->add_field( [
@@ -263,6 +264,18 @@ class Location extends PostType {
 			'type'        => 'checkbox',
 			'description' => __( 'Check to designate this as a special service that shouldn\'t show in the normal times list.', 'cp-locations' ),
 		] );
+
+		$custom_fields = Settings::get_location( 'custom_fields', [] );
+
+		foreach ( $custom_fields as $field ) {
+			$cmb->add_field(
+				[
+					'name' => $field['label'],
+					'id'   => $field['key'],
+					'type' => $field['type'],
+				]
+			);
+		}
 
 		do_action( 'cploc_location_meta_details', $cmb, $this );
 
