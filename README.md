@@ -21,6 +21,11 @@ npm run build
 
 ### Change Log
 
+#### 1.1.0
+* Create React-powered settings page
+* Change tooltips to full popups on map view
+* Add template builder for specifying the tooltip content
+
 #### 1.0.9
 * Better handling for multisite
 
