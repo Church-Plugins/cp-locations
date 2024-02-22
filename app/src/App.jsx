@@ -8,7 +8,6 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import DesktopFinder from './Components/DesktopFinder';
 import MobileFinder from './Components/MobileFinder';
 import { GestureHandling } from 'leaflet-gesture-handling';
-import {LocationOn, MyLocation} from '@mui/icons-material';
 import { distance, point } from "turf";
 import L from "leaflet";
 import markerIcon from '../../assets/images/marker-icon.png'; // "leaflet/dist/images/marker-icon.png";
@@ -30,22 +29,6 @@ const pcIcon = L.divIcon({
 	iconSize  : [24, 24],
 	iconAnchor: [12, 24]
 });
-
-const iconLocation = L.divIcon({
-	className : 'custom-div-icon',
-	html      : "<div class='marker-pin  marker-pin--location'><i class='material-icons'>location_on</i></div>",
-	iconSize  : [24, 24],
-	iconAnchor: [12, 24]
-});
-
-const iconLocationCurrent = L.divIcon({
-	className : 'custom-div-icon',
-	html      : "<div class='marker-pin marker-pin--current'><i class='material-icons'>location_on</i></div>",
-	iconSize  : [30, 30],
-	iconAnchor: [15, 30]
-});
-
-
 
 let fitBoundsTimeout;
 
@@ -176,6 +159,7 @@ const App = () => {
 		setLocations(data);
 	}, [userGeo])
 	
+	// TODO: memoize output, this function gets called on every render for each location
 	const getIconLocation = (color = null) => {
 		const style = color ? `style="color:${color}" ` : '';
 		return L.divIcon({
@@ -195,7 +179,6 @@ const App = () => {
 			iconAnchor: [16, 32]
 		})
 	}
-	
 
 	return error ? (
 			<pre>{JSON.stringify(error, null, 2)}</pre>

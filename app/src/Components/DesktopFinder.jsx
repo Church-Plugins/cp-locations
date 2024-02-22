@@ -1,10 +1,7 @@
-import { useRef, useState, useEffect, useMemo } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl, useMap } from 'react-leaflet';
+import { useRef, useState, useEffect } from 'react';
+import { MapContainer, Marker, Popup, TileLayer, ZoomControl } from 'react-leaflet';
 import SearchInput from '../Elements/SearchInput';
 import MyLocation from '@mui/icons-material/MyLocation';
-import LocationOn from '@mui/icons-material/LocationOn';
-import HomeOutlined from '@mui/icons-material/HomeOutlined';
-import CallOutlined from '@mui/icons-material/CallOutlined';
 
 const DesktopFinder = ({
 	userGeo,
