@@ -38,5 +38,6 @@ $fields = isset( $templates['tooltip'] ) ? $templates['tooltip'] : [
 			<?php else : ?>
 				<p><?php echo wp_kses_post( $location_data[ $field ] ); ?></p>
 			<?php endif; ?>
+		</div>
 	<?php endforeach; ?>
 </div>
