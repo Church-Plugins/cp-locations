@@ -1,7 +1,8 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl, useMap } from 'react-leaflet';
 import SearchInput from '../Elements/SearchInput';
 import MyLocation from '@mui/icons-material/MyLocation';
+import LocationOn from '@mui/icons-material/LocationOn';
 import HomeOutlined from '@mui/icons-material/HomeOutlined';
 import CallOutlined from '@mui/icons-material/CallOutlined';
 
@@ -11,9 +12,9 @@ const DesktopFinder = ({
 	getMyLocation,
 	locations,
 	initLocations,
-	iconLocation,
 	iconUser,
-	iconLocationCurrent
+	getIconLocation,
+	getIconLocationCurrent
 }) => {
 	let markerRef = useRef([]);
 	let fitBoundsTimeout;
@@ -63,7 +64,7 @@ const DesktopFinder = ({
 		const paddingTopLeft = [50, 100];
 		const paddingBottomRight = [50, 100];
 		fitBoundsTimeout = setTimeout(
-			() => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight}),
+			() => map?.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight}),
 			100);
 
 	}, [locations, userGeo])
@@ -100,11 +101,13 @@ const DesktopFinder = ({
 									</div>
 								)}
 								{locations.map((location, index) => (
-									<div className={"cploc-map--locations--location cploc-map-location" + ( activeLocation === index ? ' cploc-map-location--active' : '')} 
-									     key={index} 
-									     onClick={() => onClick(index)} 
-									     onMouseOver={() => focusLocation(index)}
-									     onMouseOut={() => unsetActiveLocation() }
+									<div
+										className={"cploc-map--locations--location cploc-map-location" + ( activeLocation === index ? ' cploc-map-location--active' : '')} 
+										key={index} 
+										onClick={() => onClick(index)} 
+										onMouseOver={() => focusLocation(index)}
+										onMouseOut={() => unsetActiveLocation() }
+										style={{ borderLeftColor: activeLocation === index ? (location.color || undefined) : undefined }}
 									>
 										<div className="cploc-map-location--thumb"><div style={{backgroundImage: 'url(' + location.thumb.thumbnail + ')'}} /></div>
 										<div className="cploc-map-location--content">
@@ -141,7 +144,7 @@ const DesktopFinder = ({
 									ref={(el) => (markerRef.current[index] = el)} 
 									key={index} 
 									position={location.geodata.center}
-									icon={(activeLocation == index) ? iconLocationCurrent : iconLocation }
+									icon={(activeLocation == index) ? getIconLocationCurrent( location.color ) : getIconLocation( location.color ) }
 									eventHandlers={{
 										mouseover: (e) => {
 											focusLocation(index);

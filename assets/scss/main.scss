@@ -35,16 +35,18 @@ html.is-ios-safari body {
 	}
 
 	.marker-pin {
+		cursor: pointer;
 
 		.material-icons {
-			font-size: 24px;
+			font-size: 32px;
+			-webkit-text-stroke: 1px black;
 		}
 
 		&--current {
 			color: var(--cp-color-brand-primary);
 
 			.material-icons {
-				font-size: 30px;
+				font-size: 32px;
 			}
 		}
 

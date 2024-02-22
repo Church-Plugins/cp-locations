@@ -10,9 +10,9 @@ const MobileFinder = ({
 	getMyLocation,
 	locations,
 	ChangeView,
-	iconLocation,
 	iconUser,
-	iconLocationCurrent
+	getIconLocation,
+	getIconLocationCurrent
 }) => {
 	const [mode, setMode] = useState( 'map' );
 	const [listPane, setListPane] = useState({} );
@@ -157,7 +157,7 @@ const MobileFinder = ({
 							{locations.map((location, index) => (
 								<Marker key={index} 
 								        position={location.geodata.center}
-								        icon={('location' === mode && currentLocation == location) ? iconLocationCurrent : iconLocation }
+								        icon={('location' === mode && currentLocation == location) ? getIconLocationCurrent( location.color ) : getIconLocation( location.color ) }
 								        eventHandlers={{
 									        click: (e) => {
 										        selectLocation( index );

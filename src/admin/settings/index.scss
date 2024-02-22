@@ -79,10 +79,13 @@ table.cp-settings-custom-fields {
 	}
 
 	tbody {
+
 		tr {
 			padding: 16px;
+		}
+
+		tr:not(:last-child) {
 			border-bottom: 1px solid #f0f0f0;
-			// box-shadow: 0 0 0 1  inset;
 		}
 
 		td {

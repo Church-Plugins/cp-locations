@@ -176,6 +176,25 @@ const App = () => {
 		setLocations(data);
 	}, [userGeo])
 	
+	const getIconLocation = (color = null) => {
+		const style = color ? `style="color:${color}" ` : '';
+		return L.divIcon({
+			className : 'custom-div-icon',
+			html      : `<div class='marker-pin marker-pin--location'><i ${style}class='material-icons'>location_on</i></div>`,
+			iconSize  : [32, 32],
+			iconAnchor: [16, 32]
+		});
+	}
+
+	const getIconLocationCurrent = (color = null) => {
+		const style = color ? `style="color:${color}" ` : '';
+		return L.divIcon({
+			className : 'custom-div-icon',
+			html      : `<div class='marker-pin marker-pin--current'><i ${style}class='material-icons'>location_on</i></div>`,
+			iconSize  : [32, 32],
+			iconAnchor: [16, 32]
+		})
+	}
 	
 
 	return error ? (
@@ -190,9 +209,29 @@ const App = () => {
 			)}
 
 			{isDesktop ? (
-				<DesktopFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon} initLocations={initLocations}/>
+				<DesktopFinder 
+					userGeo={userGeo}
+					onSearch={handleSearchInputChange}
+					getMyLocation={getMyLocation}
+					locations={locations}
+					ChangeView={ChangeView}
+					iconUser={pcIcon}
+					getIconLocation={getIconLocation}
+					getIconLocationCurrent={getIconLocationCurrent}
+					initLocations={initLocations}
+				/>
 			) : (
-				<MobileFinder  userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon} initLocations={initLocations}/>
+				<MobileFinder
+					userGeo={userGeo}
+					onSearch={handleSearchInputChange}
+					getMyLocation={getMyLocation}
+					locations={locations}
+					ChangeView={ChangeView}
+					iconUser={pcIcon}
+					getIconLocation={getIconLocation}
+					getIconLocationCurrent={getIconLocationCurrent}
+					initLocations={initLocations}
+				/>
 			)}
 			
 		</div>
