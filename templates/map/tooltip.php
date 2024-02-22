@@ -33,6 +33,8 @@ $fields = isset( $templates['tooltip'] ) ? $templates['tooltip'] : [
 				<h3><?php echo esc_html( $data ); ?></h3>
 			<?php elseif ( 'thumb' === $field ) : ?>
 				<img src="<?php echo esc_url( $location_data[ $field ]['thumb'] ); ?>" alt="<?php echo esc_attr( $location_data['title'] ); ?>">
+			<?php elseif ( 'permalink' === $field ) : ?>
+				<a href="<?php echo esc_url( $location_data['permalink'] ); ?>"><?php esc_html_e( 'Learn More', 'cp-locations' ); ?></a>
 			<?php else : ?>
 				<p><?php echo wp_kses_post( $location_data[ $field ] ); ?></p>
 			<?php endif; ?>

@@ -19,9 +19,10 @@ function SingleTemplate({ value, onChange }) {
 
 	const availableFields = [
 		...Object.keys(cmb2Fields),
-		'image',
+		'thumb',
 		'title',
-		'content'
+		'content',
+		'permalink',
 	]
 
 	return (

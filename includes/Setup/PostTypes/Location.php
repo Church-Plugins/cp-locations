@@ -278,7 +278,6 @@ class Location extends PostType {
 		}
 
 		do_action( 'cploc_location_meta_details', $cmb, $this );
-
 	}
 
 	/**
