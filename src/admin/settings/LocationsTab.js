@@ -280,7 +280,7 @@ function LocationTypes({ data, updateField }) {
 				</thead>
 				<tbody>
 					{
-						Object.values(data.location_types).map((type, index) => {
+						Object.values(data.location_types || {}).map((type, index) => {
 							return (
 								<tr key={index}>
 									<td>{type.name}</td>
@@ -327,7 +327,7 @@ function LocationTypes({ data, updateField }) {
 					<LocationTypeEditor
 						type={editingType}
 						onSubmit={(type) => {
-							const newTypeArray = [...Object.values(data.location_types)]
+							const newTypeArray = [...Object.values(data.location_types || {})]
 							// if a type is being edited, update it in the array. Otherwise, append it.
 							if(editingType) {
 								const typeIndex = newTypeArray.findIndex(t => t.key === editingType.key)
