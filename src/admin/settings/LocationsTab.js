@@ -19,7 +19,11 @@ const capitalize = (string) => {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function FieldEditor({ field = null, onSubmit }) {
+const slugify = (string) => {
+	return string.toLowerCase().replace(/[\s\-]/g, '_').replace(/[^a-z0-9_]/g, '')
+}
+
+function CustomFieldEditor({ field = null, onSubmit }) {
 	const initialField = field || {}
 	const isEditing = !!field
 
@@ -60,7 +64,8 @@ function FieldEditor({ field = null, onSubmit }) {
 				value={fieldKey}
 				onChange={value => setFieldKey(value)}
 				placeholder={ __( 'field_label', 'cp-locations' ) }
-				help={ __( 'The field Key.', 'cp-locations' ) }
+				onFocus={() => !fieldKey && fieldLabel && setFieldKey(slugify(fieldLabel))}
+				help={ __( 'Used internally to identify this field.', 'cp-locations' ) }
 				__nextHasNoMarginBottom
 			/>
 			<Button
@@ -145,7 +150,7 @@ function CustomFields({ data, updateField }) {
 				anchor={popoverAnchor}
 				onFocusOutside={() => setPopoverAnchor(null)}
 			>
-				<FieldEditor
+				<CustomFieldEditor
 					field={editingField}
 					onSubmit={(field) => {
 						const newFieldArray = [...existingFields]
@@ -205,8 +210,9 @@ function LocationTypeEditor({ type = null, onSubmit }) {
 				label={ __( 'Key', 'cp-locations' ) }
 				value={typeKey}
 				onChange={setTypeKey}
+				onFocus={() => !typeKey && typeName && setTypeKey(slugify(typeName))}
 				placeholder={ __( 'office', 'cp-locations' ) }
-				help={ __( 'The location type ID.', 'cp-locations' ) }
+				help={ __( 'Used internally to identify this field.', 'cp-locations' ) }
 				__nextHasNoMarginBottom
 			/>
 
