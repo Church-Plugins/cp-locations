@@ -25,6 +25,10 @@ body.cploc_location_page_cploc_settings {
 		border-bottom-color: var(--wp-admin-theme-color);
 		color: black;
 	}
+
+	h3 {
+		margin-top: 0;
+	}
 }
 
 .cp-settings-text-field {
@@ -38,12 +42,13 @@ body.cploc_location_page_cploc_settings {
 	}
 }
 
-.cp-settings-tab-content {
+.cp-settings-tab-content.components-card__body {
 	display: grid;
 	grid-template-columns: auto;
 	grid-auto-rows: auto;
-	grid-gap: 16px;
+	grid-gap: 32px;
 	justify-items: start;
+	padding-top: 32px;
 }
 
 .cp-settings-skeleton {

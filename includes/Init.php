@@ -154,6 +154,9 @@ class Init {
 				'playAudio' => __( 'Play Audio', 'cp-locations' ),
 				'playVideo' => __( 'Play Video', 'cp-locations' ),
 			],
+			'settings' => [
+				'userPinColor' => Settings::get_location( 'user_pin_color', '#333' ),
+			],
 		] );
 
 		if ( isset( $scripts['js'], $scripts['js'][0], $scripts['js'][0]['handle'] ) ) {

@@ -12,8 +12,9 @@ import {
 } from '@wordpress/components';
 import { __ } from "@wordpress/i18n";
 import { useState } from '@wordpress/element';
-import { Label } from '@mui/icons-material';
+import { AccountCircle, Label } from '@mui/icons-material';
 import { pencil, trash, settings } from '@wordpress/icons';
+import { useDebounce } from '@wordpress/compose';
 
 const capitalize = (string) => {
 	return string.charAt(0).toUpperCase() + string.slice(1);
@@ -360,27 +361,79 @@ function LocationTypes({ data, updateField }) {
 }
 
 export default function LocationsTab({ data = {}, updateField }) {
+	const [editingPinColor, setEditingPinColor] = useState(false)
+	const updatePinColor = useDebounce((value) => {
+		updateField('user_pin_color', value)
+	}, 250)
+
 	return (
 		<>
-		<h3>{ __('Labels', 'cp-locations' ) }</h3>
-		<TextControl
-			className="cp-settings-text-field"
-			value={data.singular_label || ''}
-			label={ __( 'Singular Label', 'cp-locations' ) }
-			help={ __( 'The singular label to use for Locations.', 'cp-locations' ) }
-			onChange={value => updateField('singular_label', value)}
-		/>
-		<TextControl
-			className="cp-settings-text-field"
-			value={data.plural_label || ''}
-			label={ __( 'Plural Label', 'cp-locations' ) }
-			help={ __( 'The plural label to use for Locations.', 'cp-locations' ) }
-			onChange={value => updateField('plural_label', value)}
-		/>
+		<VStack>
+			<h3>{ __('Labels', 'cp-locations' ) }</h3>
+			<TextControl
+				className="cp-settings-text-field"
+				value={data.singular_label || ''}
+				label={ __( 'Singular Label', 'cp-locations' ) }
+				help={ __( 'The singular label to use for Locations.', 'cp-locations' ) }
+				onChange={value => updateField('singular_label', value)}
+			/>
+			<TextControl
+				className="cp-settings-text-field"
+				value={data.plural_label || ''}
+				label={ __( 'Plural Label', 'cp-locations' ) }
+				help={ __( 'The plural label to use for Locations.', 'cp-locations' ) }
+				onChange={value => updateField('plural_label', value)}
+			/>
+		</VStack>
 		<CardDivider />
-		<LocationTypes data={data} updateField={updateField} />
+		<VStack>
+			<h3>{ __( 'User Pin Color', 'cp-locations' ) }</h3>
+			<VStack>
+				<AccountCircle style={{ color: data.user_pin_color || '#333' }} />
+				<Flex justify="start">
+					<TextControl
+						value={data.user_pin_color || ''}
+						placeholder='#333'
+						label={ __( 'Hex Code', 'cp-locations' ) }
+						help={ __( 'The color of the icon representing the user\'s location.', 'cp-locations' ) }
+						onChange={value => updateField('user_pin_color', value)}
+						__nextHasNoMarginBottom
+					/>
+					<Button
+						variant="tertiary"
+						icon={settings}
+						onClick={() => !editingPinColor && setEditingPinColor(true)}
+					>
+						{
+							editingPinColor &&
+							<Popover
+								placement={'bottom-start'}
+								onFocusOutside={() => {
+									setEditingPinColor(false)
+								}}
+								onClose={() => {
+									setEditingPinColor(false)
+								}}
+								closeOnEscape
+							>
+								<ColorPicker
+									color={data.user_pin_color}
+									onChange={updatePinColor}
+								/>
+							</Popover>
+						}
+					</Button>
+				</Flex>
+			</VStack>
+		</VStack>
 		<CardDivider />
-		<CustomFields data={data} updateField={updateField} />
+		<VStack>
+			<LocationTypes data={data} updateField={updateField} />
+		</VStack>
+		<CardDivider />
+		<VStack>
+			<CustomFields data={data} updateField={updateField} />
+		</VStack>
 		</>
 	)
 }

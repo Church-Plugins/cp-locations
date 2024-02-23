@@ -12,6 +12,7 @@ import { distance, point } from "turf";
 import L from "leaflet";
 import markerIcon from '../../assets/images/marker-icon.png'; // "leaflet/dist/images/marker-icon.png";
 import markerIconAlt from '../../assets/images/marker-icon-alt.png'; // "leaflet/dist/images/marker-icon.png";
+import { cplocVar } from './utils/helpers';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -23,9 +24,10 @@ L.Icon.Default.mergeOptions({
 
 L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
 
+const userPinColor = cplocVar('userPinColor', 'settings')
 const pcIcon = L.divIcon({
 	className : 'custom-div-icon',
-	html      : "<div class='marker-pin marker-pin--person'><i class='material-icons'>account_circle</i></div>",
+	html      : `<div style='color: ${userPinColor}' class='marker-pin marker-pin--person'><i class='material-icons'>account_circle</i></div>`,
 	iconSize  : [24, 24],
 	iconAnchor: [12, 24]
 });

@@ -38,18 +38,22 @@ html.is-ios-safari body {
 		cursor: pointer;
 
 		.material-icons {
-			font-size: 32px;
-			-webkit-text-stroke: 1px black;
+			font-size: 	24px;
 		}
 
 		&--current {
 			color: var(--cp-color-brand-primary);
 
 			.material-icons {
-				font-size: 32px;
+				font-size: 24px;
 			}
 		}
+	}
 
+	.marker-pin:not(.marker-pin--person) .material-icons,
+	.marker-pin--current .material-icons {
+		font-size: 32px;
+		-webkit-text-stroke: 1px black;
 	}
 
 	// disable leaflet gesture
