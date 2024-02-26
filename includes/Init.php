@@ -139,7 +139,7 @@ class Init {
 		$this->enqueue->enqueue( 'scripts', 'main', [] );
 		$scripts = $this->enqueue->enqueue( 'app', 'main', [ 'js_dep' => ['jquery'] ] );
 
-		$cpl_vars = apply_filters( 'cploc_app_vars', [
+		$cploc_vars =  [
 			'site' => [
 				'title' => get_bloginfo( 'name', 'display' ),
 //				'thumb' => Settings::get( 'default_thumbnail', CP_LOCATIONS_PLUGIN_URL . 'assets/images/cpl-logo.jpg' ),
@@ -154,10 +154,13 @@ class Init {
 				'playAudio' => __( 'Play Audio', 'cp-locations' ),
 				'playVideo' => __( 'Play Video', 'cp-locations' ),
 			],
-		] );
+			'mapboxAccessToken' => Settings::get( 'mapbox_api_key', '' )
+		];
+
+		$cploc_vars = apply_filters( 'cploc_app_vars', $cploc_vars );
 
 		if ( isset( $scripts['js'], $scripts['js'][0], $scripts['js'][0]['handle'] ) ) {
-			wp_localize_script( $scripts['js'][0]['handle'], 'cplocVars', $cpl_vars );
+			wp_localize_script( $scripts['js'][0]['handle'], 'cplocVars', $cploc_vars );
 		}
 
 	}
