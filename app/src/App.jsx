@@ -8,11 +8,11 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import DesktopFinder from './Components/DesktopFinder';
 import MobileFinder from './Components/MobileFinder';
 import { GestureHandling } from 'leaflet-gesture-handling';
-import {LocationOn, MyLocation} from '@mui/icons-material';
 import { distance, point } from "turf";
 import L from "leaflet";
 import markerIcon from '../../assets/images/marker-icon.png'; // "leaflet/dist/images/marker-icon.png";
 import markerIconAlt from '../../assets/images/marker-icon-alt.png'; // "leaflet/dist/images/marker-icon.png";
+import { cplocVar } from './utils/helpers';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -24,28 +24,13 @@ L.Icon.Default.mergeOptions({
 
 L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
 
+const userPinColor = cplocVar('userPinColor', 'settings')
 const pcIcon = L.divIcon({
 	className : 'custom-div-icon',
-	html      : "<div class='marker-pin marker-pin--person'><i class='material-icons'>person_pin_circle</i></div>",
+	html      : `<div style='color: ${userPinColor}' class='marker-pin marker-pin--person'><i class='material-icons'>account_circle</i></div>`,
 	iconSize  : [24, 24],
 	iconAnchor: [12, 24]
 });
-
-const iconLocation = L.divIcon({
-	className : 'custom-div-icon',
-	html      : "<div class='marker-pin  marker-pin--location'><i class='material-icons'>location_on</i></div>",
-	iconSize  : [24, 24],
-	iconAnchor: [12, 24]
-});
-
-const iconLocationCurrent = L.divIcon({
-	className : 'custom-div-icon',
-	html      : "<div class='marker-pin marker-pin--current'><i class='material-icons'>location_on</i></div>",
-	iconSize  : [30, 30],
-	iconAnchor: [15, 30]
-});
-
-
 
 let fitBoundsTimeout;
 
@@ -176,7 +161,26 @@ const App = () => {
 		setLocations(data);
 	}, [userGeo])
 	
-	
+	// TODO: memoize output, this function gets called on every render for each location
+	const getIconLocation = (color = null) => {
+		const style = color ? `style="color:${color}" ` : '';
+		return L.divIcon({
+			className : 'custom-div-icon',
+			html      : `<div class='marker-pin marker-pin--location'><i ${style}class='material-icons'>location_on</i></div>`,
+			iconSize  : [32, 32],
+			iconAnchor: [16, 32]
+		});
+	}
+
+	const getIconLocationCurrent = (color = null) => {
+		const style = color ? `style="color:${color}" ` : '';
+		return L.divIcon({
+			className : 'custom-div-icon',
+			html      : `<div class='marker-pin marker-pin--current'><i ${style}class='material-icons'>location_on</i></div>`,
+			iconSize  : [32, 32],
+			iconAnchor: [16, 32]
+		})
+	}
 
 	return error ? (
 			<pre>{JSON.stringify(error, null, 2)}</pre>
@@ -190,9 +194,29 @@ const App = () => {
 			)}
 
 			{isDesktop ? (
-				<DesktopFinder userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon} initLocations={initLocations}/>
+				<DesktopFinder 
+					userGeo={userGeo}
+					onSearch={handleSearchInputChange}
+					getMyLocation={getMyLocation}
+					locations={locations}
+					ChangeView={ChangeView}
+					iconUser={pcIcon}
+					getIconLocation={getIconLocation}
+					getIconLocationCurrent={getIconLocationCurrent}
+					initLocations={initLocations}
+				/>
 			) : (
-				<MobileFinder  userGeo={userGeo} onSearch={handleSearchInputChange} getMyLocation={getMyLocation} locations={locations} ChangeView={ChangeView} iconLocation={iconLocation} iconLocationCurrent={iconLocationCurrent} iconUser={pcIcon} initLocations={initLocations}/>
+				<MobileFinder
+					userGeo={userGeo}
+					onSearch={handleSearchInputChange}
+					getMyLocation={getMyLocation}
+					locations={locations}
+					ChangeView={ChangeView}
+					iconUser={pcIcon}
+					getIconLocation={getIconLocation}
+					getIconLocationCurrent={getIconLocationCurrent}
+					initLocations={initLocations}
+				/>
 			)}
 			
 		</div>

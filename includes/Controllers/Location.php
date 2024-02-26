@@ -114,6 +114,21 @@ class Location extends Controller {
 		];
 	}
 
+	/**
+	 * Get location map pin color.
+	 *
+	 * @param string $type Location type key.
+	 */
+	public function get_location_color( $type ) {
+		$types = \CP_Locations\Admin\Settings::get_location( 'location_types', [] );
+
+		if ( isset( $types[ $type ] ) ) {
+			return $types[ $type ]['color'];
+		}
+
+		return '';
+	}
+
 	public function get_formatted_times( $times ) {
 		if ( empty( $times ) || ! is_array( $times ) ) {
 			return $times;
@@ -183,10 +198,14 @@ class Location extends Controller {
 		$data['address']       = wp_kses_post( nl2br( $data['address'] ) );
 		$data['service_times'] = $this->get_formatted_times( $data['service_times'] );
 
+		if ( isset( $data['location_type'] ) ) {
+			$data['color'] = $this->get_location_color( $data['location_type'] );
+		}
+
 		// legacy data
 		$data['times']   = $data['service_times'];
 		$data['geodata'] = $this->get_geo();
-		
+
 		$template_data = [
 			'location'      => $this,
 			'location_data' => $data,
