@@ -41,6 +41,9 @@ if( !defined( 'CP_LOCATIONS_DIST' ) ) {
 		CP_LOCATIONS_PLUGIN_URL . "/dist/"
    );
 }
+if ( ! defined( 'CP_LOCATIONS_TAX_ENABLED' ) ) {
+	define( 'CP_LOCATIONS_TAX_ENABLED', false );
+}
 
 /**
  * Licensing constants

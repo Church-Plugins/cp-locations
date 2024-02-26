@@ -345,7 +345,7 @@ class Init {
 			return false;
 		}
 
-		return apply_filters( 'cploc_location_taxonomy_enabled', false );
+		return apply_filters( 'cploc_location_taxonomy_enabled', CP_LOCATIONS_TAX_ENABLED );
 	}
 
 }
