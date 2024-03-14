@@ -67,6 +67,9 @@ const App = () => {
 	const [userGeo, setUserGeo] = useState( false );
 	const isDesktop = useMediaQuery('(min-width:1025px)');
 
+	const urlParams = new URLSearchParams(window.location.search);
+	const initialSearchValue = urlParams.get('zipcode') || urlParams.get('s') || '';
+
 	const getMyLocation = () => {
 		navigator.geolocation.getCurrentPosition((position) => {
 			setUserGeo( {
@@ -79,6 +82,25 @@ const App = () => {
 			Toast.error( 'Location sharing is disabled in your browser.' );
 		} );
 	}
+
+	const loadUserGeo = async (value) => {
+		try {
+			setLoading(true);
+			const restRequest = new Controllers_WP_REST_Request();
+			const data = await restRequest.get({endpoint: 'locations/postcode/' + value});
+			setUserGeo( data );
+		} catch (error) {
+			setError(error);
+		} finally {
+			setLoading(false);
+		}
+	}
+
+	useEffect(() => {
+		if (initialSearchValue) {
+			loadUserGeo(initialSearchValue);
+		}
+	}, [])
 	
 	const handleSearchInputChange = debounce((value) => {
 		
@@ -87,20 +109,7 @@ const App = () => {
 			return;
 		}
 
-		(
-			async () => {
-				try {
-					setLoading(true);
-					const restRequest = new Controllers_WP_REST_Request();
-					const data = await restRequest.get({endpoint: 'locations/postcode/' + value});
-					setUserGeo( data );
-				} catch (error) {
-					setError(error);
-				} finally {
-					setLoading(false);
-				}
-			}
-		)();
+		loadUserGeo(value);
 		
 	}, 100);
 	
@@ -204,6 +213,7 @@ const App = () => {
 					getIconLocation={getIconLocation}
 					getIconLocationCurrent={getIconLocationCurrent}
 					initLocations={initLocations}
+					initialSearchValue={initialSearchValue}
 				/>
 			) : (
 				<MobileFinder
@@ -216,6 +226,7 @@ const App = () => {
 					getIconLocation={getIconLocation}
 					getIconLocationCurrent={getIconLocationCurrent}
 					initLocations={initLocations}
+					initialSearchValue={initialSearchValue}
 				/>
 			)}
 			
