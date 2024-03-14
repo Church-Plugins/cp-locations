@@ -58,6 +58,67 @@ class Location extends Taxonomy  {
 		add_action( 'wp_head', [ $this, 'location_css' ] );
 		add_action( 'template_redirect', [ $this, 'add_location_query_var' ] );
 		add_action( 'pre_get_posts', [ $this, 'include_global_items'] );
+		add_filter( 'posts_results', [ $this, 'remove_duplicate_posts' ], 10, 2 );
+	}
+
+	/**
+	 * Remove duplicate posts from the query
+	 *
+	 * @param $posts
+	 *
+	 * @return array
+	 * @since  1.0.10
+	 *
+	 * @author Tanner Moushey
+	 */
+	public function remove_duplicate_posts( $posts, $query ) {
+
+		// make sure this is a locations query
+		$locations = $query->get( $this->taxonomy );
+		if ( empty( $locations ) ) {
+			return $posts;
+		}
+
+		// this is not a location page, bale
+		if ( ! $current_location = self::get_rewrite_location() ) {
+			return $posts;
+		}
+
+		$urls       = [];
+		$duplicates = [];
+
+		// find posts with duplicate permalinks
+		foreach( $posts as $post ) {
+			// if we have a duplicate, add it to the list
+			if ( in_array( get_the_permalink( $post->ID ), $urls ) ) {
+				$duplicates[] = get_the_permalink( $post->ID );
+			}
+
+			$urls[] = get_the_permalink( $post->ID );
+		}
+
+		// no duplicates found, proceed as normal
+		if ( empty( $duplicates ) ) {
+			return $posts;
+		}
+
+		// loop through and remove any duplicates that don't have the current location term
+		foreach( $posts as $index => $post ) {
+			if ( ! in_array( get_the_permalink( $post->ID ), $duplicates ) ) {
+				continue;
+			}
+
+			// if this post does not have the location term, remove the duplicate
+			if ( ! has_term( $current_location['term'], $this->taxonomy, $post ) ) {
+				unset( $posts[ $index ] );
+			}
+		}
+
+		// update the found post count
+		$query->found_posts = count( $posts );
+
+		// reset the indexes
+		return array_values( $posts );
 	}
 
 	public function get_args() {
