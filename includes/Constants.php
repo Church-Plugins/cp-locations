@@ -69,3 +69,17 @@ if( !defined( 'CP_LOCATIONS_ASSET_MANIFEST' ) ) {
 	 	plugin_dir_path( dirname( __FILE__ ) ) . 'app/build/asset-manifest.json'
 	);
 }
+
+/**
+ * Modules constants
+ */
+if( !defined( 'CP_LOCATIONS_FL_MODULES_DIR' ) ) {
+	 define ( 'CP_LOCATIONS_FL_MODULES_DIR',
+	 	plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Modules/BeaverBuilder/'
+	);
+}
+if( !defined( 'CP_LOCATIONS_FL_MODULES_URL' ) ) {
+	 define ( 'CP_LOCATIONS_FL_MODULES_URL',
+	 	plugin_dir_url( dirname( __FILE__ ) ) . 'includes/Modules/BeaverBuilder/'
+	);
+}
