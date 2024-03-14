@@ -12,7 +12,8 @@ const MobileFinder = ({
 	ChangeView,
 	iconLocation,
 	iconUser,
-	iconLocationCurrent
+	iconLocationCurrent,
+	initialSearchValue = '',
 }) => {
 	const [mode, setMode] = useState( 'map' );
 	const [listPane, setListPane] = useState({} );
@@ -138,7 +139,7 @@ const MobileFinder = ({
 					
 					<div className="cploc-map--map">
 						<div className="cploc-map--controls">
-							<SearchInput onValueChange={onSearch} className="cploc-map--search" />
+							<SearchInput initialValue={initialSearchValue} onValueChange={onSearch} className="cploc-map--search" />
 							<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation /></button>
 						</div>
 	

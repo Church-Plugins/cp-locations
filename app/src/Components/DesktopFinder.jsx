@@ -11,7 +11,8 @@ const DesktopFinder = ({
 	initLocations,
 	iconLocation,
 	iconUser,
-	iconLocationCurrent
+	iconLocationCurrent,
+	initialSearchValue = '',
 }) => {
 	let markerRef = useRef([]);
 	let fitBoundsTimeout;
@@ -126,7 +127,7 @@ const DesktopFinder = ({
 							/>
 
 							<div className="cploc-map--controls">
-								<SearchInput onValueChange={onSearch} className="cploc-map--search"/>
+								<SearchInput initialValue={initialSearchValue} onValueChange={onSearch} className="cploc-map--search"/>
 								<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation/></button>
 							</div>
 							
@@ -174,7 +175,7 @@ const DesktopFinder = ({
 			
 				<div className="cploc-list" style={mode === 'list' ? {} : { display: 'none' }}>
 	        <div>
-		        <SearchInput onValueChange={onSearch} className="cploc-map--search" />
+		        <SearchInput initialValue={initialSearchValue} onValueChange={onSearch} className="cploc-map--search" />
 	        </div>
 
 					<div className="cploc-list--meta">
