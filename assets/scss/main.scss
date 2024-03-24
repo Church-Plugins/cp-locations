@@ -243,6 +243,28 @@ body .cupertino-pane-wrapper {
 
 	}
 
+	&--popup--title {
+		margin-top: 0;
+		margin-bottom: var(--cp-gap--sm);
+	}
+
+	&--popup--row {
+		display: flex;
+		flex-flow: row;
+		align-items: center;
+		gap: var(--cp-gap-base);
+		margin-top: var(--cp-gap--base);
+	}
+
+	&--popup--row--icon {
+		font-size: 0.7em;
+		color: var(--cp-color-ui-primary);
+	}
+
+	&--popup--description {
+		color: var(--cp-color-text-secondary);
+	}
+
 	&--map {
 		position: relative;
 		width: 100%;

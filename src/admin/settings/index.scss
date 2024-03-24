@@ -1,0 +1,102 @@
+
+.cp-settings-wrapper {
+	padding: 16px;
+}
+
+body.cploc_location_page_cploc_settings {
+	background-color: white;
+}
+
+.cploc_location_page_cploc_settings .notice {
+	margin-left: 16px;
+}
+
+.cploc_location_page_cploc_settings #wpcontent, .privacy-settings.auto-fold #wpcontent {
+	padding-left: 0;
+}
+
+.cp-settings-tabs {
+	.components-tab-panel__tabs-item {
+		border-bottom: 2px solid transparent;
+		color: #6e7175;
+	}
+
+	.active-tab {
+		border-bottom-color: var(--wp-admin-theme-color);
+		color: black;
+	}
+}
+
+.cp-settings-text-field {
+	input {
+		max-width: 400px;
+		display: block;
+	}
+
+	.components-base-control__help {
+		margin-bottom: 0;
+	}
+}
+
+.cp-settings-tab-content {
+	display: grid;
+	grid-template-columns: auto;
+	grid-auto-rows: auto;
+	grid-gap: 16px;
+	justify-items: start;
+}
+
+.cp-settings-skeleton {
+	display: grid;
+	grid-template-columns: auto;
+	grid-auto-rows: auto;
+	grid-gap: 16px;
+
+	&-line {
+		background: linear-gradient(90deg, #f0f0f0 100px, #e0e0e0 200px, #f0f0f0 300px);
+		background-size: 200% 100%;
+		animation: cp-skeleton 1.5s infinite linear;
+	}
+
+	@keyframes cp-skeleton {
+		0% {
+			background-position: 100% 0;
+		}
+		100% {
+			background-position: -100% 0;
+		}
+	}
+}
+
+table.cp-settings-custom-fields {
+	border: 0px;
+	border-collapse: collapse;
+
+	thead th {
+		padding: 4px 0;
+		padding-right: 64px;
+		text-align: start;
+	}
+
+	tbody {
+		tr {
+			padding: 16px;
+			border-bottom: 1px solid #f0f0f0;
+			// box-shadow: 0 0 0 1  inset;
+		}
+
+		td {
+			padding: 16px;
+			padding-right: 64px;
+			text-align: start;
+		}
+
+		td:last-child {
+			padding-right: 16px;
+		}
+
+		td:not(:first-child) {
+			padding-left: 0;
+		}
+	}
+}

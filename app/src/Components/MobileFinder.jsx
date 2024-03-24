@@ -126,7 +126,7 @@ const MobileFinder = ({
 		const paddingTopLeft = [50, 100];
 		const paddingBottomRight = [100, 100];
 		fitBoundsTimeout = setTimeout(
-			() => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight}),
+			() => map.fitBounds?.(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight}),
 			100);
 
 	}, [locations, userGeo])

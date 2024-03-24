@@ -1,7 +1,9 @@
 import { useRef, useState, useEffect } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl, useMap } from 'react-leaflet';
 import SearchInput from '../Elements/SearchInput';
-import { MyLocation } from '@mui/icons-material';
+import MyLocation from '@mui/icons-material/MyLocation';
+import HomeOutlined from '@mui/icons-material/HomeOutlined';
+import CallOutlined from '@mui/icons-material/CallOutlined';
 
 const DesktopFinder = ({
 	userGeo,
@@ -135,7 +137,7 @@ const DesktopFinder = ({
 							)}
 							
 							{locations.map((location, index) => (
-								<Marker 
+								<Marker
 									ref={(el) => (markerRef.current[index] = el)} 
 									key={index} 
 									position={location.geodata.center}
@@ -143,6 +145,7 @@ const DesktopFinder = ({
 									eventHandlers={{
 										mouseover: (e) => {
 											focusLocation(index);
+											e.target.openPopup?.();
 										},
 										mouseout: (e) => {
 											unsetActiveLocation();
@@ -152,15 +155,31 @@ const DesktopFinder = ({
 										}
 									}}
 								>
-									{activeLocation == index && (
+									{/* {activeLocation == index && (
 										<Tooltip 
 											direction="bottom"
 											interactive={true} 
 											onClick={() => onClick(index)}
 											onMouseOut={() => unsetActiveLocation()}
-											permanent>{location.title}</Tooltip>		
-									) }
+											permanent>
+												<h3>This is the header</h3>
+												<div>Hello, wolrld</div>
+											</Tooltip>		
+									) } */}
 									
+									<Popup
+										position={location.geodata.center}
+										offset={[0, -20]}
+										autoPan={true}
+										autoPanPadding={[16, 16]}
+										onClose={() => unsetActiveLocation()}
+										className='cploc-map--popup'
+									>
+										<div
+											className="cploc-map--popup--content"
+											dangerouslySetInnerHTML={{__html: location.templates.tooltip }}
+										/>
+									</Popup>
 								</Marker>	
 							))}
 							
