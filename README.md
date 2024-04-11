@@ -21,6 +21,9 @@ npm run build
 
 ### Change Log
 
+#### 1.0.10
+* Update assets
+
 #### 1.0.9
 * Better handling for multisite
 
