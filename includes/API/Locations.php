@@ -67,7 +67,7 @@ class Locations extends WP_REST_Controller {
 			// 'schema' => array( $this, 'get_public_schema' ),
 		) );
 
-		register_rest_route( $this->namespace, $this->rest_base . '/postcode/(?P<postcode>[\d]+)', array(
+		register_rest_route( $this->namespace, $this->rest_base . '/postcode/(?P<postcode>[\w]+)', array(
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_postcode' ),

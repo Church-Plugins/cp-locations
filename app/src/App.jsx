@@ -97,7 +97,7 @@ const App = () => {
 	
 	const handleSearchInputChange = debounce((value) => {
 		
-		if ( 5 !== value.length ) {
+		if ( 5 > value.length ) {
 			setUserGeo( false );
 			return;
 		}
@@ -110,7 +110,8 @@ const App = () => {
 					const data = await restRequest.get({endpoint: 'locations/postcode/' + value});
 					setUserGeo( data );
 				} catch (error) {
-					setError(error);
+					console.log( error );
+//					setError(error);
 				} finally {
 					setLoading(false);
 				}

@@ -21,6 +21,9 @@ npm run build
 
 ### Change Log
 
+#### 1.0.10.1
+* Remove country restriction for zip code lookup
+
 #### 1.0.10
 * Update assets
 

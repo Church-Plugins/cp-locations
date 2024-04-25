@@ -14,7 +14,7 @@ export default function SearchInput({
       placeholder="Enter your zip code"
       defaultValue={urlParams.get('s')}
       startAdornment={<Search />}
-      inputProps={{pattern: '[0-9]{5}', maxLength: '5'}}
+      inputProps={{ pattern: '^\\d{5}(?:[-\\s]\\d{4})?$', maxLength: '10' }}
       onChange={e => onValueChange(e.target.value)}
     />
   );

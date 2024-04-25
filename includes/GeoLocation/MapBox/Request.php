@@ -58,7 +58,7 @@ class Request extends RequestJSON {
 	public function setup_postcode_geo( $postcode ) {
 		$this->path   = 'mapbox.places/' . urlencode( $postcode ) . '.json';
 		$this->params = [
-			'country'      => 'us',
+//			'country'      => 'us',
 			'types'        => 'postcode',
 			'access_token' => $this->api_key,
 			'limit'        => 1,
