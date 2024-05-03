@@ -114,9 +114,7 @@ class Location extends Controller {
 		];
 	}
 
-	public function get_formatted_times() {
-		$times = $this->service_times;
-		
+	public function get_formatted_times( $times ) {
 		if ( empty( $times ) || ! is_array( $times ) ) {
 			return $times;
 		}
@@ -156,6 +154,9 @@ class Location extends Controller {
 	}
 
 	public function get_api_data( $templates = true ) {
+		$metabox = \CMB2_Boxes::get( 'location_meta' );
+		$cmb2_fields = $metabox->prop( 'fields' );
+
 		$data = [
 			'id'        => $this->model->id,
 			'originID'  => $this->post->ID,
@@ -163,29 +164,43 @@ class Location extends Controller {
 			'slug'      => $this->post->post_name,
 			'thumb'     => $this->get_thumbnail(),
 			'title'     => htmlspecialchars_decode( $this->get_title(), ENT_QUOTES | ENT_HTML401 ),
-			'subtitle'  => nl2br( esc_html( $this->subtitle ) ),
-			'pastor'    => $this->pastor,
 			'desc'      => $this->get_content(),
-			'address'   => wp_kses_post( nl2br( $this->address ) ),
-			'phone'     => $this->phone,
-			'email'     => $this->email,
-			'times'     => $this->get_formatted_times(),
-			'geodata'   => $this->get_geo(),
 			'templates' => [
+				'tooltip' => '',
 				'card' => '',
 				'popup' => '',
 				'list-item' => '',
 			]
 		];
+
+		// get data for custom fields
+		foreach ( $cmb2_fields as $field_key => $field ) {
+			$data[ $field_key ] = $this->{$field_key};
+		}
+
+		// sanitize certain fields
+		$data['subtitle']      = nl2br( esc_html( $data['subtitle'] ) );
+		$data['address']       = wp_kses_post( nl2br( $data['address'] ) );
+		$data['service_times'] = $this->get_formatted_times( $data['service_times'] );
+
+		// legacy data
+		$data['times']   = $data['service_times'];
+		$data['geodata'] = $this->get_geo();
 		
+		$template_data = [
+			'location'      => $this,
+			'location_data' => $data,
+		];
+
 		if ( $templates ) {
 			$data['templates'] = [
-				'card'      => get_template_part( 'card', [ 'location' => $this ], true ),
-				'popup'     => get_template_part( 'map/popup', [ 'location' => $this ], true ),
-				'list-item' => get_template_part( 'map/list-item', [ 'location' => $this ], true ),
+				'tooltip'   => get_template_part( 'map/tooltip', $template_data, true ),
+				'card'      => get_template_part( 'card', $template_data, true ),
+				'popup'     => get_template_part( 'map/popup', $template_data, true ),
+				'list-item' => get_template_part( 'map/list-item', $template_data, true ),
 			];
 		}
 
-		return $this->filter( $data, __FUNCTION__ );
+		return $data = $this->filter( $data, __FUNCTION__ );
 	}
 }

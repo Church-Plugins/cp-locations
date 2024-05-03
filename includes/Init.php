@@ -244,6 +244,45 @@ class Init {
 	}
 
 	/**
+	 * Enqueues a script by name. Scripts are bundled with wp-scripts and follow a specific pattern.
+	 * We can locate the dependencies and correlating stylesheet based on the build output.
+	 *
+	 * @param string $script_name The script filename.
+	 * @param array  $extra_dependencies Extra dependencies to add to the script.
+	 * @param array  $style_dependencies Extra dependencies for the stylesheet.
+	 * @since 1.1.0
+	 */
+	public function enqueue_script( $script_name, $extra_dependencies = [], $style_dependencies = [] ) {
+		$asset_path = CP_LOCATIONS_PLUGIN_DIR . 'build/' . $script_name . '.asset.php';
+
+		if ( ! file_exists( $asset_path ) ) {
+			return;
+		}
+
+		$handle = 'cp-locations-' . $script_name;
+
+		$assets = require $asset_path;
+		wp_enqueue_script(
+			$handle,
+			CP_LOCATIONS_PLUGIN_URL . 'build/' . $script_name . '.js',
+			array_merge( $assets['dependencies'], $extra_dependencies ),
+			$assets['version'],
+			false
+		);
+
+		$style_path = CP_LOCATIONS_PLUGIN_DIR . 'build/' . $script_name . '.css';
+
+		if ( file_exists( $style_path ) ) {
+			wp_enqueue_style(
+				$handle,
+				CP_LOCATIONS_PLUGIN_URL . 'build/' . $script_name . '.css',
+				$style_dependencies,
+				$assets['version']
+			);
+		}
+	}
+
+	/**
 	 * Gets the plugin support URL
 	 *
 	 * @since 1.0.0
