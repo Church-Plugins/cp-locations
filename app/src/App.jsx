@@ -88,8 +88,6 @@ const App = () => {
 				attr : { postcode : 'current location' },
 				center : [ position.coords.latitude, position.coords.longitude ],
 			} );
-			console.log('Latitude is :', position.coords.latitude);
-			console.log('Longitude is :', position.coords.longitude);
 		}, () => {
 			Toast.error( 'Location sharing is disabled in your browser.' );
 		} );

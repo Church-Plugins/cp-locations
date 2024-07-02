@@ -117,7 +117,7 @@ const MobileFinder = ({
 			return null;
 		}
 
-		const features = [...locations];
+		const features = [...locations.filter(location => Object.keys(location.geodata).length > 0)];
 
 		if (userGeo) {
 			features.push({geodata: {center: userGeo.center}});
@@ -155,14 +155,16 @@ const MobileFinder = ({
 							)}
 							
 							{locations.map((location, index) => (
-								<Marker key={index} 
-								        position={location.geodata.center}
-								        icon={('location' === mode && currentLocation == location) ? iconLocationCurrent : iconLocation }
-								        eventHandlers={{
-									        click: (e) => {
-										        selectLocation( index );
-									        },
-								        }}/>
+								Object.keys(location.geodata).length > 0 && (
+									<Marker key={index}
+									        position={location.geodata.center}
+									        icon={('location' === mode && currentLocation == location) ? iconLocationCurrent : iconLocation }
+									        eventHandlers={{
+										        click: (e) => {
+											        selectLocation( index );
+										        },
+									        }}/>
+								)
 							))}
 						</MapContainer>
 	

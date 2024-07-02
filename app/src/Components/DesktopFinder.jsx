@@ -40,7 +40,11 @@ const DesktopFinder = ({
 	}
 	
 	const closePopups = () => {
-		locations.map((location, index) => ( markerRef.current[index].closePopup() ));
+		locations.map((location, index) => {
+			if ( Object.keys(location.geodata).length > 0 ) {
+				markerRef.current[index].closePopup();
+			}
+		});
 	}
 	
 	useEffect( () => {
@@ -52,7 +56,7 @@ const DesktopFinder = ({
 			return null;
 		}
 
-		const features = [...locations];
+		const features = [...locations.filter(location => Object.keys(location.geodata).length > 0)];
 
 		if (userGeo) {
 			features.push({geodata: {center: userGeo.center}});
@@ -135,33 +139,35 @@ const DesktopFinder = ({
 							)}
 							
 							{locations.map((location, index) => (
-								<Marker 
-									ref={(el) => (markerRef.current[index] = el)} 
-									key={index} 
-									position={location.geodata.center}
-									icon={(activeLocation == index) ? iconLocationCurrent : iconLocation }
-									eventHandlers={{
-										mouseover: (e) => {
-											focusLocation(index);
-										},
-										mouseout: (e) => {
-											unsetActiveLocation();
-										},
-										click: (e) => {
-											onClick(index);
-										}
-									}}
-								>
-									{activeLocation == index && (
-										<Tooltip 
-											direction="bottom"
-											interactive={true} 
-											onClick={() => onClick(index)}
-											onMouseOut={() => unsetActiveLocation()}
-											permanent>{location.title}</Tooltip>		
-									) }
-									
-								</Marker>	
+								Object.keys(location.geodata).length > 0 && (
+									<Marker
+										ref={(el) => (markerRef.current[index] = el)}
+										key={index}
+										position={location.geodata.center}
+										icon={(activeLocation == index) ? iconLocationCurrent : iconLocation }
+										eventHandlers={{
+											mouseover: (e) => {
+												focusLocation(index);
+											},
+											mouseout: (e) => {
+												unsetActiveLocation();
+											},
+											click: (e) => {
+												onClick(index);
+											}
+										}}
+									>
+										{activeLocation == index && (
+											<Tooltip
+												direction="bottom"
+												interactive={true}
+												onClick={() => onClick(index)}
+												onMouseOut={() => unsetActiveLocation()}
+												permanent>{location.title}</Tooltip>
+										) }
+
+									</Marker>
+								)
 							))}
 							
 							<ZoomControl position="bottomleft"  />

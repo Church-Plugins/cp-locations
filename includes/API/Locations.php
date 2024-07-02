@@ -116,7 +116,7 @@ class Locations extends WP_REST_Controller {
 		foreach( $posts as $post ) {
 			try {
 				$location = new Location( $post->ID );
-				$return_value['locations'][] = $location->get_api_data(); 
+				$return_value['locations'][] = $location->get_api_data();
 			} catch( Exception $e ) {
 				$return_value['error'] = $e->getMessage();
 				error_log( $e->getMessage() );
