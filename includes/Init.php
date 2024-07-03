@@ -134,7 +134,7 @@ class Init {
 	 * @author costmo
 	 */
 	public function app_enqueue() {
-		wp_enqueue_script( 'cploc-leaflet', 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js' );
+//		wp_enqueue_script( 'cploc-leaflet', 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js' );
 		$this->enqueue->enqueue( 'styles', 'main', [] );
 		$this->enqueue->enqueue( 'scripts', 'main', [] );
 		$scripts = $this->enqueue->enqueue( 'app', 'main', [ 'js_dep' => ['jquery'] ] );

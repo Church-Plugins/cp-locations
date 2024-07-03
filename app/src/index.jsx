@@ -1,12 +1,13 @@
 import React 		from 'react';
-import ReactDOM 	from 'react-dom';
+import {createRoot} 	from 'react-dom/client';
 import App from "./App";
 
 
 // Possible elements that we may find for shortcodes
-const root = document.getElementById( 'cploc_root' );
+const rootNode = document.getElementById( 'cploc_root' );
 
-if (root) {
+if (rootNode) {
 //	let locations = root.getAttribute( 'data-locations' );
-	ReactDOM.render(<App />, root );
+	const root = createRoot( rootNode );
+	root.render( <App /> );
 }

@@ -1,3 +1,4 @@
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useRef, useState, useEffect } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl, useMap } from 'react-leaflet';
 import SearchInput from '../Elements/SearchInput';
@@ -16,10 +17,12 @@ const DesktopFinder = ({
 	let markerRef = useRef([]);
 	let fitBoundsTimeout;
 	let activeLocationTimeout;
+
 	const [mode, setMode] = useState( 'map' );
 	const [activeLocation, setActiveLocation] = useState(-1);
 	const [map, setMap] = useState(null);
-	
+	const [openCluster, setOpenCluster] = useState(0);
+
 	const onClick = ( index ) => {
 		clearTimeout( activeLocationTimeout );
 		setActiveLocation(index);
@@ -46,6 +49,26 @@ const DesktopFinder = ({
 			}
 		});
 	}
+
+	useEffect( () => {
+
+		if ( -1 === activeLocation ) {
+			if ( openCluster && typeof openCluster.unspiderfy === 'function' ) {
+				openCluster.unspiderfy();
+			}
+
+			setOpenCluster(0);
+
+			return;
+		}
+
+		const clusterGroup = L.markerClusterGroup().getVisibleParent( markerRef.current[activeLocation] );
+
+		if ( clusterGroup && typeof clusterGroup.spiderfy === 'function' ) {
+			clusterGroup.spiderfy();
+			setOpenCluster( clusterGroup );
+		}
+	}, [activeLocation] );
 	
 	useEffect( () => {
 		if (typeof fitBoundsTimeout === 'number') {
@@ -53,7 +76,7 @@ const DesktopFinder = ({
 		}
 
 		if (!locations.length) {
-			return null;
+			return;
 		}
 
 		const features = [...locations.filter(location => Object.keys(location.geodata).length > 0)];
@@ -64,11 +87,16 @@ const DesktopFinder = ({
 
 		const paddingTopLeft = [50, 100];
 		const paddingBottomRight = [50, 100];
+
+		if ( ! map ) {
+			return;
+		}
+
 		fitBoundsTimeout = setTimeout(
 			() => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight}),
 			100);
 
-	}, [locations, userGeo])
+	}, [locations, map, userGeo])
 	
 	return (
 		<div className="cploc-container cploc-container--desktop">
@@ -121,8 +149,8 @@ const DesktopFinder = ({
 						</div>
 					</div>
 					<div className="cploc-map--map">
-	
-						<MapContainer whenCreated={setMap} scrollWheelZoom={false} zoomControl={false}>
+
+						<MapContainer ref={setMap} scrollWheelZoom={false} zoomControl={false}>
 							
 							<TileLayer
 								attribution='Map Data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery &copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a>'
@@ -133,47 +161,48 @@ const DesktopFinder = ({
 								<SearchInput onValueChange={onSearch} className="cploc-map--search"/>
 								<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation/></button>
 							</div>
-							
-							{userGeo !== false && (
-								<Marker icon={iconUser} position={userGeo.center} />
-							)}
-							
-							{locations.map((location, index) => (
-								Object.keys(location.geodata).length > 0 && (
-									<Marker
-										ref={(el) => (markerRef.current[index] = el)}
-										key={index}
-										position={location.geodata.center}
-										icon={(activeLocation == index) ? iconLocationCurrent : iconLocation }
-										eventHandlers={{
-											mouseover: (e) => {
-												focusLocation(index);
-											},
-											mouseout: (e) => {
-												unsetActiveLocation();
-											},
-											click: (e) => {
-												onClick(index);
-											}
-										}}
-									>
-										{activeLocation == index && (
-											<Tooltip
-												direction="bottom"
-												interactive={true}
-												onClick={() => onClick(index)}
-												onMouseOut={() => unsetActiveLocation()}
-												permanent>{location.title}</Tooltip>
-										) }
 
-									</Marker>
-								)
-							))}
-							
+							<MarkerClusterGroup>
+								{userGeo !== false && (
+									<Marker icon={iconUser} position={userGeo.center} />
+								)}
+
+								{locations.map((location, index) => (
+									Object.keys(location.geodata).length > 0 && (
+										<Marker
+											ref={(el) => (markerRef.current[index] = el)}
+											key={index}
+											position={location.geodata.center}
+											icon={(activeLocation == index) ? iconLocationCurrent : iconLocation }
+											eventHandlers={{
+												mouseover: (e) => {
+													focusLocation(index);
+												},
+												mouseout: (e) => {
+													unsetActiveLocation();
+												},
+												click: (e) => {
+													onClick(index);
+												}
+											}}
+										>
+											{activeLocation == index && (
+												<Tooltip
+													direction="bottom"
+													interactive={true}
+													onClick={() => onClick(index)}
+													onMouseOut={() => unsetActiveLocation()}
+													permanent>{location.title}</Tooltip>
+											) }
+
+										</Marker>
+									)
+								))}
+							</MarkerClusterGroup>
 							<ZoomControl position="bottomleft"  />
 
 						</MapContainer>
-	
+
 					</div>
 
 				</div>

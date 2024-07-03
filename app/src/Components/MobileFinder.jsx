@@ -3,6 +3,7 @@ import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import SearchInput from '../Elements/SearchInput';
 import { CupertinoPane } from 'cupertino-pane';
 import { MyLocation } from '@mui/icons-material';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 
 const MobileFinder = ({
 	userGeo,
@@ -114,7 +115,7 @@ const MobileFinder = ({
 		}
 
 		if (!locations.length) {
-			return null;
+			return;
 		}
 
 		const features = [...locations.filter(location => Object.keys(location.geodata).length > 0)];
@@ -142,30 +143,32 @@ const MobileFinder = ({
 							<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation /></button>
 						</div>
 	
-						<MapContainer whenCreated={setMap} scrollWheelZoom={false} zoomControl={false} gestureHandling={true}>
+						<MapContainer ref={setMap} scrollWheelZoom={false} zoomControl={false} gestureHandling={true}>
 							<TileLayer
 								attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 								url="https://api.mapbox.com/styles/v1/mapbox-map-design/ckshxkppe0gge18nz20i0nrwq/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoidGFubmVybW91c2hleSIsImEiOiJjbDFlaWEwZ2IwaHpjM2NsZjh4Z2s3MHk2In0.QGwQkxVGACSg4yQnFhmjuw"
 							/>
 							
 							<ChangeView locations={locations} userGeo={userGeo} />
-	
-							{userGeo && (
-								<Marker icon={iconUser} position={userGeo.center} />
-							)}
-							
-							{locations.map((location, index) => (
-								Object.keys(location.geodata).length > 0 && (
-									<Marker key={index}
-									        position={location.geodata.center}
-									        icon={('location' === mode && currentLocation == location) ? iconLocationCurrent : iconLocation }
-									        eventHandlers={{
-										        click: (e) => {
-											        selectLocation( index );
-										        },
-									        }}/>
-								)
-							))}
+
+							<MarkerClusterGroup>
+								{userGeo && (
+									<Marker icon={iconUser} position={userGeo.center} />
+								)}
+
+								{locations.map((location, index) => (
+									Object.keys(location.geodata).length > 0 && (
+										<Marker key={index}
+										        position={location.geodata.center}
+										        icon={('location' === mode && currentLocation == location) ? iconLocationCurrent : iconLocation }
+										        eventHandlers={{
+											        click: (e) => {
+												        selectLocation( index );
+											        },
+										        }}/>
+									)
+								))}
+							</MarkerClusterGroup>
 						</MapContainer>
 	
 						<div id="cploc-map-pane" className="cploc-map--locations-mobile" >

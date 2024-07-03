@@ -50,6 +50,16 @@ html.is-ios-safari body {
 
 	}
 
+	.marker-cluster {
+		background: rgba( 0, 0, 0, .4 );
+
+		> div {
+			background: rgba( 0, 0, 0, .6 );
+			color: white;
+			font-weight: bold;
+		}
+	}
+
 	// disable leaflet gesture
 	.leaflet-gesture-handling-touch-warning:after {
 		content: none;
