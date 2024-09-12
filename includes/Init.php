@@ -26,6 +26,11 @@ class Init {
 	public $api;
 
 	/**
+	 * @var Modules\Init
+	 */
+	public $modules;
+
+	/**
 	 * @var
 	 */
 	public $geoAPI;
@@ -172,6 +177,7 @@ class Init {
 		Admin\Init::get_instance();
 		$this->setup = Setup\Init::get_instance();
 		$this->geoAPI = new GeoLocation\MapBox\MapBox();
+		$this->modules = Modules\Init::get_instance();
 		API\Init::get_instance();
 	}
 
