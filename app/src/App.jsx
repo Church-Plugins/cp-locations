@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
 import Controllers_WP_REST_Request from './Controllers/WP_REST_Request';
 import debounce from '@mui/utils/debounce';
@@ -93,9 +93,8 @@ const App = () => {
 		} );
 	}
 	
-	const handleSearchInputChange = debounce((value) => {
-		
-		if ( 5 !== value.length ) {
+	const handleZipCodeSearch = useMemo(() => debounce((value) => {
+		if ( 5 !== value.length || isNaN(value) ) {
 			setUserGeo( false );
 			return;
 		}
@@ -108,14 +107,29 @@ const App = () => {
 					const data = await restRequest.get({endpoint: 'locations/postcode/' + value});
 					setUserGeo( data );
 				} catch (error) {
-					setError(error);
+					setError(error.message || error);
 				} finally {
 					setLoading(false);
 				}
 			}
 		)();
 		
-	}, 100);
+	}, 100), []);
+
+	const handleSearchInputChange = (data) => {
+		if(!data?.features?.length) {
+			return;
+		}
+
+		const feature = data.features[0]
+
+		setUserGeo({
+			attr: {
+				postcode: feature.properties.postcode
+			},
+			center: feature.geometry.coordinates.reverse()
+		})
+	}
 	
 	useEffect(() => {
 		(
@@ -127,7 +141,7 @@ const App = () => {
 					setLocations(JSON.parse(JSON.stringify(data.locations)));
 					setInitLocations( JSON.parse(JSON.stringify(data.locations)) );
 				} catch (error) {
-					setError(error);
+					setError(error.message || error);
 				} finally {
 					setLoading(false);
 				}
@@ -174,11 +188,13 @@ const App = () => {
 		setLocations(data);
 	}, [userGeo])
 	
-	
+	useEffect(() => {
+		if (error) {
+			Toast.error(error);
+		}
+	}, [error])
 
-	return error ? (
-			<pre>{JSON.stringify(error, null, 2)}</pre>
-	) : ( 
+	return (
 		<div className="cploc">
 			
 			{ loading && (
