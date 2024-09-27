@@ -168,6 +168,24 @@ class Location extends PostType {
 			'show_in_rest' => true,
 		] );
 
+		if ( \CP_Locations\Admin\Settings::get_location( 'location_types_enabled', false ) ) {
+			$options = array();
+
+			$types = \CP_Locations\Admin\Settings::get_location( 'location_types', [] );
+
+			foreach ( $types as $type ) {
+				$options[ $type['key'] ] = $type['name'];
+			}
+
+			$cmb->add_field( [
+				'name'    => __( 'Location Type', 'cp-locations' ),
+				'desc'    => __( 'Specify the location type (differentiated by map pin color.)', 'cp-locations' ),
+				'id'      => 'location_type',
+				'type'    => 'select',
+				'options' => $options,
+			] );
+		}
+
 		$cmb->add_field( [
 			'name' => __( 'Subtitle', 'cp-locations' ),
 			'desc' => __( 'The text to show under the location name on dropdowns and maps.', 'cp-locations' ),

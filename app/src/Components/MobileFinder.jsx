@@ -10,9 +10,10 @@ const MobileFinder = ({
 	getMyLocation,
 	locations,
 	ChangeView,
-	iconLocation,
 	iconUser,
-	iconLocationCurrent
+	getIconLocation,
+	getIconLocationCurrent,
+	initialSearchValue = '',
 }) => {
 	const [mode, setMode] = useState( 'map' );
 	const [listPane, setListPane] = useState({} );
@@ -138,7 +139,7 @@ const MobileFinder = ({
 					
 					<div className="cploc-map--map">
 						<div className="cploc-map--controls">
-							<SearchInput onValueChange={onSearch} className="cploc-map--search" />
+							<SearchInput initialValue={initialSearchValue} onValueChange={onSearch} className="cploc-map--search" />
 							<button className="cploc-map--my-location" onClick={getMyLocation}><MyLocation /></button>
 						</div>
 	
@@ -157,7 +158,7 @@ const MobileFinder = ({
 							{locations.map((location, index) => (
 								<Marker key={index} 
 								        position={location.geodata.center}
-								        icon={('location' === mode && currentLocation == location) ? iconLocationCurrent : iconLocation }
+								        icon={('location' === mode && currentLocation == location) ? getIconLocationCurrent( location.color ) : getIconLocation( location.color ) }
 								        eventHandlers={{
 									        click: (e) => {
 										        selectLocation( index );
