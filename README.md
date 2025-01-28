@@ -21,6 +21,9 @@ npm run build
 
 ### Change Log
 
+#### 1.0.10.2
+* Add support for locations with the same address
+
 #### 1.0.10
 * Update assets
 

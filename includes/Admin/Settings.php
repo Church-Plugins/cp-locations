@@ -191,14 +191,14 @@ class Settings {
 		) );
 
 		$options->add_field( array(
-			'name' => __( '[cp-locations-data]', 'cp-library' ),
-			'desc' => __( "Use the [cp-locations-data] shortcode to display information about a location.
+			'name' => __( '[cp-location-data]', 'cp-library' ),
+			'desc' => __( "Use the [cp-location-data] shortcode to display information about a location.
 <br /><br />Args:<br />
 * location (the ID of the location to show data for) <br />
 * field (the data to retrieve, available options are 'title', 'service_times', 'subtitle', 'address', 'email', 'phone', 'pastor') <br /><br />
 Example: [cp-locations location=23 field='service_times']
 ", 'cp-library' ),
-			'id'   => 'cp-locations-data-shortcode',
+			'id'   => 'cp-location-data-shortcode',
 			'type' => 'title',
 		) );
 	}

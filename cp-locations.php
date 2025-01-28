@@ -12,7 +12,7 @@
 
 if( !defined( 'CP_LOCATIONS_PLUGIN_VERSION' ) ) {
 	 define ( 'CP_LOCATIONS_PLUGIN_VERSION',
-	 	'1.0.10.1'
+	 	'1.0.10.2'
 	);
 }
 
