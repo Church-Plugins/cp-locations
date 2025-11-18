@@ -169,6 +169,10 @@ class Multisite {
 
 			$locations = apply_filters( 'cploc_sync_content_locations', get_the_terms( $post_id, cp_locations()->setup->taxonomies->location->taxonomy ), $post_id, $sites );
 
+			if ( ! $locations ) {
+				$locations = [];
+			}
+
 			foreach( $locations as $location ) {
 				$location_id = absint( str_replace( 'location_', '', $location->slug ) );
 				if ( $blog_id = array_search( $location_id, $sites ) ) {
