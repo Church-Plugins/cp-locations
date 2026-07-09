@@ -185,6 +185,13 @@ class Location extends PostType {
 		], 5 );
 
 		$cmb->add_field( [
+			'name' => __( 'Pastor Link', 'cp-locations' ),
+			'desc' => __( 'Add a profile page link for this pastor.', 'cp-locations' ),
+			'id'   => 'pastor_link',
+			'type' => 'text_url',
+		], 5 );
+
+		$cmb->add_field( [
 			'name' => __( 'Address', 'cp-locations' ),
 			'desc' => __( 'The address of this location.', 'cp-locations' ),
 			'id'   => 'address',
