@@ -273,26 +273,47 @@ class TheEventsCalendar {
 	 * @author Tanner Moushey
 	 */
 	public function event_api_request_location( $request_uri ) {
-		if ( ! strstr( $request_uri, 'wp-json/tribe' ) || empty( $_POST['url'] ) ) {
+		if ( ! strstr( $request_uri, 'wp-json/tribe' ) ) {
 			return $request_uri;
 		}
-		
-		$url = $_POST['url'];
+
+		// Recent TEC versions (6.11.1+) shorten the Views V2 params (url => u, prev_url => pu)
+		// and send them as GET query args; older versions POST the long names. TEC restores the
+		// short names server-side in Rest_Endpoint::unshrink_url_components(), which runs after
+		// do_parse_request, so here we normalize whichever variant is present and rewrite it in
+		// place on the same superglobal TEC will read.
+		if ( isset( $_GET['url'] ) || isset( $_GET['u'] ) ) {
+			$params = &$_GET;
+		} elseif ( isset( $_POST['url'] ) || isset( $_POST['u'] ) ) {
+			$params = &$_POST;
+		} else {
+			return $request_uri;
+		}
+
+		$url_key      = isset( $params['url'] ) ? 'url' : 'u';
+		$prev_url_key = isset( $params['prev_url'] ) ? 'prev_url' : ( isset( $params['pu'] ) ? 'pu' : false );
+
+		if ( empty( $params[ $url_key ] ) ) {
+			return $request_uri;
+		}
+
+		$url = $params[ $url_key ];
 
 		$locations_regex = cp_locations()->setup->taxonomies->location->locations_regex();
 		$slug            = trim( cp_locations()->setup->post_types->locations->get_slug(), '/' );
 
-		// don't rewrite for urls with location already set
+		// don't rewrite for urls without a location set
 		if ( ! preg_match( "/$slug\/($locations_regex)/", $url, $matches ) ) {
 			return $url;
-		}		
-		
-		$_POST['url'] = str_replace( $matches[0], '', $url );
-		
-		if ( isset( $_POST['prev_url'] ) ) {
-			$_POST['prev_url'] = str_replace( $matches[0], '', $_POST['prev_url'] );
 		}
-		
+
+		// strip the location prefix from the param TEC will actually read.
+		$params[ $url_key ] = str_replace( $matches[0], '', $url );
+
+		if ( $prev_url_key && isset( $params[ $prev_url_key ] ) ) {
+			$params[ $prev_url_key ] = str_replace( $matches[0], '', $params[ $prev_url_key ] );
+		}
+
 		return str_replace( home_url( '/' ), '', $url );
 	}
 

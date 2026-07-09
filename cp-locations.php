@@ -3,7 +3,8 @@
  * Plugin Name: CP Locations
  * Plugin URL: https://churchplugins.com
  * Description: Church locations plugin for managing campuses
- * Version: 1.0.10.2
+
+ * Version: 1.0.11
  * Author: Church Plugins
  * Author URI: https://churchplugins.com
  * Text Domain: cp-locations
@@ -12,7 +13,7 @@
 
 if( !defined( 'CP_LOCATIONS_PLUGIN_VERSION' ) ) {
 	 define ( 'CP_LOCATIONS_PLUGIN_VERSION',
-	 	'1.0.10.2'
+	 	'1.0.11'
 	);
 }
 
