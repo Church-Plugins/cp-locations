@@ -21,6 +21,14 @@ npm run build
 
 ### Change Log
 
+#### 1.0.11
+* Fix single event redirect loop when a non-public post (e.g. The Events Calendar `tribe-ignored` events, drafts) shares a slug with a published post in the same location
+* Add Pastor Link field to display a linked pastor profile on locations
+* Support The Events Calendar 6.11.1+ shortened Views V2 URL params
+* Merge location taxonomy query with existing tax queries instead of overwriting them
+* Re-enable Leaflet map script
+* Correct `[cp-locations-data]` shortcode name in settings help text
+
 #### 1.0.10.2
 * Add support for locations with the same address
 

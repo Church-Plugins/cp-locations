@@ -556,9 +556,36 @@ class Location extends Taxonomy  {
 		// add location if we only have location post_types
 		$add_location = empty( array_diff( (array) $query->query_vars['post_type'], $this->get_object_types() ) );
 
-		if ( apply_filters( 'cploc_add_location_to_query', $add_location, $query ) ) {
-			$query->set( $this->taxonomy, [ self::$_rewrite_location['term'], 'global' ] );
+		if ( ! apply_filters( 'cploc_add_location_to_query', $add_location, $query ) ) {
+			return;
 		}
+
+		// Add location tax query for the current location and global terms
+		$tax_query = $query->get( 'tax_query' );
+		if ( ! is_array( $tax_query ) ) {
+			$tax_query = [];
+		}
+
+		$location_query = [
+			'taxonomy' => $this->taxonomy,
+			'field'    => 'slug',
+			'terms'    => [ self::$_rewrite_location['term'], 'global' ],
+			'operator' => 'IN',
+		];
+
+		$location_query = apply_filters( 'cploc_location_tax_query', $location_query, $query );
+
+		if ( ! empty( $tax_query ) ) {
+			$tax_query = [
+				'relation' => 'AND',
+				$location_query,
+				$tax_query,
+			];
+		} else {
+			$tax_query = $location_query;
+		}
+
+		$query->set( 'tax_query', $tax_query );
 	}
 
 	/**
@@ -757,6 +784,30 @@ class Location extends Taxonomy  {
 			";
 
 			$posts = $wpdb->get_results( $sql, OBJECT_K );
+
+			// Since we allow multiple posts to share a slug, this SQL can return siblings
+			// that are not real front-end URL owners — e.g. TEC 'tribe-ignored' events,
+			// drafts, or trashed posts. Those must not win location resolution over a
+			// published post (doing so resolves the request to a non-viewable post and
+			// produces a 404 / canonical redirect loop). Keep only candidates that are
+			// publicly viewable, or that the current user is allowed to read (so logged-in
+			// preview of private/scheduled content still resolves). If nothing qualifies,
+			// fall back to the original set so behaviour is unchanged for queries that only
+			// ever matched non-public posts.
+			if ( ! empty( $posts ) ) {
+				$viewable = array_filter( $posts, function ( $post ) {
+					return is_post_publicly_viewable( $post->ID ) || current_user_can( 'read_post', $post->ID );
+				} );
+
+				if ( ! empty( $viewable ) ) {
+					// Consider publicly viewable candidates first so they take precedence
+					// over readable-but-non-public siblings when more than one matches.
+					uasort( $viewable, function ( $a, $b ) {
+						return ( is_post_publicly_viewable( $b->ID ) ? 1 : 0 ) - ( is_post_publicly_viewable( $a->ID ) ? 1 : 0 );
+					} );
+					$posts = $viewable;
+				}
+			}
 
 			if ( ! empty( $posts ) ) {
 				foreach ( $posts as $post ) {

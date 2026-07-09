@@ -19,7 +19,13 @@ $data = $location->get_api_data( false );
 	<a class="cploc-map-popup--thumb" href="<?php echo get_the_permalink( $location->post->ID ); ?>" style="background-image: url('<?php echo get_the_post_thumbnail_url( $location->post->ID, 'large' ); ?>')"><?php echo get_the_post_thumbnail( $location->post->ID, 'large' ); ?></a>
 	<h4 class="cploc-map-popup--title"><a href="<?php echo get_the_permalink( $location->post->ID ); ?>"><?php echo $data['title']; ?></a></h4>
 	<div class="cploc-map-popup--info">
-		<div class="cploc-map-popup--speaker"><?php echo Helpers::get_icon( 'speaker' ); ?> <?php echo $data['pastor']; ?></div>
+		<div class="cploc-map-popup--speaker"><?php echo Helpers::get_icon( 'speaker' ); ?>
+		<?php if ( !empty( $data['pastor_link'] ) ) : ?>
+				<a href="<?php echo esc_url( $data['pastor_link'] ); ?>"><?php echo $data['pastor']; ?></a>
+			<?php else : ?>
+				<?php echo $data['pastor']; ?>
+			<?php endif; ?>
+		</div>
 		<div class="cploc-map-popup--address"><?php echo Helpers::get_icon( 'location' ); ?> <?php echo $data['address']; ?></div>
 		<div class="cploc-map-popup--times"><?php echo Helpers::get_icon( 'date' ); ?> <?php echo $data['times']; ?></div>
 	</div>
