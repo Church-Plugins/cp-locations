@@ -20,7 +20,7 @@ $data = $location->get_api_data( false );
 	<h4 class="cploc-map-popup--title"><a href="<?php echo get_the_permalink( $location->post->ID ); ?>"><?php echo $data['title']; ?></a></h4>
 	<div class="cploc-map-popup--info">
 		<div class="cploc-map-popup--speaker"><?php echo Helpers::get_icon( 'speaker' ); ?>
-		<?php if ( !empty( $data['pastor_link'] ) ) : ?>
+			<?php if ( !empty( $data['pastor_link'] ) ) : ?>
 				<a href="<?php echo esc_url( $data['pastor_link'] ); ?>"><?php echo $data['pastor']; ?></a>
 			<?php else : ?>
 				<?php echo $data['pastor']; ?>

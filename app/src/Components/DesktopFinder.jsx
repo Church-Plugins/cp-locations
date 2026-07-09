@@ -1,6 +1,7 @@
-import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useRef, useState, useEffect } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import SearchInput from '../Elements/SearchInput';
 import { MyLocation } from '@mui/icons-material';
 
@@ -93,7 +94,11 @@ const DesktopFinder = ({
 		}
 
 		fitBoundsTimeout = setTimeout(
-			() => map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight}),
+			() => {
+				if (map) {
+					map.fitBounds(features.map((feature) => feature.geodata.center), {paddingTopLeft, paddingBottomRight});
+				}
+			},
 			100);
 
 	}, [locations, map, userGeo])

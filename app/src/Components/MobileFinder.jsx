@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
+import L from 'leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import SearchInput from '../Elements/SearchInput';
 import { CupertinoPane } from 'cupertino-pane';
 import { MyLocation } from '@mui/icons-material';
-import MarkerClusterGroup from 'react-leaflet-cluster';
 
 const MobileFinder = ({
 	userGeo,
