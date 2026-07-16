@@ -441,7 +441,7 @@ class Location extends Taxonomy  {
 	/**
 	 * return rewrite location
 	 *
-	 * @return bool
+	 * @return array | bool
 	 * @since  1.0.0
 	 *
 	 * @author Tanner Moushey
