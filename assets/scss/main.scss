@@ -264,6 +264,9 @@ body .cupertino-pane-wrapper {
 		position: absolute;
 		left: var(--cpl-map-control-gap);
 		top: var(--cpl-map-control-gap);
+		display: flex;
+		align-items: center;
+		width: calc(100% - var(--cpl-map-control-gap) * 2);
 	}
 
 	&--my-location {

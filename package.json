@@ -9,12 +9,13 @@
     "archive": "wpackio-scripts pack"
   },
   "devDependencies": {
-    "@wpackio/scripts": "^6.4.0",
     "sass": "^1.42.1"
   },
   "dependencies": {
+    "@wpackio/scripts": "^6.4.0",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
+    "@mapbox/search-js-core": "^1.0.0-beta.18",
     "@mui/icons-material": "^5.0.3",
     "@mui/material": "^5.0.0",
     "@mui/styled-engine-sc": "^5.0.0",
