@@ -32,7 +32,7 @@ For issues not covered in the documentation, contact support through the ChurchP
    - Steps to reproduce the issue
    - Any error messages or screenshots
 
-Premium license holders receive priority support.
+Support is for license holders.
 
 ## Community Resources
 
