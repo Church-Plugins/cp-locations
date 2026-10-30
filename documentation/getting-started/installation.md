@@ -13,8 +13,6 @@ This guide walks you through installing and activating CP Locations on your Word
 
 ## Requirements
 
-- WordPress 5.3 or higher
-- PHP 5.3 or higher
 - A MapBox account (free tier available) for map tiles and geocoding
 
 ## Installing the Plugin
